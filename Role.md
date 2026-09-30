@@ -28,4 +28,7 @@ idempotency:
   last_executor_report_at: 2026-10-01T02:22:27+08:00
   last_executor_report_guide: docs/15-v0-generated-filter-goal-mode-execution-guide.md
   last_check_status: pass
+  last_check_phase: V0 Phase 1 generated Filter and three internal effects
+  last_check_report: docs/28-phase1-planner-acceptance.md
+  last_checked_commit: 65b4dab3594579129ae162962ecd2482c2357ea9
   last_repair_request: 2026-09-30T12:03:51.3934886+08:00

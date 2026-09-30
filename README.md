@@ -4,7 +4,7 @@
 
 FXWeave 是一个面向游戏效果的网页低代码节点创作工具。平台中的 Shader 都由这套节点工具生成。**第一步先做项目方自用版**，用它实际制作和迭代自己的效果；随后推出面向用户的网页第一版，让用户搭建节点图并生成所见即所得的 Shader 和效果；第二版在代码生成/编译层扩展到不同平台，并按需要适配各自的渲染管线。作品社区与分享是后续围绕同一节点源图发展的产品层。
 
-**状态：Phase 0 已通过独立验收；Phase 1 的 20 轮开发已提交，正在等待规划会话独立验收。** 桌面 Chrome 中已有 PixiJS **8.21.0 WebGL2** Sprite/Container Filter 节点图、生成 GLSL、同源实时预览与可搬迁工程。首批 **03 径向燃烧、05 局部溶融、09 局部全息扫描** 均由编辑器从空图创作；示例入口可派生独立副本。Phase 1 的开发通过不等于 V0 自用版最终验收。第二版目标平台和商业模式仍待确定。
+**状态：Phase 0 与 Phase 1 均已通过独立技术验收。** 桌面 Chrome 中已有 PixiJS **8.21.0 WebGL2** Sprite/Container Filter 节点图、生成 GLSL、同源实时预览与可搬迁工程。首批 **03 径向燃烧、05 局部溶融、09 局部全息扫描** 均由编辑器从空图创作；示例入口可派生独立副本。[Phase 1 独立验收](./docs/28-phase1-planner-acceptance.md)记录通过范围；实际项目素材和真实跨日编辑仍待自用验证。第二版目标平台和商业模式仍待确定。
 
 ## 运行与验证
 
@@ -46,7 +46,8 @@ Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phas
 13. [V0 2D 游戏效果候选](./docs/13-v0-2d-effect-candidates.md)：已定首批作品及其余候选的用途、节点能力和边界。
 14. [UnregisteredScene Shader 使用核查](./docs/14-unregisteredscene-shader-usage-review.md)：根据实际运行时资产和代码接线调整首批推荐。
 15. [V0 Phase 1 执行指南](./docs/15-v0-generated-filter-goal-mode-execution-guide.md)：节点生成 Filter、同源预览和三件作品，**20 轮**开发及验收门槛。
-16. [V0 Phase 1 开发报告](./docs/27-phase1-validation-report.md)：20 轮提交、三件作品、WebGL2 验证与待独立验收项。
+16. [V0 Phase 1 开发报告](./docs/27-phase1-validation-report.md)：20 轮提交、三件作品、WebGL2 验证与实际自用待验证项。
+17. [V0 Phase 1 独立验收](./docs/28-phase1-planner-acceptance.md)：技术交付 PASS、独立复验和真实自用门槛。
 
 此前讨论形成的完整研究文档存放在 [研究历史目录](./docs/research-history/INDEX.md)；它们保留原貌供追溯，以上主文档是当前项目口径。
 
@@ -70,4 +71,4 @@ Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phas
 
 本目录是后续会话的项目工作区。继续推进时先阅读主文档，并把新决策更新到这里。
 
-**V0 Phase 0** 已通过架构验收。**Phase 1** 已按[执行指南](./docs/15-v0-generated-filter-goal-mode-execution-guide.md)完成 20 轮开发并提交，下一门槛是 `Role.md` 中规划验收会话用 `$checkandgoal` 独立检查[开发报告](./docs/27-phase1-validation-report.md)。在其给出结论前，不把 Phase 1 开发结果称为 V0 自用版最终通过。
+**V0 Phase 0 与 Phase 1** 均通过独立技术验收。下一步用实际素材制作和修改效果，保存工程并跨日重开，记录自用卡点；规划会话依据这些反馈确定下一阶段范围。现有合成示例和自动测试不构成真实自用的最终认证。

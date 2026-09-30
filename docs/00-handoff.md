@@ -1,6 +1,6 @@
 # 新会话接续说明
 
-更新：2026-10-01。Phase 1 开发交付待规划会话独立验收。
+更新：2026-10-01。Phase 1 [独立技术验收](./28-phase1-planner-acceptance.md)已 PASS；下一步是实际项目素材与真实跨日自用反馈。
 
 ## 背景
 
@@ -34,12 +34,12 @@
 
 - 没有真实用户访谈、付费测试或可量化的市场需求结论。
 - 没有完成竞品的同任务上手对比，也没有运行时视觉回归数据。
-- Phase 1 已交付三件 **合成测试素材上的**可编辑作品及真实 Chrome/WebGL2 预览；尚未由规划会话独立验收，也未使用项目方的授权实素材完成接入复验。自用版规格中的“隔天继续编辑”尚未进行真实跨日验证。第二版的首批平台/渲染管线尚未选定。
+- Phase 1 已交付三件 **合成测试素材上的**可编辑作品及真实 Chrome/WebGL2 预览，并通过独立技术验收；尚未使用项目方的授权实素材完成接入复验。自用版规格中的“隔天继续编辑”尚未进行真实跨日验证。第二版的首批平台/渲染管线尚未选定。
 - 尚无公开站点、域名或商标审查。当前 WebGL2 Filter 后端与 PixiJS 8.21.0 锁定，WebGPU、Unity 导出及其他渲染管线不在 Phase 1 范围。
 
 ## 新会话推荐起点
 
-当前分工：Phase 0 的[开发报告](./11-phase0-validation-report.md)与[独立验收](./12-phase0-planner-acceptance.md)已完成，结论 **PASS**。Phase 1 开发会话也已按[20 轮执行指南](./15-v0-generated-filter-goal-mode-execution-guide.md)提交节点生成 Filter、同源预览和 03/05/09 三件作品；[Phase 1 开发报告](./27-phase1-validation-report.md)列出提交、源码、画面、测试与边界。规划验收会话现在应使用 `$checkandgoal` 独立复验，验收前不要宣布 V0 自用版完成或派发下一阶段。会话路由见根目录 `Role.md`。
+当前分工：Phase 0 的[开发报告](./11-phase0-validation-report.md)与[独立验收](./12-phase0-planner-acceptance.md)已完成，结论 **PASS**。Phase 1 也已按[20 轮执行指南](./15-v0-generated-filter-goal-mode-execution-guide.md)交付节点生成 Filter、同源预览和 03/05/09 三件作品，并通过[独立技术验收](./28-phase1-planner-acceptance.md)。[开发报告](./27-phase1-validation-report.md)保留原始交付记录。下一步由项目方完成实际素材与跨日编辑自用反馈，规划会话再确定后续范围。会话路由见根目录 `Role.md`。
 
 1. 阅读 [定位](./01-vision-positioning.md)、[产品设计](./02-product-design.md)、[技术草案](./03-technical-design.md)、[阶段草案](./04-roadmap-validation.md)、[可执行路线图建议稿](./06-roadmap-proposal.md) 和 [自用版功能与交互设计](./07-self-use-product-spec.md)。
 2. 复验 [03](./22-work03-radial-burn.md)、[05](./23-work05-local-melt.md)、[09](./24-work09-hologram-scan.md) 的真实 WebGL2 构建身份、图变化、固定画面、另存与重开。运行 `npm run smoke`，并在 `npm run build` 后运行 `npm run smoke:preview`。
