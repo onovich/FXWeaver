@@ -125,6 +125,7 @@ export function generateFilter(ir: FilterIR): GeneratedFilter {
   const textureById = new Map(textureBindings.map((binding, index) => [binding.assetId, { ...binding, index }]));
   const usesTime = ir.nodes.some((node) => node.type === 'filter.time');
   const lines: string[] = [
+    '#version 300 es',
     'precision highp float;',
     'in vec2 vTextureCoord;',
     'out vec4 finalColor;',

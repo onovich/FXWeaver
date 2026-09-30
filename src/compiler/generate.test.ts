@@ -27,6 +27,7 @@ describe('deterministic Pixi Filter generator', () => {
     let document: EditorDocument = apply(base, { type: 'add-node', nodeId: 'source', nodeType: 'filter.source', position: { x: 2, y: 3 } });
     document = apply(document, { type: 'connect', edgeId: 'edge', from: { nodeId: 'source', portId: 'rgba' }, to: { nodeId: 'root', portId: 'rgba' } });
     const first = build(document);
+    expect(first.fragmentSource.startsWith('#version 300 es\n')).toBe(true);
     expect(first.fragmentSource).toContain('texture(uTexture, vTextureCoord)');
     expect(first.fragmentSource).toContain('finalColor = ');
     expect(first.nodeSourceRanges.source.firstLine).toBeLessThan(first.nodeSourceRanges.root.firstLine);

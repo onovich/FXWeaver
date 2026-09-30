@@ -11,6 +11,7 @@
     "smoke": "playwright test",
     "smoke:webgl": "playwright test tests/webgl-spike.smoke.spec.ts",
     "spike:capture": "node scripts/capture-phase1-spike.mjs",
+    "runtime:capture": "node scripts/capture-phase1-generated.mjs",
     "demo:capture": "node scripts/capture-phase0-demo.mjs"
   },
   "dependencies": {

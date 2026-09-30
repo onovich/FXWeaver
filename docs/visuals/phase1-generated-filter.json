@@ -1,0 +1,62 @@
+{
+  "pixiVersion": "8.21.0",
+  "browser": "154.0.8037.57",
+  "result": {
+    "status": "ready",
+    "source": [
+      255,
+      0,
+      0,
+      128
+    ],
+    "parameterRed": [
+      255,
+      0,
+      0,
+      127
+    ],
+    "parameterGreen": [
+      0,
+      255,
+      0,
+      127
+    ],
+    "parameterAfterInvalid": [
+      0,
+      255,
+      0,
+      127
+    ],
+    "extraLinear": [
+      124,
+      0,
+      131,
+      255
+    ],
+    "extraNearest": [
+      0,
+      0,
+      255,
+      255
+    ],
+    "extraReplaced": [
+      0,
+      255,
+      0,
+      255
+    ],
+    "inputTextureUntouched": true,
+    "missingTexture": "MISSING_TEXTURE",
+    "invalidShader": {
+      "code": "FRAGMENT_COMPILE",
+      "message": "ERROR: 0:14: 'this' : Illegal use of reserved word",
+      "rawLog": "ERROR: 0:14: 'this' : Illegal use of reserved word\nERROR: 0:14: 'this' : syntax error\n",
+      "generatedLine": 11,
+      "nodeIds": [
+        "source"
+      ]
+    },
+    "destroyedUpdate": "rejected",
+    "buildId": "f1-0fac089779c4c6f2"
+  }
+}
