@@ -1,4 +1,5 @@
 import type { JsonValue, ValueType } from './schema';
+import { filterMathNodes, filterMathNodeTypes } from './filterMathNodes';
 
 export interface PortDefinition {
   id: string;
@@ -129,6 +130,7 @@ const nodeDefinitions: Record<string, NodeDefinition> = {
     inputs: [], outputs: [{ id: 'value', label: 'Value', type: 'vec2' }],
     properties: [{ id: 'value', label: 'Value', type: 'vec2', defaultValue: [0, 0] }],
   },
+  ...filterMathNodes,
 };
 
 const graphKinds: Record<string, GraphKindDefinition> = {
@@ -137,7 +139,7 @@ const graphKinds: Record<string, GraphKindDefinition> = {
     label: 'PixiJS 2D Filter',
     rootNodeType: 'filter.output',
     nodeTypes: ['filter.output', 'filter.source', 'filter.uv', 'filter.time', 'filter.float',
-      'filter.vec2', 'filter.vec3', 'filter.vec4', 'filter.color', 'filter.color-rgba'],
+      'filter.vec2', 'filter.vec3', 'filter.vec4', 'filter.color', 'filter.color-rgba', ...filterMathNodeTypes],
     isTestOnly: false,
   },
   [FOUNDATION_GRAPH_KIND]: {
