@@ -1,8 +1,13 @@
 import type { JsonValue, ValueType } from './schema';
 
+const MAX_GLSL_FLOAT = 3.402823466e38;
+function isGlslNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && Math.abs(value) <= MAX_GLSL_FLOAT;
+}
+
 export function isValueOfType(value: JsonValue, type: ValueType): boolean {
   switch (type) {
-    case 'float': return typeof value === 'number' && Number.isFinite(value);
+    case 'float': return isGlslNumber(value);
     case 'vec2': return isNumericTuple(value, 2);
     case 'vec3': return isNumericTuple(value, 3);
     case 'vec4': return isNumericTuple(value, 4);
@@ -12,5 +17,5 @@ export function isValueOfType(value: JsonValue, type: ValueType): boolean {
 }
 
 function isNumericTuple(value: JsonValue, length: number): boolean {
-  return Array.isArray(value) && value.length === length && value.every((item) => typeof item === 'number' && Number.isFinite(item));
+  return Array.isArray(value) && value.length === length && value.every(isGlslNumber);
 }

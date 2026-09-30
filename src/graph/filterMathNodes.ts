@@ -51,11 +51,11 @@ const definitions: NodeDefinition[] = [
   define('split-vec2', 'Split Vector 2', 'Channel', [['vector', 'vec2']], [['x', 'float'], ['y', 'float']], 'Reads individual coordinate components.'),
   define('compose-vec2', 'Compose Vector 2', 'Channel', [['x', 'float'], ['y', 'float']], [['value', 'vec2']], 'Combines two numbers into a coordinate pair.'),
   define('split-vec4', 'Split RGBA', 'Channel', [['rgba', 'vec4']], [['r', 'float'], ['g', 'float'], ['b', 'float'], ['a', 'float']], 'Reads individual RGBA components.'),
-  define('rgb-vec4', 'RGB from RGBA', 'Channel', [['rgba', 'vec4']], [['rgb', 'vec3']], 'Reads RGB while discarding alpha.'),
+  define('rgb-vec4', 'RGB from RGBA', 'Channel', [['rgba', 'vec4']], [['rgb', 'vec3']], 'Reads premultiplied RGB while discarding alpha.'),
   define('alpha-vec4', 'Alpha from RGBA', 'Channel', [['rgba', 'vec4']], [['alpha', 'float']], 'Reads alpha from RGBA.'),
   define('compose-vec3', 'Compose Vector 3', 'Channel', [['x', 'float'], ['y', 'float'], ['z', 'float']], [['value', 'vec3']], 'Combines three numbers.'),
   define('compose-vec4', 'Compose Vector 4', 'Channel', [['x', 'float'], ['y', 'float'], ['z', 'float'], ['w', 'float']], [['value', 'vec4']], 'Combines four numbers.'),
-  define('compose-rgba', 'Compose RGBA', 'Channel', [['rgb', 'vec3'], ['alpha', 'float']], [['rgba', 'vec4']], 'Combines RGB and alpha for Filter output.'),
+  define('compose-rgba', 'Compose RGBA', 'Channel', [['rgb', 'vec3'], ['alpha', 'float']], [['rgba', 'vec4']], 'Combines already premultiplied RGB and alpha for Filter output.'),
 ];
 
 export const filterMathNodeTypes = definitions.map((definition) => definition.type);

@@ -103,4 +103,10 @@ describe('Filter graph validation', () => {
       expect.objectContaining({ code: 'DUPLICATE_PARAMETER_BINDING', nodeId: 'value', portId: 'value' }),
     ]));
   });
+
+  it('rejects values beyond GLSL float range before code generation', () => {
+    const base = createProject('large', 'Large value', FILTER_GRAPH_KIND, 'root');
+    const added = applyCommand(base, { type: 'add-node', nodeId: 'value', nodeType: 'filter.vec4', position: { x: 0, y: 0 } });
+    expect(applyCommand(added.document, { type: 'set-property', nodeId: 'value', propertyId: 'value', value: [1e100, 0, 0, 1] }).ok).toBe(false);
+  });
 });

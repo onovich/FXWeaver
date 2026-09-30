@@ -44,7 +44,7 @@ export const FILTER_GRAPH_KIND = 'pixi.filter2d';
 const nodeDefinitions: Record<string, NodeDefinition> = {
   'filter.output': {
     type: 'filter.output', version: 1, label: 'Filter Output', category: 'Output',
-    description: 'Final RGBA for the host content. A source connection will be required before build.',
+    description: 'Final premultiplied RGBA for the host content. A source connection is required before build.',
     inputs: [{ id: 'rgba', label: 'RGBA', type: 'vec4', required: true }], outputs: [], properties: [],
   },
   'filter.source': {
@@ -82,7 +82,7 @@ const nodeDefinitions: Record<string, NodeDefinition> = {
   },
   'filter.vec4': {
     type: 'filter.vec4', version: 1, label: 'Vector 4', category: 'Value',
-    description: 'Editable four-component RGBA or vector value.',
+    description: 'Editable raw four-component value. For Filter output, RGB must be premultiplied by alpha.',
     inputs: [], outputs: [{ id: 'value', label: 'Value', type: 'vec4' }],
     properties: [{ id: 'value', label: 'Value', type: 'vec4', defaultValue: [0, 0, 0, 1] }],
   },
@@ -94,7 +94,7 @@ const nodeDefinitions: Record<string, NodeDefinition> = {
   },
   'filter.color-rgba': {
     type: 'filter.color-rgba', version: 1, label: 'Color to RGBA', category: 'Convert',
-    description: 'Explicitly converts a color value to four normalized RGBA components.',
+    description: 'Explicitly converts a straight hexadecimal color to normalized premultiplied RGBA.',
     inputs: [{ id: 'color', label: 'Color', type: 'color', required: true }],
     outputs: [{ id: 'rgba', label: 'RGBA', type: 'vec4' }], properties: [],
   },

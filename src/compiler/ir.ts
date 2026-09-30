@@ -33,12 +33,24 @@ export interface IrNode {
   properties: IrProperty[];
 }
 
+export interface IrParameter {
+  id: string;
+  name: string;
+  valueType: ValueType;
+  sourceNodeId: string;
+  sourceKey: string;
+  defaultValue: JsonValue;
+  min?: number;
+  max?: number;
+}
+
 export interface FilterIR {
   irVersion: typeof FILTER_IR_VERSION;
   graphSchemaVersion: number;
   graphKind: typeof FILTER_GRAPH_KIND;
   rootNodeId: string;
   nodes: IrNode[];
+  parameters: IrParameter[];
   dependencyAssetIds: string[];
 }
 
@@ -102,7 +114,9 @@ export function lowerFilterGraph(graph: GraphDocument): IrResult {
   });
   return { ok: true, ir: { irVersion: FILTER_IR_VERSION, graphSchemaVersion: graph.schemaVersion,
     graphKind: FILTER_GRAPH_KIND, rootNodeId: graph.nodes.find((node) => node.type === 'filter.output')!.id,
-    nodes, dependencyAssetIds: [...dependencies].sort(compare) } };
+    nodes, parameters: [...graph.parameters].sort((a, b) => compare(a.id, b.id)).map((parameter) => ({ ...parameter,
+      defaultValue: canonicalJsonValue(parameter.defaultValue) as JsonValue })),
+    dependencyAssetIds: [...dependencies].sort(compare) } };
 }
 
 export function canonicalIrJson(ir: FilterIR): string {

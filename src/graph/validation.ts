@@ -77,7 +77,7 @@ export function validateGraph(graph: GraphDocument): GraphIssue[] {
     seenParameterBindings.add(binding);
     const node = graph.nodes.find((item) => item.id === parameter.sourceNodeId);
     const property = node && getNodeDefinition(graph.graphKind, node.type)?.properties.find((item) => item.id === parameter.sourceKey);
-    if (!property || property.type !== parameter.valueType || !isValueOfType(parameter.defaultValue, parameter.valueType) ||
+    if (!property || property.type === 'texture' || property.type !== parameter.valueType || !isValueOfType(parameter.defaultValue, parameter.valueType) ||
       JSON.stringify(node?.values[parameter.sourceKey]) !== JSON.stringify(parameter.defaultValue)) {
       issues.push({ code: 'INVALID_PARAMETER', message: `Parameter ${parameter.name} is not bound to a compatible property.`, nodeId: parameter.sourceNodeId, portId: parameter.sourceKey });
     }
