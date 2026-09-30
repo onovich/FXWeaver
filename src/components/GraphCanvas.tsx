@@ -18,6 +18,7 @@ interface Props {
   onDisconnect: (edgeId: string) => void;
   onViewport: (viewport: { x: number; y: number; zoom: number }) => void;
   onSearch: () => void;
+  fitRequest: number;
 }
 
 function portPoint(document: EditorDocument, node: GraphNode, portId: string, direction: 'in' | 'out', previewPositions?: Record<string, { x: number; y: number }> | null) {
@@ -33,7 +34,7 @@ function wirePath(a: { x: number; y: number }, b: { x: number; y: number }) {
   return `M ${a.x} ${a.y} C ${a.x + bend} ${a.y}, ${b.x - bend} ${b.y}, ${b.x} ${b.y}`;
 }
 
-export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, onMove, onConnect, onDisconnect, onViewport, onSearch }: Props) {
+export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, onMove, onConnect, onDisconnect, onViewport, onSearch, fitRequest }: Props) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ pointerId: number; startX: number; startY: number; positions: Record<string, { x: number; y: number }> } | null>(null);
   const wireDragRef = useRef<{ pointerId: number; from: GraphPortRef; startX: number; startY: number } | null>(null);
@@ -48,6 +49,20 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!fitRequest || !canvas) return;
+    const nodes = [...canvas.querySelectorAll<HTMLElement>('.canvas-node')];
+    if (!nodes.length || canvas.clientWidth <= 64 || canvas.clientHeight <= 64) return;
+    const minX = Math.min(...nodes.map((node) => node.offsetLeft));
+    const minY = Math.min(...nodes.map((node) => node.offsetTop));
+    const maxX = Math.max(...nodes.map((node) => node.offsetLeft + node.offsetWidth));
+    const maxY = Math.max(...nodes.map((node) => node.offsetTop + node.offsetHeight));
+    const zoom = Math.min(1, (canvas.clientWidth - 64) / (maxX - minX), (canvas.clientHeight - 64) / (maxY - minY));
+    onViewportRef.current({ zoom, x: canvas.clientWidth / 2 - (minX + maxX) / 2 * zoom,
+      y: canvas.clientHeight / 2 - (minY + maxY) / 2 * zoom });
+  }, [fitRequest]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
     if (!canvas) return;
     function wheelZoom(event: WheelEvent) {
       event.preventDefault();
@@ -55,7 +70,7 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
       const viewport = viewportRef.current;
       const px = event.clientX - rect.left;
       const py = event.clientY - rect.top;
-      const zoom = Math.min(2, Math.max(.5, viewport.zoom * (event.deltaY < 0 ? 1.1 : .9)));
+      const zoom = Math.min(2, Math.max(.01, viewport.zoom * (event.deltaY < 0 ? 1.1 : .9)));
       const ratio = zoom / viewport.zoom;
       onViewportRef.current({ x: px - (px - viewport.x) * ratio, y: py - (py - viewport.y) * ratio, zoom });
     }

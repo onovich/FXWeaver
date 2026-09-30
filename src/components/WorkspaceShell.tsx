@@ -22,6 +22,8 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const [actionIssue, setActionIssue] = useState<GraphIssue | null>(null);
   const [search, setSearch] = useState('');
   const [problemsOpen, setProblemsOpen] = useState(false);
+  const [fitRequest, setFitRequest] = useState(0);
+  const [beforeFitViewport, setBeforeFitViewport] = useState<typeof project.layout.viewport | null>(null);
   const [fileHandle, setFileHandle] = useState<ProjectFileHandle | null>(initialHandle ?? null);
   const [lastSavedJson, setLastSavedJson] = useState<string | null>(initialSavedJson ?? null);
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
@@ -81,7 +83,12 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   }
 
   function changeZoom(factor: number) {
-    setViewport({ ...document.layout.viewport, zoom: Math.min(2, Math.max(.5, Math.round(document.layout.viewport.zoom * factor * 100) / 100)) });
+    setViewport({ ...document.layout.viewport, zoom: Math.min(2, Math.max(.01, document.layout.viewport.zoom * factor)) });
+  }
+
+  function fitAllNodes() {
+    setBeforeFitViewport(document.layout.viewport);
+    setFitRequest((value) => value + 1);
   }
 
   function focusIssue(issue: GraphIssue) {
@@ -173,8 +180,11 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
         } else void saveToFile();
         return;
       }
-      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || (target instanceof HTMLElement && target.isContentEditable)) return;
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || (target instanceof HTMLElement && target.isContentEditable)) return;
+      if (window.document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      if (event.key.toLowerCase() === 'f' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.preventDefault(); fitAllNodes();
+      } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
         event.preventDefault();
         setHistory((current) => event.shiftKey ? redo(current) : undo(current));
         setActionIssue(null);
@@ -240,9 +250,11 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
               <span aria-label="Canvas zoom">{Math.round(document.layout.viewport.zoom * 100)}%</span>
               <button type="button" onClick={() => changeZoom(1.25)} aria-label="Zoom in">+</button>
               <button type="button" onClick={() => setViewport({ x: 0, y: 0, zoom: 1 })}>Reset view</button>
+              <button type="button" onClick={fitAllNodes} aria-keyshortcuts="F" title="Fit all nodes (F)">Fit all nodes</button>
+              {beforeFitViewport && <button type="button" onClick={() => { setViewport(beforeFitViewport); setBeforeFitViewport(null); }}>Restore view</button>}
             </div>
           </div>
-          <GraphCanvas document={document} pendingFrom={pendingFrom} onPendingFrom={setPendingFrom} onSelect={setSelection} onMove={(positions) => { dispatch({ type: 'move-nodes', positions }); }} onConnect={connect} onDisconnect={(edgeId) => { dispatch({ type: 'disconnect', edgeId }); }} onViewport={setViewport} onSearch={() => searchRef.current?.focus()} />
+          <GraphCanvas document={document} pendingFrom={pendingFrom} onPendingFrom={setPendingFrom} onSelect={setSelection} onMove={(positions) => { dispatch({ type: 'move-nodes', positions }); }} onConnect={connect} onDisconnect={(edgeId) => { dispatch({ type: 'disconnect', edgeId }); }} onViewport={setViewport} onSearch={() => searchRef.current?.focus()} fitRequest={fitRequest} />
           {actionIssue && <div className="canvas-feedback" role="alert">Connection or edit rejected: {actionIssue.message}</div>}
         </section>
 
