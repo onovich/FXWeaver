@@ -98,6 +98,37 @@ const nodeDefinitions: Record<string, NodeDefinition> = {
     inputs: [{ id: 'color', label: 'Color', type: 'color', required: true }],
     outputs: [{ id: 'rgba', label: 'RGBA', type: 'vec4' }], properties: [],
   },
+  'filter.sample-source': {
+    type: 'filter.sample-source', version: 1, label: 'Sample Source', category: 'Sample',
+    description: 'Samples host Filter input at normalized frame UV. Outside 0–1 is transparent; the interior is clamped to uInputClamp.',
+    inputs: [{ id: 'uv', label: 'UV', type: 'vec2', required: true }],
+    outputs: [{ id: 'rgba', label: 'RGBA', type: 'vec4' }], properties: [],
+  },
+  'filter.sample-image': {
+    type: 'filter.sample-image', version: 1, label: 'Sample Image', category: 'Sample',
+    description: 'Samples an embedded dependency image at normalized UV. Outside 0–1 is transparent; filtering follows preview sampling.',
+    inputs: [{ id: 'uv', label: 'UV', type: 'vec2', required: true }],
+    outputs: [{ id: 'rgba', label: 'RGBA', type: 'vec4' }],
+    properties: [{ id: 'image', label: 'Dependency image ID', type: 'texture', defaultValue: 'unbound' }],
+  },
+  'filter.uv-transform': {
+    type: 'filter.uv-transform', version: 1, label: 'UV Transform', category: 'Coordinate',
+    description: 'Computes UV × scale + offset. The sampling node applies the out-of-bounds rule.',
+    inputs: [{ id: 'uv', label: 'UV', type: 'vec2', required: true },
+      { id: 'scale', label: 'Scale', type: 'vec2', required: true },
+      { id: 'offset', label: 'Offset', type: 'vec2', required: true }],
+    outputs: [{ id: 'transformed', label: 'Transformed UV', type: 'vec2' }], properties: [],
+  },
+  'filter.input-size': {
+    type: 'filter.input-size', version: 1, label: 'Filter Input Size', category: 'Input',
+    description: 'Width and height in pixels of the current Filter input frame.',
+    inputs: [], outputs: [{ id: 'pixels', label: 'Pixels', type: 'vec2' }], properties: [],
+  },
+  'filter.input-texel': {
+    type: 'filter.input-texel', version: 1, label: 'Filter Texel Size', category: 'Input',
+    description: 'Reciprocal width and height of the Filter input frame, for pixel-sized frame UV offsets.',
+    inputs: [], outputs: [{ id: 'uv', label: 'UV', type: 'vec2' }], properties: [],
+  },
   'foundation.output': {
     type: 'foundation.output', version: 1, label: 'Test Output', category: 'Output',
     description: 'Completes a test graph. It has no Shader meaning.',
@@ -139,7 +170,9 @@ const graphKinds: Record<string, GraphKindDefinition> = {
     label: 'PixiJS 2D Filter',
     rootNodeType: 'filter.output',
     nodeTypes: ['filter.output', 'filter.source', 'filter.uv', 'filter.time', 'filter.float',
-      'filter.vec2', 'filter.vec3', 'filter.vec4', 'filter.color', 'filter.color-rgba', ...filterMathNodeTypes],
+      'filter.vec2', 'filter.vec3', 'filter.vec4', 'filter.color', 'filter.color-rgba',
+      'filter.sample-source', 'filter.sample-image', 'filter.uv-transform', 'filter.input-size', 'filter.input-texel',
+      ...filterMathNodeTypes],
     isTestOnly: false,
   },
   [FOUNDATION_GRAPH_KIND]: {

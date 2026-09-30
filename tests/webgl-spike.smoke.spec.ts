@@ -17,6 +17,13 @@ test('PixiJS custom Filter compiles and draws in real WebGL2', async ({ page }) 
   expect(result?.withPadding?.[3]).toBeGreaterThan(110);
   expect(result?.uvRight?.[0]).toBeGreaterThan((result?.uvLeft?.[0] ?? 0) + 100);
   expect(result?.uvLeft?.[2]).toBeGreaterThan(0);
+  expect(result?.sourceInside).toEqual(result?.original);
+  expect(result?.sourceOutside?.[3]).toBe(0);
+  expect(result?.extraNearest?.[2]).toBeGreaterThan(240);
+  expect(result?.extraNearest?.[0]).toBeLessThan(10);
+  expect(result?.extraLinear?.[0]).toBeGreaterThan(110);
+  expect(result?.extraLinear?.[2]).toBeGreaterThan(110);
+  expect(result?.extraOutside?.[3]).toBe(0);
   expect(result?.invalidShader).toContain('Could not initialize shader');
   await page.screenshot({ path: 'test-results/webgl-spike.png' });
 });

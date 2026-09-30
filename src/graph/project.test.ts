@@ -57,6 +57,20 @@ describe('project file', () => {
     expect(result).toMatchObject({ ok: true, assetIssues: [{ code: 'MISSING_PREVIEW_ASSET', assetId: 'gone' }] });
   });
 
+  it('binds image sampling only to formal dependency assets', () => {
+    const base = createProject('sample', 'Sample image', FILTER_GRAPH_KIND, 'root');
+    const added = applyCommand(base, { type: 'add-node', nodeId: 'sampler', nodeType: 'filter.sample-image', position: { x: 0, y: 0 } });
+    const project = { ...base, ...added.document };
+    const image = { id: 'unbound', name: 'noise.png', mimeType: 'image/png' as const,
+      dataUrl: 'data:image/png;base64,AA==', width: 1, height: 1 };
+    expect(parseProject(serializeProject(project))).toMatchObject({ ok: true,
+      assetIssues: [{ code: 'MISSING_DEPENDENCY_ASSET', nodeId: 'sampler', assetId: 'unbound' }] });
+    expect(parseProject(serializeProject({ ...project, assets: { dependencies: [], preview: [image] } })))
+      .toMatchObject({ ok: true, assetIssues: [{ code: 'MISSING_DEPENDENCY_ASSET' }] });
+    expect(parseProject(serializeProject({ ...project, assets: { dependencies: [image], preview: [] } })))
+      .toMatchObject({ ok: true, assetIssues: [] });
+  });
+
   it('keeps preview parameter values tied to stable graph parameter IDs and types', () => {
     const base = createProject('parameters', 'Parameters', FOUNDATION_GRAPH_KIND, 'root');
     const added = applyCommand({ graph: base.graph, layout: base.layout }, { type: 'add-node', nodeId: 'amount-node', nodeType: 'foundation.number', position: { x: 1, y: 2 } });

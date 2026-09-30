@@ -34,6 +34,10 @@ describe('Pixi Filter node contract', () => {
     expect(getNodeDefinition(FILTER_GRAPH_KIND, 'filter.uv')?.outputs).toMatchObject([{ id: 'uv', type: 'vec2' }]);
     expect(getNodeDefinition(FILTER_GRAPH_KIND, 'filter.time')?.outputs).toMatchObject([{ id: 'seconds', type: 'float' }]);
     expect(getNodeDefinition(FILTER_GRAPH_KIND, 'filter.color-rgba')?.inputs).toMatchObject([{ id: 'color', type: 'color' }]);
+    expect(getNodeDefinition(FILTER_GRAPH_KIND, 'filter.sample-source')?.inputs).toMatchObject([{ id: 'uv', type: 'vec2' }]);
+    expect(getNodeDefinition(FILTER_GRAPH_KIND, 'filter.sample-image')?.properties).toMatchObject([{ id: 'image', type: 'texture' }]);
+    expect(getNodeDefinition(FILTER_GRAPH_KIND, 'filter.uv-transform')?.outputs).toMatchObject([{ id: 'transformed', type: 'vec2' }]);
+    expect(getNodeDefinition(FILTER_GRAPH_KIND, 'filter.input-size')?.outputs).toMatchObject([{ id: 'pixels', type: 'vec2' }]);
     expect(getNodeDefinition(FOUNDATION_GRAPH_KIND, 'filter.source')).toBeUndefined();
     expect(getNodeDefinition(FILTER_GRAPH_KIND, 'foundation.number')).toBeUndefined();
     expect(registryIssues()).toEqual([]);

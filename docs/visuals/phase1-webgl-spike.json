@@ -47,6 +47,36 @@
       64,
       255
     ],
+    "sourceInside": [
+      255,
+      0,
+      0,
+      128
+    ],
+    "sourceOutside": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "extraNearest": [
+      0,
+      0,
+      255,
+      255
+    ],
+    "extraLinear": [
+      127,
+      0,
+      127,
+      255
+    ],
+    "extraOutside": [
+      0,
+      0,
+      0,
+      0
+    ],
     "invalidShader": "ERROR: 0:10: 'this' : Illegal use of reserved word | 0: #define SHADER_NAME fxweave-invalid-spike-fragment | PixiJS Error: Could not initialize shader. | PixiJS Warning: gl.getProgramInfoLog() Fragment shader is not compiled. | PixiJS Warning:  Attribute aPosition is not present in the shader, but is present in the geometry. Unable to infer attribute details."
   },
   "unavailable": {

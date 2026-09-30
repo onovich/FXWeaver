@@ -12,6 +12,11 @@ interface SpikeResult {
   withPadding?: Pixel;
   uvLeft?: Pixel;
   uvRight?: Pixel;
+  sourceInside?: Pixel;
+  sourceOutside?: Pixel;
+  extraNearest?: Pixel;
+  extraLinear?: Pixel;
+  extraOutside?: Pixel;
   invalidShader?: string;
   message?: string;
 }
@@ -40,6 +45,20 @@ function sourceTexture(): Texture {
   context.fillStyle = 'rgba(255, 0, 0, 0.5)';
   context.fillRect(8, 8, 48, 48);
   return Texture.from(canvas);
+}
+
+function bandTexture(scaleMode: 'nearest' | 'linear'): Texture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2;
+  canvas.height = 1;
+  const context = canvas.getContext('2d')!;
+  context.fillStyle = '#ff0000';
+  context.fillRect(0, 0, 1, 1);
+  context.fillStyle = '#0000ff';
+  context.fillRect(1, 0, 1, 1);
+  const texture = Texture.from(canvas);
+  texture.source.style.scaleMode = scaleMode;
+  return texture;
 }
 
 function pixel(canvas: HTMLCanvasElement, x: number, y: number): Pixel {
@@ -81,6 +100,33 @@ void main() {
   vec2 frameUv = vTextureCoord / (uOutputFrame.zw * uInputSize.zw);
   finalColor = vec4(frameUv, uInputPixel.z * 16.0, 1.0);
 }`;
+
+function sourceProbeFragment(x: number): string { return `
+in vec2 vTextureCoord;
+out vec4 finalColor;
+uniform sampler2D uTexture;
+uniform highp vec4 uInputSize;
+uniform highp vec4 uOutputFrame;
+uniform highp vec4 uInputClamp;
+void main() {
+  vec2 frameUv = vec2(${x.toFixed(2)}, 0.5);
+  if (any(lessThan(frameUv, vec2(0.0))) || any(greaterThan(frameUv, vec2(1.0)))) {
+    finalColor = vec4(0.0);
+  } else {
+    vec2 inputUv = frameUv * (uOutputFrame.zw * uInputSize.zw);
+    finalColor = texture(uTexture, clamp(inputUv, uInputClamp.xy, uInputClamp.zw));
+  }
+}`; }
+
+function extraProbeFragment(x: number): string { return `
+in vec2 vTextureCoord;
+out vec4 finalColor;
+uniform sampler2D uExtra;
+void main() {
+  vec2 uv = vec2(${x.toFixed(2)}, 0.5);
+  finalColor = any(lessThan(uv, vec2(0.0))) || any(greaterThan(uv, vec2(1.0)))
+    ? vec4(0.0) : texture(uExtra, uv);
+}`; }
 
 async function run(): Promise<void> {
   const probe = document.createElement('canvas').getContext('webgl2');
@@ -130,6 +176,34 @@ async function run(): Promise<void> {
   const uvRight = pixel(app.canvas, 80, 82);
   main.filters = [filter];
 
+  const sourceInsideFilter = new Filter({ glProgram: GlProgram.from({ vertex: defaultFilterVert, fragment: sourceProbeFragment(0.5), name: 'fxweave-source-inside-spike' }) });
+  main.filters = [sourceInsideFilter];
+  app.renderer.render(app.stage);
+  const sourceInside = pixel(app.canvas, 64, 82);
+  const sourceOutsideFilter = new Filter({ glProgram: GlProgram.from({ vertex: defaultFilterVert, fragment: sourceProbeFragment(-0.2), name: 'fxweave-source-outside-spike' }) });
+  main.filters = [sourceOutsideFilter];
+  app.renderer.render(app.stage);
+  const sourceOutside = pixel(app.canvas, 64, 82);
+
+  const nearest = bandTexture('nearest');
+  const linear = bandTexture('linear');
+  function extraFilter(texture: Texture, uvX: number): Filter {
+    return new Filter({
+      glProgram: GlProgram.from({ vertex: defaultFilterVert, fragment: extraProbeFragment(uvX), name: `fxweave-extra-${texture.source.style.scaleMode}-${uvX}` }),
+      resources: { uExtra: texture.source, uExtraSampler: texture.source.style },
+    });
+  }
+  main.filters = [extraFilter(nearest, 0.5)];
+  app.renderer.render(app.stage);
+  const extraNearest = pixel(app.canvas, 64, 82);
+  main.filters = [extraFilter(linear, 0.5)];
+  app.renderer.render(app.stage);
+  const extraLinear = pixel(app.canvas, 64, 82);
+  main.filters = [extraFilter(linear, -0.2)];
+  app.renderer.render(app.stage);
+  const extraOutside = pixel(app.canvas, 64, 82);
+  main.filters = [filter];
+
   const padSprite = new Sprite(solidTexture('#ffffff'));
   padSprite.position.set(190, 65);
   padSprite.width = 40;
@@ -156,7 +230,9 @@ async function run(): Promise<void> {
   main.filters = [filter];
   app.renderer.render(app.stage);
 
-  window.__filterSpike = { status: 'ready', glVersion: gl.getParameter(gl.VERSION) as string, original, filtered, maskedOut, noPadding, withPadding, uvLeft, uvRight, invalidShader: shaderErrors.map((message) => message.split('\n')[0]).join(' | ') };
+  window.__filterSpike = { status: 'ready', glVersion: gl.getParameter(gl.VERSION) as string, original, filtered, maskedOut, noPadding, withPadding, uvLeft, uvRight,
+    sourceInside, sourceOutside, extraNearest, extraLinear, extraOutside,
+    invalidShader: shaderErrors.map((message) => message.split('\n')[0]).join(' | ') };
   status.textContent = 'WebGL2 Filter rendered; pixel probes recorded.';
 }
 

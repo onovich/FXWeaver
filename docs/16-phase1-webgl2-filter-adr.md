@@ -30,3 +30,9 @@ Alpha 观察：在相同 Alpha 128 下，颜色乘 0.5 后浏览器读回红色�
 ## 后续实现约束
 
 第 2–8 轮建立正式图、类型化 IR、确定性生成器；第 9–11 轮以本探针确认的 Filter 包装实现编译、资源绑定和同源预览。越界采样应明确使用 `uInputClamp` 或声明其他规则；图和预览设置须明确 padding、分辨率及纹理过滤方式。当前探针尚未覆盖 Container、图集 frame/trim、真实素材、时间更新或由节点图生成代码，不能据此宣称三件作品已完成。
+
+## 第 6 轮补充：采样边界
+
+正式 `filter.uv` 是 Filter 输入区域的归一化 UV；`filter.sample-source` 把该 UV 乘以 `uOutputFrame.zw * uInputSize.zw` 后在 `uInputClamp` 内采样。`filter.sample-image` 使用依赖图片自身的归一化 UV。两种采样均规定 **UV 超出 0–1 返回透明黑**，不依赖底层 sampler 的默认边界颜色。`filter.uv-transform` 只计算 `UV × scale + offset`，不偷偷截断。输入尺寸和纹素尺寸另有明确节点。额外纹理的 nearest/linear 由预览采样设置驱动；正式依赖图片 ID 不能指向预览专用素材。
+
+同一 Chrome 154 / PixiJS 8.21.0 / WebGL2 探针在 50% Alpha 红色宿主中心得到：源图内部 `[255,0,0,128]`、越界 `[0,0,0,0]`。对 2×1 红蓝测试纹理在中线采样，nearest 为 `[0,0,255,255]`，linear 为 `[127,0,127,255]`，越界为 `[0,0,0,0]`。数据已写入同一[像素记录](./visuals/phase1-webgl-spike.json)，由 `npm run smoke:webgl` 和 `npm run spike:capture` 重现。该测试是通用采样契约探针；正式节点生成代码仍需第 8–9 轮另行验证。
