@@ -11,6 +11,7 @@
     "smoke": "playwright test",
     "trial:local": "playwright test --config=playwright.local.config.ts",
     "trial:prepare": "node scripts/prepare-local-trial.mjs",
+    "usability:capture": "playwright test --config=playwright.capture.config.ts tests/phase2-usability.capture.spec.ts",
     "smoke:preview": "playwright test --config=playwright.preview.config.ts",
     "gallery:capture": "playwright test --config=playwright.capture.config.ts tests/phase1-gallery.capture.spec.ts",
     "smoke:webgl": "playwright test tests/webgl-spike.smoke.spec.ts",

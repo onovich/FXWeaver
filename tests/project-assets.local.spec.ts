@@ -95,6 +95,19 @@ for (const sample of samples) test(`local work ${sample.id}: modify graph, compa
   await runtimeParameter.fill(sample.runtimeValue); await runtimeParameter.press('Enter');
   await expect.poll(pixelHash).not.toBe(hash(graphChanged));
   const fixed = await pixels();
+  const probes = sample.id === '03'
+    ? [{ role: 'textbox' as const, name: 'Center', value: '0.65, 0.5' }, { role: 'textbox' as const, name: 'Edge color', value: '#306dffff' }]
+    : sample.id === '05' ? [{ role: 'spinbutton' as const, name: 'Frequency', value: '26' }]
+      : [{ role: 'textbox' as const, name: 'Red channel offset', value: '0, 0' }];
+  for (const probe of probes) {
+    const input = page.locator('.runtime-parameter').getByRole(probe.role, { name: probe.name });
+    const original = await input.inputValue();
+    await input.fill(probe.value); await input.press('Enter');
+    await expect.poll(pixelHash).not.toBe(hash(fixed));
+    await page.locator('.preview-stage').screenshot({ path: path.join(output, `work${sample.id}-probe-${probe.name.replaceAll(' ', '-')}.png`) });
+    await input.fill(original); await input.press('Enter');
+    await expect.poll(pixelHash).toBe(hash(fixed));
+  }
   await page.waitForTimeout(150);
   expect(await pixelHash()).toBe(hash(fixed));
   if (sample.id !== '03') {
@@ -161,6 +174,7 @@ for (const sample of samples) test(`local work ${sample.id}: modify graph, compa
     buildId, fixedCanvasHash: hash(fixed), alpha, graphParameter: { name: sample.parameter, value: sample.graphValue },
     runtimeValue: sample.runtimeValue, fixedTime: sample.time, host: project.preview.host,
     usability: { fitAllNodes: true, enlargedParameterResponse: true, enlargedSplit: true, reopenedViewport: viewportStyle },
+    parameterProbes: probes,
     persistenceMethod: 'UI Save As with a disk-writing file-handle bridge; physical JSON file reimport',
     durationSeconds: (Date.now() - startedAt) / 1000 };
   await writeFile(path.join(output, `work${sample.id}-result.json`), JSON.stringify(result, null, 2));
