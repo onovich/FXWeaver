@@ -22,7 +22,7 @@ test('edits a Filter constant and exposes a stable parameter through the inspect
   await page.goto('/');
   await page.getByRole('button', { name: 'Create Filter graph' }).click();
   await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Number');
-  await page.getByRole('button', { name: 'Value Number', exact: true }).click();
+  await page.locator('.library-list').getByRole('button', { name: 'Number', exact: true }).click();
   const property = page.locator('.inspector-content').getByRole('spinbutton', { name: 'Value' });
   await property.fill('0.75');
   await property.press('Enter');

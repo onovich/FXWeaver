@@ -171,7 +171,8 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
             if (!source || !target) return null;
             const sourcePoint = portPoint(document, source, edge.from.portId, 'out', dragPositions);
             const targetPoint = portPoint(document, target, edge.to.portId, 'in', dragPositions);
-            return <path key={edge.id} d={wirePath(sourcePoint, targetPoint)} className="connection-path" />;
+            const portType = getNodeDefinition(graph.graphKind, source.type)?.outputs.find((port) => port.id === edge.from.portId)?.type;
+            return <path key={edge.id} d={wirePath(sourcePoint, targetPoint)} className={`connection-path connection-${portType}`} />;
           })}
           {wirePointer && (() => {
             const source = graph.nodes.find((node) => node.id === wirePointer.from.nodeId);
@@ -182,7 +183,7 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
           const definition = getNodeDefinition(graph.graphKind, node.type);
           const position = dragPositions?.[node.id] ?? layout.nodePositions[node.id] ?? { x: 0, y: 0 };
           return (
-            <article className={`canvas-node ${layout.selectedNodeIds.includes(node.id) ? 'selected' : ''}`} key={node.id} style={{ left: position.x, top: position.y }} data-node-id={node.id}>
+            <article className={`canvas-node ${layout.selectedNodeIds.includes(node.id) ? 'selected' : ''}`} key={node.id} style={{ left: position.x, top: position.y }} data-node-id={node.id} data-category={definition?.category.toLowerCase()}>
               <button className="canvas-node-title" type="button" onPointerDown={(event) => startDrag(event, node.id)} onPointerMove={dragNode} onPointerUp={endDrag} onClick={(event) => { if (event.detail === 0) onSelect([node.id]); }} aria-label={`Select ${definition?.label ?? node.type} node`}>{definition?.label ?? node.type}</button>
               <div className="canvas-node-body">
                 {definition?.inputs.map((port) => {

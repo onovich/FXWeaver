@@ -11,3 +11,26 @@ for (const width of [1440, 390]) test(`capture Phase 3 homepage at ${width}`, as
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: path.resolve(`docs/visuals/phase3-home-${width}.png`), fullPage: true });
 });
+
+test('capture unified Filter workbench, properties, generated result and enlarged preview', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Edit a copy of Hologram scan' }).click();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  await expect(page.locator('.problem-context')).toHaveText('Filter graph · WebGL2');
+  await page.getByRole('button', { name: 'Select Filter Output node' }).click();
+  await page.getByRole('button', { name: 'Fit all nodes', exact: true }).click();
+  await page.screenshot({ path: path.resolve('docs/visuals/phase3-studio-1440.png') });
+  await page.getByRole('button', { name: 'Enlarge preview' }).click();
+  await page.getByText('Generated code and bindings').click();
+  await page.locator('.generated-output').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: path.resolve('docs/visuals/phase3-generated-output.png') });
+  await page.getByRole('button', { name: 'Split', exact: true }).scrollIntoViewIfNeeded();
+  await page.getByRole('button', { name: 'Split', exact: true }).click();
+  await page.screenshot({ path: path.resolve('docs/visuals/phase3-enlarged-preview.png') });
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Return to project entry' }).click();
+  await page.getByRole('button', { name: 'Create Filter graph' }).click();
+  await expect(page.getByText('Preview unavailable')).toBeVisible();
+  await page.screenshot({ path: path.resolve('docs/visuals/phase3-empty-filter.png') });
+});

@@ -203,7 +203,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   return (
     <main className={`workbench ${problemsOpen ? 'problems-open' : ''}`}>
       <header className="workbench-header">
-        <button className="brand-button" type="button" onClick={returnToEntry} aria-label="Return to project entry">FXWeave</button>
+        <button className="brand-button" type="button" onClick={returnToEntry} aria-label="Return to project entry"><span className="brand-symbol" aria-hidden="true">◈</span>FXWeave</button>
         <div className="header-divider" aria-hidden="true" />
         <div className="project-heading"><strong>{project.name}</strong><span>{graphKind.label}</span></div>
         <div className="header-spacer" />
@@ -211,7 +211,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
         <button className="header-tool" type="button" disabled={history.past.length === 0} onClick={() => setHistory(undo(history))}>Undo</button>
         <button className="header-tool" type="button" disabled={history.future.length === 0} onClick={() => setHistory(redo(history))}>Redo</button>
         <button className="header-tool" type="button" onClick={() => void saveToFile()}>Save</button>
-        <button className="header-tool" type="button" onClick={() => void saveToFile(true)}>Save As</button>
+        <button className="header-tool header-save-as" type="button" onClick={() => void saveToFile(true)}>Save As</button>
         <button className="header-tool" type="button" onClick={() => { downloadProject(currentProject); setSaveNotice('Project JSON downloaded; this is a separate copy.'); }}>Export JSON</button>
         <span className="phase-chip">{project.rendererTarget ?? 'Renderer pending'}</span>
       </header>
@@ -224,10 +224,10 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
           <input id="node-search" ref={searchRef} className="node-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name or purpose" />
           <p className="panel-note">{graphKind.isTestOnly ? 'Test nodes only. No Shader code is generated.' : 'Filter graph nodes generate the live WebGL2 preview.'}</p>
           <ul className="library-list">
-            {definitions.map((definition) => {
+            {definitions.map((definition, index) => {
               const rootExists = document.graph.nodes.some((node) => node.type === definition.type);
               const isRoot = definition.type === graphKind.rootNodeType;
-              return <li key={definition.type}><button type="button" onClick={() => addNode(definition.type)} disabled={isRoot && rootExists} title={definition.description}><span className="library-category">{definition.category}</span><strong>{definition.label}</strong></button></li>;
+              return <li key={definition.type}>{(index === 0 || definitions[index - 1].category !== definition.category) && <p className="library-category">{definition.category}</p>}<button type="button" onClick={() => addNode(definition.type)} disabled={isRoot && rootExists} title={definition.description}><span className="library-node-mark" data-category={definition.category.toLowerCase()} aria-hidden="true">◇</span><strong>{definition.label}</strong><span className="library-add" aria-hidden="true">+</span></button></li>;
             })}
           </ul>
           {definitions.length === 0 && <p className="panel-note" role="status">No matching nodes.</p>}
@@ -267,7 +267,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
         </aside>
       </div>
 
-      <ProblemsPanel issues={issues} expanded={problemsOpen} onToggle={() => setProblemsOpen(!problemsOpen)} onFocus={focusIssue} actionIssue={actionIssue} />
+      <ProblemsPanel issues={issues} expanded={problemsOpen} onToggle={() => setProblemsOpen(!problemsOpen)} onFocus={focusIssue} actionIssue={actionIssue} targetLabel={graphKind.isTestOnly ? 'Test graph · No build' : `Filter graph · ${project.rendererTarget === 'pixi.webgl2' ? 'WebGL2' : project.rendererTarget ?? 'Renderer pending'}`} />
     </main>
   );
 }
