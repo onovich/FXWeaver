@@ -5,7 +5,8 @@ import { RuntimeControls } from './RuntimeControls';
 import { generateFilter, type GeneratedFilter } from '../compiler/generate';
 import { lowerFilterGraph } from '../compiler/ir';
 import type { EmbeddedImage, PreviewScene, ProjectAssets } from '../graph/assets';
-import { checkProjectAssets, findAssetIssues, MAX_IMAGE_BYTES, MAX_IMAGE_DIMENSION } from '../graph/assets';
+import { checkProjectAssets, findAssetIssues } from '../graph/assets';
+import { readEmbeddedImage } from '../graph/imageImport';
 import type { GraphDocument, JsonValue } from '../graph/schema';
 import { createFilterRuntime, type FilterRuntime } from '../runtime/filterRuntime';
 
@@ -279,22 +280,7 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
   };
   const addPreviewImage = async (file: File) => {
     try {
-      if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Use a PNG, JPEG, or WebP image.');
-      if (file.size > MAX_IMAGE_BYTES) throw new Error('A preview image must be 2 MiB or smaller.');
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = () => reject(new Error('Could not read the preview image.'));
-        reader.readAsDataURL(file);
-      });
-      const element = new Image();
-      element.src = dataUrl;
-      await element.decode();
-      if (element.naturalWidth > MAX_IMAGE_DIMENSION || element.naturalHeight > MAX_IMAGE_DIMENSION) {
-        throw new Error('Image dimensions must be at most 4096 × 4096.');
-      }
-      const image: EmbeddedImage = { id: crypto.randomUUID(), name: file.name, mimeType: file.type as EmbeddedImage['mimeType'],
-        dataUrl, width: element.naturalWidth, height: element.naturalHeight };
+      const image = await readEmbeddedImage(file);
       const candidate = { ...assets, preview: [...assets.preview, image] };
       const checked = checkProjectAssets(candidate);
       if (!checked.ok) throw new Error(checked.message);

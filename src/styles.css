@@ -83,8 +83,18 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .library-list strong { font-size: .78rem; font-weight: 600; }
 .library-category { color: var(--accent); font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .pending-help { margin: .2rem .75rem; padding: .6rem; border: 1px solid #4b7f8a; border-radius: .25rem; color: #d3f2f4; background: #1a3845; font-size: .72rem; line-height: 1.4; }
-.library-file-actions { display: grid; gap: .5rem; margin: 1rem .75rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-.library-file-actions button { text-align: left; }
+  .library-file-actions { display: grid; gap: .5rem; margin: 1rem .75rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .library-file-actions button { text-align: left; }
+  .dependency-assets { margin: .5rem .75rem; padding: .65rem 0; border-top: 1px solid var(--border); font-size: .7rem; }
+  .dependency-assets h3 { margin: .3rem 0; font-size: .78rem; }
+  .dependency-assets p { margin: .3rem 0; color: var(--text-muted); line-height: 1.4; }
+  .dependency-assets label { display: grid; gap: .2rem; color: #cce1e6; }
+  .dependency-assets input { max-width: 100%; font-size: .65rem; }
+  .dependency-assets ul { display: grid; gap: .4rem; margin: .5rem 0; padding: 0; list-style: none; }
+  .dependency-assets li { display: grid; gap: .15rem; padding: .4rem; border: 1px solid #38515d; border-radius: .2rem; overflow-wrap: anywhere; }
+  .dependency-assets li small { color: var(--text-muted); }
+  .dependency-assets li button { justify-self: start; border: 0; color: #b2e2e8; background: transparent; font-size: .66rem; text-decoration: underline; }
+  .dependency-assets .dependency-message { color: #c7e9e7; }
 .graph-panel { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; background: #07121b; }
 .graph-toolbar { z-index: 1; display: flex; align-items: center; justify-content: space-between; min-height: 68px; padding: .8rem 1.25rem; border-bottom: 1px solid #1c303e; background: #0a1822; }
 .graph-toolbar h1 { margin: .18rem 0 0; font-size: 1rem; }
@@ -170,7 +180,7 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .linked-property { padding: .55rem .65rem; border: 1px solid #3a5d68; border-radius: .25rem; background: #183544; }
 .property-control { display: grid; gap: .35rem; margin: .8rem 0; }
 .property-control label { color: #d8e7ed; font-size: .72rem; font-weight: 600; }
-.property-control input:not([type="range"]) { width: 100%; padding: .48rem .55rem; border: 1px solid #476271; border-radius: .25rem; outline: none; color: #e8f0f5; background: #182e3c; font-size: .75rem; }
+  .property-control input:not([type="range"]), .property-control select { width: 100%; padding: .48rem .55rem; border: 1px solid #476271; border-radius: .25rem; outline: none; color: #e8f0f5; background: #182e3c; font-size: .75rem; }
 .property-control input:not([type="range"]):focus { border-color: #7bd9e4; }
 .property-control input[type="range"] { width: 100%; accent-color: #57cddc; }
 .field-error { color: #ffb4a5; font-size: .7rem; }

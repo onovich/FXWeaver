@@ -123,7 +123,7 @@ test('imports a preview image into the project and reports oversize input', asyn
   expect(project.assets.preview).toMatchObject([{ name: 'green.png', width: 4, height: 4 }]);
   expect(project.preview.sourceAssetId).toBe(project.assets.preview[0].id);
   await page.getByLabel('Import preview image').setInputFiles({ name: 'large.png', mimeType: 'image/png', buffer: Buffer.alloc(2 * 1024 * 1024 + 1) });
-  await expect(page.getByText('A preview image must be 2 MiB or smaller.')).toBeVisible();
+  await expect(page.getByText('An image must be 2 MiB or smaller.')).toBeVisible();
   await expect(page.getByText('Preview ready')).toBeVisible();
 });
 

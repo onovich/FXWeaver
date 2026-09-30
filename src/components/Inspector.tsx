@@ -3,15 +3,17 @@ import { ParameterNameControl } from './ParameterNameControl';
 import type { GraphCommand } from '../graph/commands';
 import { getGraphKind, getNodeDefinition } from '../graph/registry';
 import type { GraphDocument } from '../graph/schema';
+import type { ProjectAssets } from '../graph/assets';
 
 interface Props {
   graph: GraphDocument;
+  assets: ProjectAssets;
   selectedNodeId?: string;
   dispatch: (command: GraphCommand) => boolean;
   onDelete: () => void;
 }
 
-export function Inspector({ graph, selectedNodeId, dispatch, onDelete }: Props) {
+export function Inspector({ graph, assets, selectedNodeId, dispatch, onDelete }: Props) {
   const node = graph.nodes.find((item) => item.id === selectedNodeId);
   const definition = node && getNodeDefinition(graph.graphKind, node.type);
 
@@ -23,9 +25,18 @@ export function Inspector({ graph, selectedNodeId, dispatch, onDelete }: Props) 
       {definition.properties.map((property) => {
         const linked = graph.parameters.find((parameter) => parameter.sourceNodeId === node.id && parameter.sourceKey === property.id);
         return <div key={property.id}>
-          {linked ? <p className="linked-property">{property.label}: Linked to {linked.name} · {linked.id.slice(0, 8)}</p> : <>
+          {property.type === 'texture' ? <div className="property-control">
+            <label htmlFor={`dependency-${node.id}-${property.id}`}>{property.label}</label>
+            <select id={`dependency-${node.id}-${property.id}`} aria-label="Dependency image" value={String(node.values[property.id])}
+              onChange={(event) => dispatch({ type: 'set-property', nodeId: node.id, propertyId: property.id, value: event.target.value })}>
+              <option value="unbound">Unbound</option>
+              {!assets.dependencies.some((image) => image.id === node.values[property.id]) && node.values[property.id] !== 'unbound' &&
+                <option value={String(node.values[property.id])}>Missing: {String(node.values[property.id])}</option>}
+              {assets.dependencies.map((image) => <option key={image.id} value={image.id}>{image.name} · {image.id.slice(0, 8)}</option>)}
+            </select>
+          </div> : linked ? <p className="linked-property">{property.label}: Linked to {linked.name} · {linked.id.slice(0, 8)}</p> : <>
             <PropertyControl id={`inspector-${node.id}-${property.id}`} property={property} value={node.values[property.id]} onCommit={(value) => dispatch({ type: 'set-property', nodeId: node.id, propertyId: property.id, value })} />
-            {property.type !== 'texture' && <button className="text-button" type="button" onClick={() => dispatch({ type: 'expose-parameter', parameterId: crypto.randomUUID(), nodeId: node.id, propertyId: property.id, name: property.label })}>Expose as parameter</button>}
+            <button className="text-button" type="button" onClick={() => dispatch({ type: 'expose-parameter', parameterId: crypto.randomUUID(), nodeId: node.id, propertyId: property.id, name: property.label })}>Expose as parameter</button>
           </>}
         </div>;
       })}

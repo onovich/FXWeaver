@@ -3,6 +3,7 @@ import { GraphCanvas } from './GraphCanvas';
 import { Inspector } from './Inspector';
 import { ProblemsPanel } from './ProblemsPanel';
 import { FilterPreview } from './FilterPreview';
+import { DependencyAssets } from './DependencyAssets';
 import { findAssetIssues } from '../graph/assets';
 import type { GraphCommand } from '../graph/commands';
 import { applyHistoryCommand, createHistory, redo, undo } from '../graph/history';
@@ -217,6 +218,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
           </ul>
           {definitions.length === 0 && <p className="panel-note" role="status">No matching nodes.</p>}
           {pendingFrom && <p className="pending-help" role="status">Choose a compatible input port. Press Esc to cancel.</p>}
+          {!graphKind.isTestOnly && <DependencyAssets graph={document.graph} assets={projectAssets} onAssetsChange={setProjectAssets} />}
           <div className="library-file-actions">
             <p className="section-kicker">PROJECT FILE</p>
             <button className="secondary-button" type="button" onClick={() => void openProjectFromPicker()}>Open project file</button>
@@ -245,7 +247,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
             <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{assetIssues.length ? 'Missing project image' : graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{assetIssues.length ? assetIssues.map((issue) => issue.message).join(' ') : graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
           </section> : <FilterPreview graph={document.graph} assets={projectAssets} scene={safePreviewScene} onSceneChange={setPreviewScene} onAssetsChange={setProjectAssets} />}
-          <Inspector graph={document.graph} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
+          <Inspector graph={document.graph} assets={projectAssets} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
         </aside>
       </div>
 
