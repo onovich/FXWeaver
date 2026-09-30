@@ -9,6 +9,7 @@
     "test": "vitest run --passWithNoTests",
     "build": "tsc --noEmit && vite build",
     "smoke": "playwright test",
+    "trial:local": "playwright test --config=playwright.local.config.ts",
     "smoke:preview": "playwright test --config=playwright.preview.config.ts",
     "gallery:capture": "playwright test --config=playwright.capture.config.ts tests/phase1-gallery.capture.spec.ts",
     "smoke:webgl": "playwright test tests/webgl-spike.smoke.spec.ts",
