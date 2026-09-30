@@ -1,6 +1,6 @@
 # FXWeave V0：2D 游戏效果候选
 
-日期：2026-09-30。状态：**待用户选定首批作品**。用户已同意以 **PixiJS 8 WebGL 的 Sprite/Container Filter** 作为 V0 首个网页渲染目标；本文只策划供选择的效果，不代表已经决定首批制作项。
+日期：2026-09-30。状态：**待用户选定首批作品**。用户已同意以 **PixiJS 8 WebGL 的 Sprite/Container Filter** 作为 V0 首个网页渲染目标。现已结合用户的 [UnregisteredScene Shader 使用核查](./14-unregisteredscene-shader-usage-review.md)调整推荐顺序；本文仍是待选择的清单。
 
 ## 筛选依据
 
@@ -20,20 +20,21 @@ PixiJS 8 的 Filter 可以作用于 Sprite 或 Container，并提供自定义 We
 | **06** | **径向冲击波** | 爆炸、技能命中、地面震荡 | 中心点、距离、波前、时间、UV 位移 | **中高**；作用区域与坐标空间需要明确，若扭曲整屏要用场景容器预览 |
 | **07** | **拾取物／技能发光** | 稀有掉落、充能、关键道具、危险提示 | Alpha 外扩、邻域采样、颜色与强度 | **高**；边界扩展及多次采样成本明显，可能需要多 Pass，不宜作为第一条生成链路 |
 | **08** | **像素化／马赛克** | 复古风格、受干扰状态、转场 | UV 量化、纹理采样、像素块大小参数 | **低中**；需在不同分辨率与最近邻／线性采样下检查一致性 |
-| **09** | **故障画面／CRT** | 科幻终端、通讯受干扰、整场景风格化 | 扫描线、通道偏移、时间、噪声与组合 | **高**；更适合整场景容器，并容易把多个独立效果混成一个不可复用模板 |
+| **09** | **局部全息扫描／信号故障** | 调查终端、人物投影、科幻 UI | 扫描线、通道偏移、时间、噪声与局部遮罩 | **高**；首批只取一个局部形态；整屏 CRT 和完整多变体全息系统后置 |
+| **10** | **笔记页揭示** | 图鉴、调查日志、剧情页的渐进显现 | 进度、确定性噪声、柔边、Alpha | **低中**；便于快速完成，但与 03 都属于揭示类结构 |
 
-上述 01、02、04、07、08、09 可对照 [pixi-filters 目录](https://github.com/pixijs/filters/blob/main/README.md)中的 ColorOverlay、Outline、ColorReplace、Glow、Pixelate、Glitch/CRT 家族；05 可对照 [PixiJS 内置 DisplacementFilter](https://pixijs.com/8.x/guides/components/scene-objects)；06 对照扩展目录中的 Shockwave；03 可对照 [GDQuest 2D dissolve 示例](https://github.com/gdquest-demos/godot-shaders)。FXWeave 应用自己的节点图生成 Shader，这些现成滤镜仅供验证题材与预期外观，不能作为最终作品的隐藏实现。
+上述 01、02、04、07、08、09 可对照 [pixi-filters 目录](https://github.com/pixijs/filters/blob/main/README.md)中的 ColorOverlay、Outline、ColorReplace、Glow、Pixelate、Glitch 家族；05 可对照 [PixiJS 内置 DisplacementFilter](https://pixijs.com/8.x/guides/components/scene-objects)；06 对照扩展目录中的 Shockwave；03 可对照 [GDQuest 2D dissolve 示例](https://github.com/gdquest-demos/godot-shaders)。03、05、09、10 另有用户项目中的实际资产和代码线索，见[使用核查](./14-unregisteredscene-shader-usage-review.md)。FXWeave 应用自己的节点图生成 Shader，这些现成滤镜和 Unity Shader 仅供验证题材与预期外观，不能作为最终作品的隐藏实现。
 
 ## 我建议先选哪三个
 
-**推荐组合：01 受击闪色 + 03 噪声溶解 + 02 交互描边。** 它们分别检验颜色与透明、额外纹理与进度、邻域采样与滤镜边界，复用同一 Sprite/Container Filter 宿主，却覆盖三种不同图结构。01 可先打通从节点图到生成 Shader 再到预览的闭环；03 和 02 会检验工具能否处理素材与边界这些真实创作约束。
+基于用户项目实际接线，**推荐组合改为：03 径向燃烧／烧蚀 + 05 局部溶融／波纹扭曲 + 09 局部全息扫描／信号故障**。03 对应多个运行时 UI 场景、第一章 Timeline 和参数驱动；05 对应第一章 UI/Timeline 的动画扭曲；09 对应调查 UI 的全息风格。它们分别检验噪声遮罩/Alpha、UV 重采样/时间、扫描线/通道偏移/局部遮罩。
 
-如果游戏更重视水、火焰或传送门，可把 **02 换成 05 水波／热浪扭曲**。05 会验证 UV 扭曲与重新采样，但暂时不会检验外描边所需的区域扩展。若项目是像素风换装或多阵营游戏，可把 02 或 05 换成 **04 阵营换色**。
+09 只建议做一个局部版本；现有 Unity Shader 的多变体、人物遮罩和图集投影不进入首批。如果希望更快完成三件作品，用 **10 笔记页揭示**替换 09；若只做两件，先做 **03 + 05**。先前的 01 受击闪色和 02 外描边仍是通用 2D 候选，但在该项目没有发现同等级的运行时使用证据。
 
 这里的“源图采样”指 Filter 对宿主已渲染内容的输入纹理，不自动等同于 Sprite 原图集 UV。开发前还需固定具体 PixiJS 8 小版本、Filter 区域/像素尺寸与预乘 Alpha 语义；边缘外扩的效果必须检查 padding、透明 PNG、图集帧和不同分辨率。[PixiJS Filters](https://pixijs.com/8.x/guides/components/filters) · [PixiJS Textures](https://pixijs.com/8.x/guides/components/textures) · [FilterOptions](https://pixijs.download/v8.14.0/docs/filters.FilterOptions.html)
 
 ## 拍板时需要确定的内容
 
-请从编号中选 **2–3 项**；可直接回复如 `01 + 03 + 02`。每项若能补一句实际用途和对象（例如“敌人死亡时溶解 Sprite”“鼠标悬停时描边道具”），就能把候选变成 V0 的真实验收任务。没有实际素材时可先用有透明边缘的角色 Sprite、Container 组合和噪声贴图做可重复的测试素材；在把某项宣布为自用版作品前，再用项目方素材复验。
+请从编号中选 **2–3 项**；可直接回复如 `03 + 05 + 09` 或 `03 + 05 + 10`。没有实际素材时可先用有透明边缘的 Sprite、UI Container 组合和噪声贴图做可重复的测试素材；在把某项宣布为自用版作品前，再用项目方素材复验。
 
 选定后，架构会话再用 `$goalnext` 编写下一阶段执行指南并派发给开发会话；未选定的效果保留为后续节点能力候选。

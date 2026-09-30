@@ -34,6 +34,7 @@ npm run dev
 11. [V0 Phase 0 验收报告](./docs/11-phase0-validation-report.md)：实现范围、16 轮提交、复现步骤、验证结果和后续决策。
 12. [V0 Phase 0 架构验收](./docs/12-phase0-planner-acceptance.md)：独立复验、修复记录及通过范围。
 13. [V0 2D 游戏效果候选](./docs/13-v0-2d-effect-candidates.md)：首批作品的名称、用途、节点能力和实施边界，待用户拍板。
+14. [UnregisteredScene Shader 使用核查](./docs/14-unregisteredscene-shader-usage-review.md)：根据实际运行时资产和代码接线调整首批推荐。
 
 此前讨论形成的完整研究文档存放在 [研究历史目录](./docs/research-history/INDEX.md)；它们保留原貌供追溯，以上主文档是当前项目口径。
 
