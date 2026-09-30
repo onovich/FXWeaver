@@ -16,3 +16,51 @@ for (const viewport of [{ width: 1920, height: 1080 }, { width: 1366, height: 76
     await expect(page.getByText('Build OK')).toHaveCount(0);
   });
 }
+
+test('edits a typed test graph and explains a rejected connection', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Create test graph' }).click();
+
+  await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Number');
+  await page.locator('.library-list button').filter({ hasText: 'Number' }).click();
+  await expect(page.getByText('2 nodes')).toBeVisible();
+  await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Vector 2');
+  await page.locator('.library-list button').filter({ hasText: 'Vector 2' }).click();
+  await page.getByRole('button', { name: 'Vector 2 Value output, vec2' }).click();
+  await page.getByRole('button', { name: 'Test Output Value input, float' }).click();
+  await expect(page.getByRole('alert')).toContainText('vec2 cannot connect to float');
+  await expect(page.getByText('Problems 1')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Number Value output, float' }).click();
+  await page.getByRole('button', { name: 'Test Output Value input, float' }).click();
+  await expect(page.getByText('Problems 0')).toBeVisible();
+  await expect(page.locator('.connection-path')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(page.getByText('Problems 1')).toBeVisible();
+  await page.getByRole('button', { name: 'Redo' }).click();
+  await expect(page.getByText('Problems 0')).toBeVisible();
+
+  const number = page.locator('.canvas-node').filter({ has: page.getByRole('button', { name: 'Select Number node' }) });
+  const before = await number.boundingBox();
+  if (!before) throw new Error('Number node is not visible');
+  await page.getByRole('button', { name: 'Select Number node' }).hover();
+  await page.mouse.down();
+  await page.mouse.move(before.x + 130, before.y + 100, { steps: 8 });
+  await page.mouse.up();
+  const after = await number.boundingBox();
+  expect(after?.x).toBeGreaterThan(before.x + 20);
+
+  await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(page.getByLabel('Canvas zoom')).toHaveText('125%');
+  const world = page.locator('.canvas-world');
+  const transformBefore = await world.getAttribute('style');
+  const canvas = page.getByLabel('Node graph canvas');
+  const canvasBox = await canvas.boundingBox();
+  if (!canvasBox) throw new Error('Canvas is not visible');
+  await page.mouse.move(canvasBox.x + 15, canvasBox.y + 15);
+  await page.mouse.down();
+  await page.mouse.move(canvasBox.x + 50, canvasBox.y + 45, { steps: 4 });
+  await page.mouse.up();
+  expect(await world.getAttribute('style')).not.toBe(transformBefore);
+});

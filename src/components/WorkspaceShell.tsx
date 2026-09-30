@@ -1,88 +1,142 @@
+import { useEffect, useRef, useState } from 'react';
+import { GraphCanvas } from './GraphCanvas';
+import type { GraphCommand } from '../graph/commands';
+import { applyHistoryCommand, createHistory, redo, undo } from '../graph/history';
 import { getNodeDefinition, listNodeDefinitions } from '../graph/registry';
 import type { ProjectFile } from '../graph/project';
+import type { GraphIssue } from '../graph/diagnostics';
+import type { GraphPortRef } from '../graph/schema';
 import { validateGraph } from '../graph/validation';
 
 interface Props { project: ProjectFile; onBack: () => void }
 
 export function WorkspaceShell({ project, onBack }: Props) {
-  const issues = validateGraph(project.graph);
-  const definitions = listNodeDefinitions(project.graph.graphKind);
+  const [history, setHistory] = useState(() => createHistory({ graph: project.graph, layout: project.layout }));
+  const [pendingFrom, setPendingFrom] = useState<GraphPortRef | null>(null);
+  const [actionIssue, setActionIssue] = useState<GraphIssue | null>(null);
+  const [search, setSearch] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const document = history.present;
+  const issues = validateGraph(document.graph);
+  const selectedId = document.layout.selectedNodeIds[0];
+  const selected = document.graph.nodes.find((node) => node.id === selectedId);
+  const selectedDefinition = selected && getNodeDefinition(document.graph.graphKind, selected.type);
+  const definitions = listNodeDefinitions(document.graph.graphKind).filter((definition) =>
+    `${definition.label} ${definition.category} ${definition.description}`.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  function dispatch(command: GraphCommand): boolean {
+    const result = applyHistoryCommand(history, command);
+    setHistory(result.history);
+    setActionIssue(result.issue ?? null);
+    return !result.issue;
+  }
+
+  function setSelection(ids: string[]) {
+    setHistory((current) => ({ ...current, present: { ...current.present, layout: { ...current.present.layout, selectedNodeIds: ids } } }));
+  }
+
+  function setViewport(viewport: { x: number; y: number; zoom: number }) {
+    setHistory((current) => ({ ...current, present: { ...current.present, layout: { ...current.present.layout, viewport } } }));
+  }
+
+  function addNode(nodeType: string) {
+    const nodeId = crypto.randomUUID();
+    const count = document.graph.nodes.length;
+    if (dispatch({ type: 'add-node', nodeId, nodeType, position: { x: 80 + (count % 4) * 46, y: 110 + (count % 5) * 72 } })) {
+      setSelection([nodeId]);
+      setSearch('');
+    }
+  }
+
+  function connect(from: GraphPortRef, to: GraphPortRef) {
+    if (dispatch({ type: 'connect', edgeId: crypto.randomUUID(), from, to, replaceExisting: true })) setPendingFrom(null);
+  }
+
+  function changeZoom(factor: number) {
+    setViewport({ ...document.layout.viewport, zoom: Math.min(2, Math.max(.5, Math.round(document.layout.viewport.zoom * factor * 100) / 100)) });
+  }
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+      if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || (target instanceof HTMLElement && target.isContentEditable)) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        setHistory((current) => event.shiftKey ? redo(current) : undo(current));
+        setActionIssue(null);
+      } else if (event.key === 'Delete' && document.layout.selectedNodeIds.length > 0) {
+        event.preventDefault();
+        dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds });
+      } else if (event.key === 'Escape') {
+        setPendingFrom(null);
+        setActionIssue(null);
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
 
   return (
     <main className="workbench">
       <header className="workbench-header">
         <button className="brand-button" type="button" onClick={onBack} aria-label="Return to project entry">FXWeave</button>
         <div className="header-divider" aria-hidden="true" />
-        <div className="project-heading">
-          <strong>{project.name}</strong>
-          <span>Foundation test graph</span>
-        </div>
+        <div className="project-heading"><strong>{project.name}</strong><span>Foundation test graph</span></div>
         <div className="header-spacer" />
         <span className="file-state">Draft only · Not saved to file</span>
+        <button className="header-tool" type="button" disabled={history.past.length === 0} onClick={() => setHistory(undo(history))}>Undo</button>
+        <button className="header-tool" type="button" disabled={history.future.length === 0} onClick={() => setHistory(redo(history))}>Redo</button>
         <span className="phase-chip">Renderer pending</span>
       </header>
 
       <div className="workbench-grid">
         <aside className="library-panel" aria-labelledby="library-heading">
-          <div className="panel-heading">
-            <p className="section-kicker">GRAPH TOOLS</p>
-            <h2 id="library-heading">Nodes</h2>
-          </div>
-          <p className="panel-note">Test definitions for editor validation. They do not create Shader code.</p>
+          <div className="panel-heading"><p className="section-kicker">GRAPH TOOLS</p><h2 id="library-heading">Nodes</h2></div>
+          <label className="search-label" htmlFor="node-search">Search nodes</label>
+          <input id="node-search" ref={searchRef} className="node-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name or purpose" />
+          <p className="panel-note">Test nodes only. No Shader code is generated.</p>
           <ul className="library-list">
-            {definitions.map((definition) => (
-              <li key={definition.type}>
-                <span className="library-category">{definition.category}</span>
-                <strong>{definition.label}</strong>
-              </li>
-            ))}
+            {definitions.map((definition) => {
+              const rootExists = document.graph.nodes.some((node) => node.type === definition.type);
+              const isRoot = definition.type === 'foundation.output';
+              return <li key={definition.type}><button type="button" onClick={() => addNode(definition.type)} disabled={isRoot && rootExists} title={definition.description}><span className="library-category">{definition.category}</span><strong>{definition.label}</strong></button></li>;
+            })}
           </ul>
+          {definitions.length === 0 && <p className="panel-note" role="status">No matching nodes.</p>}
+          {pendingFrom && <p className="pending-help" role="status">Choose a compatible input port. Press Esc to cancel.</p>}
         </aside>
 
         <section className="graph-panel" aria-labelledby="graph-heading">
           <div className="graph-toolbar">
-            <div>
-              <p className="section-kicker">SOURCE GRAPH</p>
-              <h1 id="graph-heading">Node canvas</h1>
+            <div><p className="section-kicker">SOURCE GRAPH</p><h1 id="graph-heading">Node canvas</h1></div>
+            <div className="canvas-tools">
+              <span className="canvas-count">{document.graph.nodes.length} nodes</span>
+              <button type="button" onClick={() => changeZoom(.8)} aria-label="Zoom out">−</button>
+              <span aria-label="Canvas zoom">{Math.round(document.layout.viewport.zoom * 100)}%</span>
+              <button type="button" onClick={() => changeZoom(1.25)} aria-label="Zoom in">+</button>
+              <button type="button" onClick={() => setViewport({ x: 0, y: 0, zoom: 1 })}>Reset view</button>
             </div>
-            <span className="canvas-count">{project.graph.nodes.length} node{project.graph.nodes.length === 1 ? '' : 's'}</span>
           </div>
-          <div className="graph-canvas" aria-label="Node graph canvas">
-            {project.graph.nodes.map((node) => {
-              const definition = getNodeDefinition(project.graph.graphKind, node.type);
-              const position = project.layout.nodePositions[node.id] ?? { x: 0, y: 0 };
-              return (
-                <article className="canvas-node" key={node.id} style={{ left: position.x, top: position.y }}>
-                  <div className="canvas-node-title">{definition?.label ?? node.type}</div>
-                  <div className="canvas-node-body">
-                    {definition?.inputs.map((port) => <span className="port-line" key={port.id}><i className={`port-dot port-${port.type}`} />{port.label}<small>{port.type}</small></span>)}
-                    {definition?.outputs.map((port) => <span className="port-line output-port" key={port.id}>{port.label}<small>{port.type}</small><i className={`port-dot port-${port.type}`} /></span>)}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <GraphCanvas document={document} pendingFrom={pendingFrom} onPendingFrom={setPendingFrom} onSelect={setSelection} onMove={(positions) => { dispatch({ type: 'move-nodes', positions }); }} onConnect={connect} onDisconnect={(edgeId) => { dispatch({ type: 'disconnect', edgeId }); }} onViewport={setViewport} onSearch={() => searchRef.current?.focus()} />
+          {actionIssue && <div className="canvas-feedback" role="alert">Connection or edit rejected: {actionIssue.message}</div>}
         </section>
 
         <aside className="context-panel" aria-label="Preview and inspector">
           <section className="preview-panel" aria-labelledby="preview-heading">
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
-            <div className="preview-unconfigured" role="status">
-              <span className="preview-mark" aria-hidden="true">◇</span>
-              <strong>Renderer not configured</strong>
-              <p>The first effect host and web renderer are still to be chosen. This area will run generated output in a later phase.</p>
-            </div>
+            <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>Renderer not configured</strong><p>The first effect host and web renderer are still to be chosen. This area will run generated output in a later phase.</p></div>
           </section>
           <section className="inspector-panel" aria-labelledby="inspector-heading">
             <div className="panel-heading"><p className="section-kicker">SELECTION</p><h2 id="inspector-heading">Inspector</h2></div>
-            <p className="panel-note">Select a node to inspect its properties. Editing arrives with canvas interactions.</p>
+            {selected && selectedDefinition ? <div className="inspector-content"><strong>{selectedDefinition.label}</strong><p>{selectedDefinition.description}</p><p>{selectedDefinition.inputs.length} inputs · {selectedDefinition.outputs.length} outputs</p><button className="secondary-button" type="button" disabled={selected.type === 'foundation.output'} onClick={() => dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds })}>Delete selected</button></div> : <p className="panel-note">Select a node to inspect its properties.</p>}
           </section>
         </aside>
       </div>
 
       <section className="problem-bar" aria-label="Graph problems">
         <strong>Problems {issues.length}</strong>
-        <span>{issues[0]?.message ?? 'No graph issues found.'}</span>
+        <span>{actionIssue?.message ?? issues[0]?.message ?? 'No graph issues found.'}</span>
         <span className="problem-context">Test graph · No build</span>
       </section>
     </main>
