@@ -52,6 +52,8 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const definitions = listNodeDefinitions(document.graph.graphKind).filter((definition) =>
     `${definition.label} ${definition.category} ${definition.description}`.toLowerCase().includes(search.toLowerCase()),
   );
+  const categoryOrder = [...new Set(definitions.map((definition) => definition.category))];
+  definitions.sort((a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category));
 
   function dispatch(command: GraphCommand): boolean {
     const result = applyHistoryCommand(history, command);

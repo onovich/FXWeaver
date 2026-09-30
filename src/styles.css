@@ -31,7 +31,7 @@ button { cursor: pointer; }
 button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-.brand-button { display: inline-flex; align-items: center; gap: .45rem; font-family: Bahnschrift, "Segoe UI", sans-serif; font-size: 1.15rem; font-weight: 650; letter-spacing: -.04em; color: #e8edf7; }
+.brand-button { display: inline-flex; align-items: center; gap: .45rem; padding: 0; border: 0; background: none; font-family: Bahnschrift, "Segoe UI", sans-serif; font-size: 1.15rem; font-weight: 650; letter-spacing: -.04em; color: #e8edf7; }
 .recovery-choice { max-width: 720px; margin: 12vh auto; padding: 2rem; }
 .recovery-choice h1 { margin: .5rem 0 1rem; font-size: 2rem; }
 .recovery-choice > p:not(.eyebrow) { color: var(--text-muted); line-height: 1.5; }
@@ -43,7 +43,6 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .workbench { position: relative; display: grid; grid-template-rows: 58px minmax(0, 1fr) 42px; height: 100vh; min-height: 600px; overflow: hidden; }
 .workbench.problems-open { grid-template-rows: 58px minmax(0, 1fr) 190px; }
 .workbench-header { display: flex; align-items: center; gap: .75rem; min-width: 0; padding: 0 1.1rem; border-bottom: 1px solid var(--border); background: #171c25; }
-.brand-button { padding: 0; border: 0; background: none; }
 .header-divider { align-self: stretch; width: 1px; margin: .8rem 0; background: var(--border); }
 .project-heading { display: flex; flex-direction: column; min-width: 0; gap: .12rem; }
 .project-heading strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .9rem; }
@@ -68,6 +67,7 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .search-label { display: block; margin: .3rem .75rem .3rem; color: #aab6c9; font-size: .68rem; }
 .node-search { width: calc(100% - 1.5rem); margin: 0 .75rem .7rem; padding: .55rem .65rem; border: 1px solid #37576a; border-radius: .25rem; outline: none; color: #e8edf7; background: #1b212c; font-size: .74rem; }
 .node-search:focus { border-color: #6bd8e4; }
+.node-search:focus-visible, .property-control :is(input, select):focus-visible, .preview-controls :is(input, select):focus-visible { outline: 2px solid #79c9ec; outline-offset: 2px; }
 .library-list { display: grid; gap: .15rem; margin: 0; padding: 0 .65rem 1rem; list-style: none; }
 .library-list li { min-width: 0; }
 .library-list button { display: flex; align-items: center; gap: .55rem; width: 100%; min-height: 33px; padding: .45rem .6rem; border: 1px solid transparent; border-radius: 5px; color: inherit; background: transparent; text-align: left; }

@@ -12,6 +12,16 @@ for (const width of [1440, 390]) test(`capture Phase 3 homepage at ${width}`, as
   await page.screenshot({ path: path.resolve(`docs/visuals/phase3-home-${width}.png`), fullPage: true });
 });
 
+for (const width of [1920, 1024]) test(`capture usable studio at ${width}`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Edit a copy of Radial burn' }).click();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  await page.getByRole('button', { name: 'Fit all nodes', exact: true }).click();
+  await page.getByRole('button', { name: 'Select Number node', exact: true }).first().click();
+  await page.screenshot({ path: path.resolve(`docs/visuals/phase3-studio-${width}.png`) });
+});
+
 test('capture unified Filter workbench, properties, generated result and enlarged preview', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 960 });
   await page.goto('/');
