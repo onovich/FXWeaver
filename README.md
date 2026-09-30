@@ -48,6 +48,7 @@ Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phas
 15. [V0 Phase 1 执行指南](./docs/15-v0-generated-filter-goal-mode-execution-guide.md)：节点生成 Filter、同源预览和三件作品，**20 轮**开发及验收门槛。
 16. [V0 Phase 1 开发报告](./docs/27-phase1-validation-report.md)：20 轮提交、三件作品、WebGL2 验证与实际自用待验证项。
 17. [V0 Phase 1 独立验收](./docs/28-phase1-planner-acceptance.md)：技术交付 PASS、独立复验和真实自用门槛。
+18. [V0 Phase 2 执行指南](./docs/29-v0-local-selfuse-goal-mode-execution-guide.md)：本地实际素材试用、预览放大和适配全部节点，8 轮。
 
 此前讨论形成的完整研究文档存放在 [研究历史目录](./docs/research-history/INDEX.md)；它们保留原貌供追溯，以上主文档是当前项目口径。
 

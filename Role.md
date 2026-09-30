@@ -17,8 +17,8 @@ executor:
   evidence: user requested a separate development session for V0 implementation.
 
 idempotency:
-  active_goal_guide: docs/15-v0-generated-filter-goal-mode-execution-guide.md
-  active_goal_phase: V0 Phase 1 generated Filter and three internal effects
+  active_goal_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
+  active_goal_phase: V0 Phase 2 local project asset trial and usability
   last_planner_dispatch: 2026-09-30T21:51:11.6568650+08:00
   last_planner_dispatch_status: sent
   last_planner_dispatch_guide: docs/15-v0-generated-filter-goal-mode-execution-guide.md
