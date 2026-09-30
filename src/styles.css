@@ -1,4 +1,7 @@
 :root {
+  color-scheme: dark;
+  scrollbar-color: #536178 #151a23;
+  scrollbar-width: thin;
   font-family: "Segoe UI", system-ui, sans-serif;
   color: #e8edf7;
   background: #10141b;
@@ -11,6 +14,12 @@
 }
 
 * { box-sizing: border-box; }
+:is(.workbench, .entry-shell) * { scrollbar-color: #536178 #151a23; scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #151a23; }
+::-webkit-scrollbar-thumb { background: #536178; border: 2px solid #151a23; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #79c9ec; }
+::-webkit-scrollbar-corner { background: #151a23; }
 .eyebrow, .section-kicker { margin: 0; color: #97a3b9; font-size: .62rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; }
 code, pre { font-family: "Cascadia Code", Consolas, monospace; }
 .filter-preview-panel > .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }

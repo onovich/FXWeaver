@@ -8,6 +8,8 @@ FXWeave 是一个面向游戏效果的网页低代码节点创作工具。平台
 
 ## 运行与验证
 
+**Phase 3 官网与工作台视觉升级已交付，等待独立验收。** 石墨灰/冰蓝体系、品牌晶体 Hero、真实效果卡、点阵节点画布及统一控件见[视觉报告与实际截图](./docs/36-phase3-visual-validation-report.md)。晶体是 Concept artwork；作品和预览继续来自节点图。`npm run visual:capture` 可重采官网与工作台截图，`smoke:preview` 使用独立4174端口的生产包。
+
 需要 Node.js 24 与 Chrome。克隆仓库后运行：
 
 ```powershell

@@ -41,6 +41,8 @@
 
 ## 新会话推荐起点
 
+当前新增交付：按用户视觉改进要求完成 [Phase 3 五轮指南](./35-phase3-visual-goal-mode-execution-guide.md)，见 [视觉报告](./36-phase3-visual-validation-report.md)，等待规划独立视觉与功能验收。官网使用规划生成品牌插画并标注 Concept artwork，工作台的实际效果和图/编译/运行时/存储语义保持不变。复验 `typecheck`、`test`、`build`、`smoke`、`smoke:preview`（独立4174端口），`visual:capture` 重采8张实际截图。不要为视觉验收重跑会覆盖私有工程的 local trial；人工跨日门槛仍待真实使用。
+
 当前分工：Phase 0 的[开发报告](./11-phase0-validation-report.md)与[独立验收](./12-phase0-planner-acceptance.md)已完成，结论 **PASS**。Phase 1 也已按[20 轮执行指南](./15-v0-generated-filter-goal-mode-execution-guide.md)交付节点生成 Filter、同源预览和 03/05/09 三件作品，并通过[独立技术验收](./28-phase1-planner-acceptance.md)。[开发报告](./27-phase1-validation-report.md)保留原始交付记录。Phase 2 已完成实际素材技术试用与交互改进，已通过[独立技术验收](./34-phase2-planner-acceptance.md)；人工跨日编辑仍需项目方实际使用反馈。会话路由见根目录 `Role.md`。
 
 1. 阅读 [定位](./01-vision-positioning.md)、[产品设计](./02-product-design.md)、[技术草案](./03-technical-design.md)、[阶段草案](./04-roadmap-validation.md)、[可执行路线图建议稿](./06-roadmap-proposal.md) 和 [自用版功能与交互设计](./07-self-use-product-spec.md)。
