@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type SetStateAction } from 'react';
 import { GraphCanvas } from './GraphCanvas';
 import { Inspector } from './Inspector';
 import { ProblemsPanel } from './ProblemsPanel';
@@ -12,7 +12,7 @@ import { serializeProject, withEditorDocument, type ProjectFile } from '../graph
 import type { GraphIssue } from '../graph/diagnostics';
 import type { GraphPortRef } from '../graph/schema';
 import { validateGraph } from '../graph/validation';
-import { chooseOpenHandle, chooseSaveHandle, downloadProject, hasFilePicker, readProjectFile, saveRecoveryDraft, writeProjectFile, type ProjectFileHandle } from '../storage/projectStorage';
+import { chooseOpenHandle, chooseSaveHandle, downloadProject, flushRecoveryDraft, hasFilePicker, readProjectFile, saveRecoveryDraft, writeProjectFile, type ProjectFileHandle } from '../storage/projectStorage';
 
 interface Props { project: ProjectFile; initialHandle?: ProjectFileHandle; initialSavedJson?: string; source: 'new' | 'draft' | 'file'; suspended: boolean; onOpenSession: (project: ProjectFile, handle?: ProjectFileHandle, migrated?: boolean) => void; onBack: () => void; onRecoveryWarning: (warning: string | null) => void }
 
@@ -33,6 +33,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const [projectAssets, setProjectAssets] = useState(project.assets);
   const searchRef = useRef<HTMLInputElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
+  const recoveryWriteSequence = useRef(0);
   const document = history.present;
   const graphKind = getGraphKind(document.graph.graphKind)!;
   const activeParameters = new Map(document.graph.parameters.map((parameter) => [parameter.id, parameter]));
@@ -46,6 +47,13 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const currentProject = { ...withEditorDocument(project, document), assets: projectAssets, preview: safePreviewScene };
   const currentProjectRef = useRef(currentProject);
   currentProjectRef.current = currentProject;
+  const updatePreviewScene = useCallback((next: SetStateAction<typeof project.preview>) => {
+    const preview = typeof next === 'function' ? next(currentProjectRef.current.preview) : next;
+    // Capture the committed value in the navigation snapshot before React's
+    // next render, so an immediate reload cannot flush a stale runtime value.
+    currentProjectRef.current = { ...currentProjectRef.current, preview };
+    setPreviewScene(preview);
+  }, []);
   const currentJson = serializeProject(currentProject);
   const issues = validateGraph(document.graph);
   const assetIssues = findAssetIssues(document.graph, currentProject.assets, currentProject.preview);
@@ -102,11 +110,17 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
     if (position) setViewport({ ...document.layout.viewport, x: 110 - position.x * document.layout.viewport.zoom, y: 110 - position.y * document.layout.viewport.zoom });
   }
 
-  function preserveRecoveryDraft(snapshot: ProjectFile) {
+  async function preserveRecoveryDraft(snapshot: ProjectFile) {
+    const sequence = ++recoveryWriteSequence.current;
+    setDraftSavedAt(null);
     try {
-      setDraftSavedAt(saveRecoveryDraft(snapshot).savedAt);
+      const record = await saveRecoveryDraft(snapshot);
+      if (sequence !== recoveryWriteSequence.current) return;
+      setDraftSavedAt(record.savedAt);
       onRecoveryWarning(null);
     } catch (error) {
+      if (sequence !== recoveryWriteSequence.current) return;
+      setDraftSavedAt(null);
       onRecoveryWarning(`Recovery draft unavailable: ${error instanceof Error ? error.message : 'Unknown error'}. Save or export a project file to keep this work.`);
     }
   }
@@ -114,7 +128,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   async function saveToFile(saveAs = false) {
     try {
       const snapshot = currentProjectRef.current;
-      preserveRecoveryDraft(snapshot);
+      void preserveRecoveryDraft(snapshot);
       let handle = saveAs ? null : fileHandle;
       if (!handle) {
         if (!hasFilePicker()) {
@@ -136,15 +150,15 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
 
   function returnToEntry() {
     window.setTimeout(() => {
-      preserveRecoveryDraft(currentProjectRef.current);
-      onBack();
+      void preserveRecoveryDraft(currentProjectRef.current).then(onBack);
     }, 0);
   }
 
   async function openProjectFromPicker() {
     try {
-      preserveRecoveryDraft(currentProjectRef.current);
+      const recovery = preserveRecoveryDraft(currentProjectRef.current);
       const handle = await chooseOpenHandle();
+      await recovery;
       const result = await readProjectFile(await handle.getFile());
       if (!result.ok) { setSaveNotice(`Open blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
       onOpenSession(result.project, handle, !!result.migratedFromVersion);
@@ -156,7 +170,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
 
   async function importProjectFile(file: File) {
     try {
-      preserveRecoveryDraft(currentProjectRef.current);
+      await preserveRecoveryDraft(currentProjectRef.current);
       const result = await readProjectFile(file);
       if (!result.ok) { setSaveNotice(`Import blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
       onOpenSession(result.project, undefined, !!result.migratedFromVersion);
@@ -166,10 +180,15 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   }
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      preserveRecoveryDraft(currentProject);
-    }, 300);
-    return () => window.clearTimeout(timer);
+    const flush = () => { void flushRecoveryDraft(currentProjectRef.current).catch(() => {}); };
+    window.addEventListener('pagehide', flush);
+    return () => { recoveryWriteSequence.current++; window.removeEventListener('pagehide', flush); };
+  }, []);
+
+  useEffect(() => {
+    // Start each committed editor snapshot immediately, including the last edit
+    // before reload. IndexedDB commits asynchronously without blocking the UI.
+    void preserveRecoveryDraft(currentProject);
   }, [currentJson]);
 
   useEffect(() => {
@@ -267,7 +286,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
           {graphKind.isTestOnly ? <section className="preview-panel" aria-labelledby="preview-heading">
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
             <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{assetIssues.length ? 'Missing project image' : graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{assetIssues.length ? assetIssues.map((issue) => issue.message).join(' ') : graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
-          </section> : <FilterPreview graph={document.graph} assets={projectAssets} scene={safePreviewScene} onSceneChange={setPreviewScene} onAssetsChange={setProjectAssets} />}
+          </section> : <FilterPreview graph={document.graph} assets={projectAssets} scene={safePreviewScene} onSceneChange={updatePreviewScene} onAssetsChange={setProjectAssets} />}
           <section className="inspector-drawer"><button className="inspector-toggle" type="button" aria-expanded={inspectorOpen} onClick={() => setInspectorOpen(!inspectorOpen)}>Graph properties <span>{inspectorOpen ? 'Back to live tuning −' : 'Edit graph defaults +'}</span></button><div hidden={!inspectorOpen}><Inspector graph={document.graph} assets={projectAssets} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} /></div></section>
         </aside>
       </div>

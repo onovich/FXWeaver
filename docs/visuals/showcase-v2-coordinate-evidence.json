@@ -1,0 +1,17 @@
+{
+  "source": {
+    "width": 1024,
+    "height": 1536,
+    "alphaBounds": {
+      "left": 205,
+      "top": 11,
+      "right": 817,
+      "bottom": 1515
+    }
+  },
+  "hostFrame": {
+    "width": 230.4,
+    "height": 345.6
+  },
+  "coordinateContract": "Filter UV normalizes vTextureCoord by outputFrame/inputSize; padding 0, filterAreaInset 0, frame UV 0..1. Host size = min(800,640) * 0.54."
+}

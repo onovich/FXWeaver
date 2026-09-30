@@ -7,6 +7,11 @@ test('formal project save works when recovery draft storage fails', async ({ pag
       if (key.startsWith('fxweave:draft:')) throw new DOMException('Storage full', 'QuotaExceededError');
       return originalSetItem.call(this, key, value);
     };
+    const originalTransaction = IDBDatabase.prototype.transaction;
+    IDBDatabase.prototype.transaction = function (...args) {
+      if (args[1] === 'readwrite') throw new DOMException('Database full', 'QuotaExceededError');
+      return originalTransaction.apply(this, args);
+    };
     let saved = '';
     const handle = {
       name: 'qa.fxweave.json',

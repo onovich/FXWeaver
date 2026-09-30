@@ -40,3 +40,11 @@ visual_refinement:
   date: 2026-10-01
   report: docs/39-visual-refinement-review-log.md
   evidence: four versions reviewed; independent interaction, 72 unit, 44 public, 14 production and 5 capture checks passed
+
+showcase_recovery_repair:
+  implementers: collaboration subagents repair_showcase_effects and repair_draft_quota
+  reviewer: planner above
+  status: pass
+  date: 2026-10-01
+  report: docs/40-showcase-and-recovery-repair-review.md
+  evidence: actual browser interaction; 72 unit, 51 public, 21 production and 5 capture checks passed

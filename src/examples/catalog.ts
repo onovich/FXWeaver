@@ -1,12 +1,12 @@
-import manifest03 from '../../examples/generated/03-radial-burn.manifest.json?raw';
+import manifest03 from '../../examples/showcase/03-radial-burn.manifest.json?raw';
 import manifest05 from '../../examples/generated/05-local-melt.manifest.json?raw';
-import manifest09 from '../../examples/generated/09-hologram-scan.manifest.json?raw';
-import manifest03Url from '../../examples/generated/03-radial-burn.manifest.json?url';
+import manifest09 from '../../examples/showcase/09-hologram-scan.manifest.json?raw';
+import manifest03Url from '../../examples/showcase/03-radial-burn.manifest.json?url';
 import manifest05Url from '../../examples/generated/05-local-melt.manifest.json?url';
-import manifest09Url from '../../examples/generated/09-hologram-scan.manifest.json?url';
-import log03Url from '../../examples/03-radial-burn.creation-log.json?url';
+import manifest09Url from '../../examples/showcase/09-hologram-scan.manifest.json?url';
+import log03Url from '../../examples/showcase/03-radial-burn.creation-log.json?url';
 import log05Url from '../../examples/05-local-melt.creation-log.json?url';
-import log09Url from '../../examples/09-hologram-scan.creation-log.json?url';
+import log09Url from '../../examples/showcase/09-hologram-scan.creation-log.json?url';
 import image03 from '../../docs/visuals/showcase-03-effect.png?url';
 import image05 from '../../docs/visuals/showcase-05-effect.png?url';
 import image09 from '../../docs/visuals/showcase-09-effect.png?url';
@@ -24,9 +24,9 @@ interface ExampleSource {
 }
 
 const sources: ExampleSource[] = [
-  { id: '03', title: 'Radial burn', purpose: 'A local reveal with a noise edge and transparent cutout.', loadProject: async () => (await import('../../examples/showcase/03-radial-burn.fxweave.json?raw')).default, manifestJson: manifest03, manifestUrl: manifest03Url, creationLogUrl: log03Url, imageUrl: image03 },
+  { id: '03', title: 'Radial burn', purpose: 'Animated orange-hot erosion. Play the cycle; set Auto burn to 0 for manual Burn progress.', loadProject: async () => (await import('../../examples/showcase/03-radial-burn.fxweave.json?raw')).default, manifestJson: manifest03, manifestUrl: manifest03Url, creationLogUrl: log03Url, imageUrl: image03 },
   { id: '05', title: 'Local melt', purpose: 'A time driven wave that resamples the host image.', loadProject: async () => (await import('../../examples/showcase/05-local-melt.fxweave.json?raw')).default, manifestJson: manifest05, manifestUrl: manifest05Url, creationLogUrl: log05Url, imageUrl: image05 },
-  { id: '09', title: 'Hologram scan', purpose: 'Local scan lines and a small red channel offset.', loadProject: async () => (await import('../../examples/showcase/09-hologram-scan.fxweave.json?raw')).default, manifestJson: manifest09, manifestUrl: manifest09Url, creationLogUrl: log09Url, imageUrl: image09 },
+  { id: '09', title: 'Hologram scan', purpose: 'Fine scan lines, restrained RGB separation, moving scan glow and intermittent horizontal glitches.', loadProject: async () => (await import('../../examples/showcase/09-hologram-scan.fxweave.json?raw')).default, manifestJson: manifest09, manifestUrl: manifest09Url, creationLogUrl: log09Url, imageUrl: image09 },
 ];
 
 export const examples = sources.map(({ loadProject: _loadProject, manifestJson, ...item }) => ({

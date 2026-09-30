@@ -6,6 +6,7 @@ test('project-file editor still starts when browser draft storage is unavailable
       configurable: true,
       get() { throw new DOMException('Storage disabled', 'SecurityError'); },
     });
+    Object.defineProperty(window, 'indexedDB', { configurable: true, get() { throw new DOMException('Database disabled', 'SecurityError'); } });
     let saved = '';
     const handle = {
       name: 'qa.fxweave.json',

@@ -82,3 +82,5 @@ Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phas
 用户要求官网与生产工作台美化，按 [Phase 3 视觉升级指南](./docs/35-phase3-visual-goal-mode-execution-guide.md) 已完成 5 轮并通过[独立视觉与功能验收](./docs/37-phase3-planner-acceptance.md)。官网与创作工作台可直接试用。
 
 2026-10-01 持续视觉优化经 subagent 四版修正、规划者独立验收通过：真实游戏素材效果展示、实时调参、100%节点编辑与关联默认值首屏编辑。见[验收记录](./docs/39-visual-refinement-review-log.md)及[最终实现验证](./docs/refinement-final-validation.md)。72单测、44公共回归、14生产回归及5截图检查通过。
+
+实际试用反馈后的[效果与恢复修复](./docs/40-showcase-and-recovery-repair-review.md)已通过独立验收：燃烧热边与循环消散、细扫描线/扫光/局部故障位移，大素材草稿改用IndexedDB并保留旧草稿。72单测、51公共回归、21生产回归、5截图检查通过。刷新后从首页重新打开示例副本可体验新版效果。

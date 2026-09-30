@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ProjectStart } from './components/ProjectStart';
 import { RecoveryChoice } from './components/RecoveryChoice';
 import { WorkspaceShell } from './components/WorkspaceShell';
@@ -18,12 +18,18 @@ export function App() {
   const exampleRequest = useRef(0);
   const [session, setSession] = useState<ActiveSession | null>(null);
   const [sessionToken, setSessionToken] = useState(0);
-  const [draftRead, setDraftRead] = useState(() => readRecoveryDrafts());
+  const [draftRead, setDraftRead] = useState<{ value: DraftProject[]; error: string | null }>({ value: [], error: null });
   const [entryError, setEntryError] = useState<string | null>(null);
   const [loadingExampleId, setLoadingExampleId] = useState<string | null>(null);
   const [recoveryReadWarning, setRecoveryReadWarning] = useState<string | null>(draftRead.error);
   const [recoveryWriteWarning, setRecoveryWriteWarning] = useState<string | null>(null);
   const [choice, setChoice] = useState<{ file: ActiveSession; draft: DraftProject; origin: 'entry' | 'editor' } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void readRecoveryDrafts().then((result) => { if (active) { setDraftRead(result); setRecoveryReadWarning(result.error); } });
+    return () => { active = false; };
+  }, []);
 
   function activate(next: ActiveSession) {
     exampleRequest.current++;
@@ -52,15 +58,19 @@ export function App() {
     }
   }
 
-  function openResolved(next: ActiveSession, origin: 'entry' | 'editor') {
-    const { value: draft, error } = readRecoveryDraft(next.project.id);
+  async function openResolved(next: ActiveSession, origin: 'entry' | 'editor') {
+    const request = ++exampleRequest.current;
+    const { value: draft, error } = await readRecoveryDraft(next.project.id);
+    if (request !== exampleRequest.current) return;
     if (error) setRecoveryReadWarning(error);
     if (draft && draft.json !== serializeProject(next.project)) setChoice({ file: next, draft, origin });
     else activate(next);
   }
 
-  function returnToEntry() {
-    const result = readRecoveryDrafts();
+  async function returnToEntry() {
+    const request = ++exampleRequest.current;
+    const result = await readRecoveryDrafts();
+    if (request !== exampleRequest.current) return;
     setDraftRead(result);
     setRecoveryReadWarning(result.error);
     setSession(null);

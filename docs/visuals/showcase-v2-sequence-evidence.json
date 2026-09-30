@@ -1,0 +1,98 @@
+{
+  "03": {
+    "buildId": "f1-2a927fd925929ed9",
+    "frames": [
+      {
+        "label": "t0",
+        "file": "docs/visuals/showcase-v2-03-t0.png",
+        "sha256": "a627cac60071029c116566fcae39010f0cce07b1b77b3f593c9f7cbf913f7b62",
+        "visiblePixels": 25363,
+        "hotPixels": 0
+      },
+      {
+        "label": "t0.85",
+        "file": "docs/visuals/showcase-v2-03-t0.85.png",
+        "sha256": "20fa5b91ccd1f3d111e44fc0f758d5946b90ced5c9b4aaf4e5c5d69e1dee8236",
+        "visiblePixels": 25312,
+        "hotPixels": 237
+      },
+      {
+        "label": "t1.6",
+        "file": "docs/visuals/showcase-v2-03-t1.6.png",
+        "sha256": "5d0bd1c72ca52ba98a47be8be5a75df3a2b9843bc909962a9e0d986b76c6df8f",
+        "visiblePixels": 20561,
+        "hotPixels": 942
+      },
+      {
+        "label": "t2.8",
+        "file": "docs/visuals/showcase-v2-03-t2.8.png",
+        "sha256": "28823c05bdd074265c9b2de4aba3ff0d97fc2c02eee053b30f76116bab9e8254",
+        "visiblePixels": 5718,
+        "hotPixels": 1010
+      },
+      {
+        "label": "t5.5",
+        "file": "docs/visuals/showcase-v2-03-t5.5.png",
+        "sha256": "c618cb7b1bc176f9ab69a3987d05e83c6b067ec57a31e7ba6bff67733387d9aa",
+        "visiblePixels": 0,
+        "hotPixels": 0
+      },
+      {
+        "label": "manual-0",
+        "file": "docs/visuals/showcase-v2-03-manual-0.png",
+        "sha256": "a627cac60071029c116566fcae39010f0cce07b1b77b3f593c9f7cbf913f7b62",
+        "visiblePixels": 25363,
+        "hotPixels": 0
+      },
+      {
+        "label": "manual-1",
+        "file": "docs/visuals/showcase-v2-03-manual-1.png",
+        "sha256": "c618cb7b1bc176f9ab69a3987d05e83c6b067ec57a31e7ba6bff67733387d9aa",
+        "visiblePixels": 0,
+        "hotPixels": 0
+      }
+    ],
+    "method": "Actual generated Pixi WebGL2 canvas frames at fixed time/ordinary runtime parameters."
+  },
+  "09": {
+    "buildId": "f1-ae6a4ade6c610586",
+    "frames": [
+      {
+        "label": "t0.9",
+        "file": "docs/visuals/showcase-v2-09-t0.9.png",
+        "sha256": "f8e823abe622dd095518bfb25ff2aba784318ce245faef20fc5030e0e17aa342",
+        "visiblePixels": 26307,
+        "hotPixels": 119
+      },
+      {
+        "label": "t2.2",
+        "file": "docs/visuals/showcase-v2-09-t2.2.png",
+        "sha256": "47c499b9052367068d234d8f06929c241faf0bdf728f4245708231b0bba23d76",
+        "visiblePixels": 26331,
+        "hotPixels": 131
+      },
+      {
+        "label": "t2.9",
+        "file": "docs/visuals/showcase-v2-09-t2.9.png",
+        "sha256": "ffcad180cd14ae71ee5ea32341b73cced211e6d1c7a64b908820b67e30fe5bd2",
+        "visiblePixels": 26354,
+        "hotPixels": 175
+      },
+      {
+        "label": "t3.8",
+        "file": "docs/visuals/showcase-v2-09-t3.8.png",
+        "sha256": "8a9c3fe48cc21caeb521aa2e509a751eb0376b1862fdc7e62101619a08098f6c",
+        "visiblePixels": 26265,
+        "hotPixels": 189
+      },
+      {
+        "label": "neutral",
+        "file": "docs/visuals/showcase-v2-09-neutral.png",
+        "sha256": "a627cac60071029c116566fcae39010f0cce07b1b77b3f593c9f7cbf913f7b62",
+        "visiblePixels": 25363,
+        "hotPixels": 0
+      }
+    ],
+    "method": "Actual generated Pixi WebGL2 canvas frames at fixed time/ordinary runtime parameters."
+  }
+}

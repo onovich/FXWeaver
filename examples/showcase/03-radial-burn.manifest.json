@@ -1,0 +1,430 @@
+{
+  "buildId": "f1-2a927fd925929ed9",
+  "generatorVersion": 1,
+  "backend": "pixi.webgl2",
+  "pixiVersion": "8.21.0",
+  "graphSchemaVersion": 1,
+  "irVersion": 1,
+  "parameterBindings": [
+    {
+      "id": "042baf7d-ce9a-451e-a68c-132086304e6f",
+      "name": "Auto burn",
+      "valueType": "float",
+      "sourceNodeId": "c337821a-5209-4975-a50a-47e6bc1981bc",
+      "sourceKey": "value",
+      "defaultValue": 1,
+      "min": 0,
+      "max": 1,
+      "uniformName": "uParam0"
+    },
+    {
+      "id": "1bf29755-d7db-4d2b-a5d4-376fa1194a39",
+      "name": "Burn progress",
+      "valueType": "float",
+      "sourceNodeId": "58fbaf12-c82b-46e5-a9a0-10c2849a4d05",
+      "sourceKey": "value",
+      "defaultValue": 0.42,
+      "min": 0,
+      "max": 1,
+      "uniformName": "uParam1"
+    },
+    {
+      "id": "1dc38ca8-7bbf-400f-af8b-cf757029839e",
+      "name": "Noise amount",
+      "valueType": "float",
+      "sourceNodeId": "d50fe46f-5149-4794-a9f7-88f96f6d5041",
+      "sourceKey": "value",
+      "defaultValue": 0.055,
+      "min": 0,
+      "max": 0.15,
+      "uniformName": "uParam2"
+    },
+    {
+      "id": "20cc3dfa-3d8d-4f73-accd-bc2daa57a2d3",
+      "name": "Center",
+      "valueType": "vec2",
+      "sourceNodeId": "90f4ce66-aa49-453a-a380-fc989d5f405c",
+      "sourceKey": "value",
+      "defaultValue": [
+        0.38,
+        0.62
+      ],
+      "uniformName": "uParam3"
+    },
+    {
+      "id": "42688808-f29d-4cef-a619-12b4cf097eca",
+      "name": "Edge color",
+      "valueType": "color",
+      "sourceNodeId": "d3688081-5c39-4374-ad76-d67e7032afd5",
+      "sourceKey": "value",
+      "defaultValue": "#ff5108ff",
+      "uniformName": "uParam4"
+    },
+    {
+      "id": "44567256-dd7d-4a52-a46c-8b9f6fbb4ab8",
+      "name": "Burn speed",
+      "valueType": "float",
+      "sourceNodeId": "4d59e287-ee20-4841-aef3-dffad79540fc",
+      "sourceKey": "value",
+      "defaultValue": 0.16,
+      "min": 0.02,
+      "max": 0.5,
+      "uniformName": "uParam5"
+    },
+    {
+      "id": "50e244ea-2140-488c-ae87-e09e0883294e",
+      "name": "Edge width",
+      "valueType": "float",
+      "sourceNodeId": "3bdb07dc-72ee-4530-a6dd-a1145e4c3b44",
+      "sourceKey": "value",
+      "defaultValue": 0.055,
+      "min": 0.015,
+      "max": 0.15,
+      "uniformName": "uParam6"
+    }
+  ],
+  "textureBindings": [],
+  "usesTime": true,
+  "nodeSourceRanges": {
+    "01031537-7099-4d0f-a380-a5a972b46276": {
+      "firstLine": 19,
+      "lastLine": 19
+    },
+    "060bbc99-50ac-4847-ac7a-ddfba8f9ca62": {
+      "firstLine": 20,
+      "lastLine": 20
+    },
+    "0f337120-3785-4b6a-ad51-5d4b2265ddd0": {
+      "firstLine": 21,
+      "lastLine": 21
+    },
+    "153c580a-48e1-47ad-a82f-9b362f9b539d": {
+      "firstLine": 22,
+      "lastLine": 22
+    },
+    "1575668d-4240-40a3-a99c-b12b065141cd": {
+      "firstLine": 23,
+      "lastLine": 23
+    },
+    "228e35e2-f74b-471c-a5e2-28d1acc2e068": {
+      "firstLine": 24,
+      "lastLine": 24
+    },
+    "2dd8f86c-1fa3-43c9-a1d8-d0a2489f0893": {
+      "firstLine": 25,
+      "lastLine": 25
+    },
+    "3bdb07dc-72ee-4530-a6dd-a1145e4c3b44": {
+      "firstLine": 26,
+      "lastLine": 26
+    },
+    "3e152351-1167-4763-a6e5-7f2d0aec4541": {
+      "firstLine": 27,
+      "lastLine": 27
+    },
+    "44a25ae8-5659-4c77-a0e5-3999b82e085c": {
+      "firstLine": 28,
+      "lastLine": 28
+    },
+    "48dba097-5578-4e36-a2e3-29cddc09abe6": {
+      "firstLine": 29,
+      "lastLine": 29
+    },
+    "4d59e287-ee20-4841-aef3-dffad79540fc": {
+      "firstLine": 30,
+      "lastLine": 30
+    },
+    "37b19266-4ad1-4eac-a46e-3d9325e79720": {
+      "firstLine": 31,
+      "lastLine": 31
+    },
+    "5377f095-bb31-4142-ae29-6b98445188e5": {
+      "firstLine": 32,
+      "lastLine": 32
+    },
+    "01128a7d-abc8-4f82-af58-f0305fdaf32e": {
+      "firstLine": 33,
+      "lastLine": 33
+    },
+    "58fbaf12-c82b-46e5-a9a0-10c2849a4d05": {
+      "firstLine": 34,
+      "lastLine": 34
+    },
+    "596615dd-2b70-4e7e-ab8d-b2f30eee65f9": {
+      "firstLine": 35,
+      "lastLine": 35
+    },
+    "5975872d-bf03-4653-a7fa-c5e91f0504a7": {
+      "firstLine": 36,
+      "lastLine": 36
+    },
+    "71872eda-7ffd-41a7-a8f5-9301a0b48c5b": {
+      "firstLine": 37,
+      "lastLine": 37
+    },
+    "766d5fc3-61e2-49f7-a3aa-93b57de9d4fc": {
+      "firstLine": 38,
+      "lastLine": 38
+    },
+    "82489184-08b6-4e4a-af49-f453892778b0": {
+      "firstLine": 39,
+      "lastLine": 39
+    },
+    "8a54de08-b373-4fab-ada6-0dc8c179bd02": {
+      "firstLine": 40,
+      "lastLine": 40
+    },
+    "90f4ce66-aa49-453a-a380-fc989d5f405c": {
+      "firstLine": 41,
+      "lastLine": 41
+    },
+    "9fb348f0-23cc-447c-ae3c-fd6045fef9d2": {
+      "firstLine": 42,
+      "lastLine": 42
+    },
+    "5c84ef42-4c6f-49f6-ad90-00b0da6acc38": {
+      "firstLine": 43,
+      "lastLine": 43
+    },
+    "aa58eb65-95a6-4bef-a297-8dee6140e465": {
+      "firstLine": 44,
+      "lastLine": 44
+    },
+    "ad684149-51d6-4d0c-a63e-e03de34facf3": {
+      "firstLine": 45,
+      "lastLine": 46
+    },
+    "506f6eb3-389f-4087-ae51-984097ea0252": {
+      "firstLine": 47,
+      "lastLine": 47
+    },
+    "9cd36d4c-51f7-4b66-ae03-b1b644cdfa17": {
+      "firstLine": 48,
+      "lastLine": 48
+    },
+    "a8e2c1a1-ed34-482b-ae65-8a25caf2923f": {
+      "firstLine": 49,
+      "lastLine": 49
+    },
+    "b88525a1-dc30-4070-a08d-16d9c4f2a64e": {
+      "firstLine": 50,
+      "lastLine": 50
+    },
+    "b026c706-98a0-48c9-abfd-5aa739115523": {
+      "firstLine": 51,
+      "lastLine": 51
+    },
+    "bc454eb9-9c90-4cce-a25c-710705cf3023": {
+      "firstLine": 52,
+      "lastLine": 52
+    },
+    "c337821a-5209-4975-a50a-47e6bc1981bc": {
+      "firstLine": 53,
+      "lastLine": 53
+    },
+    "b245cd28-3051-4096-aa02-b7be88d28cb9": {
+      "firstLine": 54,
+      "lastLine": 54
+    },
+    "4b0a5158-4064-420d-a050-ade961ab6a9b": {
+      "firstLine": 55,
+      "lastLine": 55
+    },
+    "d1c66ca4-21d4-47cb-abad-c297279f4d51": {
+      "firstLine": 56,
+      "lastLine": 56
+    },
+    "d3688081-5c39-4374-ad76-d67e7032afd5": {
+      "firstLine": 57,
+      "lastLine": 57
+    },
+    "59a72a6b-d267-407d-a1f4-e2fdef51a086": {
+      "firstLine": 58,
+      "lastLine": 58
+    },
+    "258e215f-ae81-4477-a245-afe018beaaa1": {
+      "firstLine": 59,
+      "lastLine": 62
+    },
+    "d50fe46f-5149-4794-a9f7-88f96f6d5041": {
+      "firstLine": 63,
+      "lastLine": 63
+    },
+    "e1c2c0b7-e8e3-4a66-a594-ba7fc9ef9ae0": {
+      "firstLine": 64,
+      "lastLine": 64
+    },
+    "e51acc70-8d07-4163-a119-40df08ff0e9f": {
+      "firstLine": 65,
+      "lastLine": 65
+    },
+    "e8084f92-f35c-41b7-a5db-1059df5cf03e": {
+      "firstLine": 66,
+      "lastLine": 69
+    },
+    "a5e7c885-a0ff-4654-ab02-3492cd373c6b": {
+      "firstLine": 70,
+      "lastLine": 70
+    },
+    "ea766a59-b88c-4feb-ab09-0920adeb4bb6": {
+      "firstLine": 71,
+      "lastLine": 71
+    },
+    "ede1914f-579e-4938-a2d5-4b24b96cdcc4": {
+      "firstLine": 72,
+      "lastLine": 72
+    },
+    "14e3c789-57d1-4922-a3f3-8244ede6c4df": {
+      "firstLine": 73,
+      "lastLine": 73
+    },
+    "26111ee5-2ee8-4c15-a8c1-6691b451a95f": {
+      "firstLine": 74,
+      "lastLine": 74
+    },
+    "f04438fe-eec4-4023-a6a9-db0b516f7cd0": {
+      "firstLine": 75,
+      "lastLine": 75
+    },
+    "f2aa9941-79b6-4cd6-a598-437de47f70c0": {
+      "firstLine": 76,
+      "lastLine": 76
+    },
+    "a196bc4b-292f-4b5a-adac-4fce02111535": {
+      "firstLine": 77,
+      "lastLine": 77
+    },
+    "f564a483-7cf0-404a-a575-13fcd6f8ef56": {
+      "firstLine": 78,
+      "lastLine": 78
+    },
+    "bfa17d9e-7e8e-4722-aca6-3ec1b43eecb3": {
+      "firstLine": 79,
+      "lastLine": 79
+    },
+    "8d2fd1d2-0565-4cfe-a892-fa423f1870af": {
+      "firstLine": 80,
+      "lastLine": 80
+    },
+    "7f0aab14-cc06-49a1-adb3-a1cfc78e8ec9": {
+      "firstLine": 81,
+      "lastLine": 81
+    },
+    "ac60105e-5f84-484c-a6f8-9b69e36285e7": {
+      "firstLine": 82,
+      "lastLine": 82
+    },
+    "3c2ad4e7-5e05-4b8f-aef5-d85a56396a56": {
+      "firstLine": 83,
+      "lastLine": 83
+    },
+    "f1723282-f942-437c-a897-f5ef8b8cd643": {
+      "firstLine": 84,
+      "lastLine": 84
+    },
+    "00029f15-19fb-4a57-ab7f-9f46ad91a812": {
+      "firstLine": 85,
+      "lastLine": 85
+    },
+    "8aca2cd8-779a-44d4-ac95-74b2cf58f56c": {
+      "firstLine": 86,
+      "lastLine": 86
+    },
+    "d53c1d8f-cd61-4618-a771-2e2dcb713f77": {
+      "firstLine": 87,
+      "lastLine": 87
+    },
+    "87f27115-5284-439b-ab44-6468141f83cc": {
+      "firstLine": 88,
+      "lastLine": 88
+    },
+    "ff4bdcdb-1eed-4c0a-ad28-caca05e4bd6c": {
+      "firstLine": 89,
+      "lastLine": 89
+    },
+    "5126e1e0-5a1c-455c-ad5f-994516bdf55c": {
+      "firstLine": 90,
+      "lastLine": 90
+    },
+    "77e0a62e-7ddc-4e21-a5f4-e9d61fc98a8e": {
+      "firstLine": 91,
+      "lastLine": 91
+    },
+    "1be3558e-f0d6-42a0-a694-592e410d8f19": {
+      "firstLine": 92,
+      "lastLine": 92
+    },
+    "937eb897-a7e1-4042-a111-5a76f1dc351e": {
+      "firstLine": 93,
+      "lastLine": 93
+    },
+    "5725200a-a727-446a-acc9-3bb1da875706": {
+      "firstLine": 94,
+      "lastLine": 94
+    },
+    "81fa6172-d90b-4ae5-a3fc-08291a37a207": {
+      "firstLine": 95,
+      "lastLine": 95
+    },
+    "1a95e744-befb-4a20-a22e-6eea4d3d8cc4": {
+      "firstLine": 96,
+      "lastLine": 96
+    },
+    "95d5dccf-533f-4c21-aed5-5e5ce3f0d9dd": {
+      "firstLine": 97,
+      "lastLine": 97
+    },
+    "2abbc7ef-bd5c-4f20-a1ba-7d0572e2a8ac": {
+      "firstLine": 98,
+      "lastLine": 98
+    },
+    "66b32e07-e4f1-4919-acd0-dfda9625320d": {
+      "firstLine": 99,
+      "lastLine": 99
+    },
+    "002a910e-98c4-46c7-a003-f394c3d14682": {
+      "firstLine": 100,
+      "lastLine": 100
+    },
+    "98c8623e-8bca-4bde-a090-4436972abc0e": {
+      "firstLine": 101,
+      "lastLine": 101
+    },
+    "2368211a-9017-467c-a133-e09502904621": {
+      "firstLine": 102,
+      "lastLine": 102
+    },
+    "1475f3bc-db65-42cc-afa8-bfa597d03099": {
+      "firstLine": 103,
+      "lastLine": 103
+    },
+    "ab2104f8-e59d-4780-ab0d-0880eb9605ac": {
+      "firstLine": 104,
+      "lastLine": 104
+    },
+    "d20dada4-7023-4ce0-a3c2-5dc991d0dc00": {
+      "firstLine": 105,
+      "lastLine": 105
+    },
+    "7ab9530d-570d-4618-a1e7-31c0cc64c9a6": {
+      "firstLine": 106,
+      "lastLine": 106
+    },
+    "6883882c-75f5-4aa6-a19c-61b00857f4d1": {
+      "firstLine": 107,
+      "lastLine": 107
+    },
+    "1903383c-48ff-4458-acfd-74688895cd57": {
+      "firstLine": 108,
+      "lastLine": 108
+    },
+    "8677eddb-20a7-4ee8-ab0f-d8d0554c0480": {
+      "firstLine": 109,
+      "lastLine": 109
+    },
+    "526dd4c2-9860-469e-ac03-df9da639afef": {
+      "firstLine": 110,
+      "lastLine": 110
+    }
+  }
+}

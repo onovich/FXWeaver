@@ -3,14 +3,14 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const cases = [
-  { id: '03', title: 'Radial burn', file: '03-radial-burn', parameter: 'Radius', value: '0.18' },
+  { id: '03', title: 'Radial burn', file: '03-radial-burn', parameter: 'Edge width', value: '0.025' },
   { id: '05', title: 'Local melt', file: '05-local-melt', parameter: 'Frequency', value: '28' },
   { id: '09', title: 'Hologram scan', file: '09-hologram-scan', parameter: 'Scan intensity', value: '0' },
 ];
 
 for (const sample of cases) test(`work ${sample.id} opens as an editable copy and survives Save As and reopen`, async ({ page }) => {
   const original = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'showcase', `${sample.file}.fxweave.json`), 'utf8'));
-  const manifest = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'generated', `${sample.file}.manifest.json`), 'utf8'));
+  const manifest = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', sample.id === '05' ? 'generated' : 'showcase', `${sample.file}.manifest.json`), 'utf8'));
   await page.addInitScript(() => {
     let saved = '';
     const handle = {
@@ -104,8 +104,8 @@ test('a late example load cannot replace a newer choice', async ({ page }) => {
 });
 
 test('saving one derived work leaves the original available for another independent copy', async ({ page }) => {
-  const original = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', '03-radial-burn.fxweave.json'), 'utf8'));
-  const manifest = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'generated', '03-radial-burn.manifest.json'), 'utf8'));
+  const original = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'showcase', '03-radial-burn.fxweave.json'), 'utf8'));
+  const manifest = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'showcase', '03-radial-burn.manifest.json'), 'utf8'));
   await page.addInitScript(() => {
     const handle = { name: 'first-copy.fxweave.json', createWritable: async () => ({ write: async (text: string) => { Object.assign(window, { __firstCopy: text }); }, close: async () => {} }) };
     Object.assign(window, { showSaveFilePicker: async () => handle, __firstCopy: '' });
@@ -115,8 +115,8 @@ test('saving one derived work leaves the original available for another independ
   await expect(page.getByText('Preview ready')).toBeVisible();
   if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
   if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
-  const radius = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Radius' });
-  await radius.fill('0.18');
+  const radius = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Edge width' });
+  await radius.fill('0.025');
   await radius.press('Enter');
   await page.getByRole('button', { name: 'Save As' }).click();
   await expect(page.locator('.file-state')).toContainText('Saved to project');
@@ -129,7 +129,7 @@ test('saving one derived work leaves the original available for another independ
   await page.getByRole('button', { name: /Graph properties/ }).click();
   if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
   if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
-  await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Radius' })).toHaveValue('0.34');
+  await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Edge width' })).toHaveValue('0.055');
   const secondDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export JSON' }).click();
   const second = JSON.parse(await readFile((await (await secondDownload).path())!, 'utf8'));
