@@ -50,7 +50,7 @@ flowchart LR
 
 ## V0 首个网页目标：2D Web 对象/容器 Filter
 
-用户已确认 PixiJS 8 WebGL 的 Sprite/Container Filter 为 V0 首个网页目标。执行阶段还需固定 PixiJS 小版本，用节点工具生成 Filter Shader，并让预览运行该生成结果。Filter 处理已绘制内容；它不等于替换 Sprite 绘制材质。全屏后效和真正的 Sprite 材质需要新的图类型与挂载方式。首批效果候选见[策划清单](./13-v0-2d-effect-candidates.md)。[PixiJS Filters](https://pixijs.com/8.x/guides/components/filters)
+用户已确认 PixiJS 8 WebGL 的 Sprite/Container Filter 为 V0 首个网页目标，并选定[首批 03、05、09 效果](./13-v0-2d-effect-candidates.md)。[Phase 1 执行指南](./15-v0-generated-filter-goal-mode-execution-guide.md)锁定 `pixi.js` 8.21.0 与 WebGL2，用节点工具生成 Filter Shader，并让预览运行该生成结果。Filter 处理已绘制内容；它不等于替换 Sprite 绘制材质。全屏后效和真正的 Sprite 材质需要新的图类型与挂载方式。[PixiJS Filters](https://pixijs.com/8.x/guides/components/filters)
 
 第一版至少要能查看/保存节点源图、生成的网页 Shader、参数与素材输入说明，并证明重开图后结果一致。第二版的目标导出包应包含：适配后的 Shader、运行时封装/参数接口、所需纹理与依赖清单、版本及管线信息、最小安装示例、许可证、构建诊断，以及可回到 FXWeave 编辑的源图或引用。公开分享页面始终保留源图。
 

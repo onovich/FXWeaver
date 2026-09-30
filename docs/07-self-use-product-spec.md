@@ -8,7 +8,7 @@
 
 团队成员从空节点图开始，制作一个真实要使用或展示的效果；更换测试素材，调参数，看到由当前图**生成的 Shader** 实时渲染；保存工程，隔天打开继续修改；取得当前网页目标的生成代码与参数/素材说明。项目方制作的所有示例 Shader 都从这套工具生成，不在工具外手写 Shader 来补齐作品。
 
-V0 的“所见即所得”限定在**已选的 PixiJS 8 WebGL Sprite/Container Filter**。这是一类处理宿主已绘制内容的效果，其他宿主需要不同根节点、输入和预览场景。预览需能检验滤镜作用范围、透明边和纹理采样；PixiJS 官方文档确认 Filter 可应用于 Sprite/Container，纹理还有 frame、trim、alphaMode、scaleMode 等语义。首批效果待从[候选清单](./13-v0-2d-effect-candidates.md)选定。[PixiJS Filter](https://pixijs.com/8.x/guides/components/filters) · [PixiJS 纹理](https://pixijs.com/8.x/guides/components/textures)
+V0 的“所见即所得”限定在**已选的 PixiJS 8 WebGL Sprite/Container Filter**。这是一类处理宿主已绘制内容的效果，其他宿主需要不同根节点、输入和预览场景。预览需能检验滤镜作用范围、透明边和纹理采样；PixiJS 官方文档确认 Filter 可应用于 Sprite/Container，纹理还有 frame、trim、alphaMode、scaleMode 等语义。首批已定为 [03 径向燃烧、05 局部溶融、09 单形态局部全息扫描](./13-v0-2d-effect-candidates.md)，开发门槛见 [Phase 1 指南](./15-v0-generated-filter-goal-mode-execution-guide.md)。[PixiJS Filter](https://pixijs.com/8.x/guides/components/filters) · [PixiJS 纹理](https://pixijs.com/8.x/guides/components/textures)
 
 V0 内部创作者同时是产品的第一批使用者。优先保证**做得出、改得动、存得住、结果一致**；视觉装饰和社区机制按这些任务的实际卡点再排序。
 
@@ -140,7 +140,7 @@ V0 只需要两个主页面：**项目入口**与**编辑工作台**。固定在
 ## 8. 已定首个目标与仍待确定的事项
 
 1. **已定首个效果宿主与网页后端**：PixiJS 8 WebGL 的 Sprite/Container Filter。具体 PixiJS 小版本须在开发指南中锁定，Filter 与纹理语义写进图类型和预览测试。
-2. **首批真实效果**：从[2D 游戏效果候选](./13-v0-2d-effect-candidates.md)中选 2–3 个，并说明实际用途与作用对象。
+2. **首批真实效果已定**：[03 径向燃烧、05 局部溶融、09 单形态局部全息扫描](./13-v0-2d-effect-candidates.md)；三件均须从空图制作并说明实际用途与作用对象。
 3. **团队正式工作文件位置**：V0 建议本地完整工程包加浏览器恢复草稿；若团队已有统一仓库，可把工程包纳入版本管理。
 
 后续增加其他宿主时，需扩展宿主相关节点、预览与输出契约；“图是源文件，生成 Shader 驱动预览”的核心交互不变。

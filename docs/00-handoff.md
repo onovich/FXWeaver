@@ -19,13 +19,13 @@
 | 后续产品层 | 作品展示/分享社区 |
 | 公开作品源文件 | 每件作品附可编辑节点图；图与作品同时分享 |
 | 初期内容供给 | 项目方自己使用同一工具创作和发布，不开放自由投稿 |
-| V0 首个网页目标 | PixiJS 8 WebGL 的 Sprite/Container Filter；首批效果待选 |
+| V0 首个网页目标 | PixiJS 8 WebGL 的 Sprite/Container Filter；首批已定 03 径向燃烧、05 局部溶融、09 单形态局部全息扫描 |
 | 后续社区 | 格式、质量与审核流程稳定后开放其他创作者 |
 | 长期方向 | 服务游戏中的效果应用，支持分类/标签、运行时导出、AI 易操作及 MCP 接口 |
 
 ## 工作假设与建议，不应视为最终决定
 
-- 2D Web 游戏的首批效果见[候选清单](./13-v0-2d-effect-candidates.md)；结合用户项目的[Shader 使用核查](./14-unregisteredscene-shader-usage-review.md)，推荐 03 径向燃烧、05 局部扭曲、09 简化全息扫描，仍待用户选择，不能当作开发范围。
+- 2D Web 游戏的首批效果见[候选清单](./13-v0-2d-effect-candidates.md)；结合用户项目的[Shader 使用核查](./14-unregisteredscene-shader-usage-review.md)，用户已批准 03 径向燃烧、05 局部扭曲和 09 单形态局部全息扫描，实施边界见[Phase 1 指南](./15-v0-generated-filter-goal-mode-execution-guide.md)。
 - 「2D 材质」「对象/图层滤镜」「全屏后效」「粒子系统」「3D 材质」共享部分节点运算，但有不同的输入、输出、渲染流程与导出器。分阶段支持。
 - 平台节点图是正式源文件；生成的 Shader、材质配置和项目包是目标交付物。导出 Unity 包不代表导出 Unity 原生 Shader Graph。
 - AI/MCP 应建立在稳定的图模型和 API 之上。先支持搜索、读取、派生、调参、预览、导出；结构编辑在图格式稳定后再推出。
@@ -34,15 +34,15 @@
 
 - 没有真实用户访谈、付费测试或可量化的市场需求结论。
 - 没有完成竞品的同任务上手对比，也没有运行时视觉回归数据。
-- 尚未选定 V0 首批 2–3 个真实效果，或第二版的首批目标平台/渲染管线。Phase 0 编辑器工具链为 React、TypeScript、Vite；V0 首个网页渲染目标已选为 PixiJS 8 WebGL 的 Sprite/Container Filter，具体 PixiJS 小版本须在执行指南中锁定。
+- 尚未完成 V0 首批三件真实效果，也未选定第二版的首批目标平台/渲染管线。Phase 0 编辑器工具链为 React、TypeScript、Vite；V0 首个网页渲染目标已选为 PixiJS 8 WebGL 的 Sprite/Container Filter，Phase 1 将 `pixi.js` 锁定为 8.21.0 并验证 WebGL2。
 - 尚无 Shader 生成、真实实时预览、公开站点、域名或商标审查。Phase 0 已建立可运行的内部测试图编辑器与工程文件。
 
 ## 新会话推荐起点
 
-当前已建立分工：开发会话已按 [V0 Phase 0 执行指南](./09-v0-graph-foundation-goal-mode-execution-guide.md) 完成 **16 轮**节点图与编辑器基础开发；[开发报告](./11-phase0-validation-report.md) 记录实现、测试、演示和缺口，[架构验收](./12-phase0-planner-acceptance.md) 为 **PASS**。架构验收会话负责规划后续目标。会话路由见根目录 `Role.md`。PixiJS 8 WebGL Sprite/Container Filter 已确定为首个网页目标；生成 Shader 与同源预览留在后续阶段，待首批效果选定后推进。
+当前已建立分工：开发会话已按 [V0 Phase 0 执行指南](./09-v0-graph-foundation-goal-mode-execution-guide.md) 完成 **16 轮**节点图与编辑器基础开发；[开发报告](./11-phase0-validation-report.md) 记录实现、测试、演示和缺口，[架构验收](./12-phase0-planner-acceptance.md) 为 **PASS**。用户已确定首批 03、05、09。下一步由开发会话按 [Phase 1 执行指南](./15-v0-generated-filter-goal-mode-execution-guide.md) 用 **20 轮**完成节点生成 Filter、同源预览和三件作品，规划验收会话独立验收。会话路由见根目录 `Role.md`。
 
 1. 阅读 [定位](./01-vision-positioning.md)、[产品设计](./02-product-design.md)、[技术草案](./03-technical-design.md)、[阶段草案](./04-roadmap-validation.md)、[可执行路线图建议稿](./06-roadmap-proposal.md) 和 [自用版功能与交互设计](./07-self-use-product-spec.md)。
-2. 从[2D 游戏效果候选](./13-v0-2d-effect-candidates.md)中选 2–3 个，补上项目方近期的真实用途与作用对象。
+2. 按已批准的 [03、05、09 首批范围](./13-v0-2d-effect-candidates.md)制作三件作品，记录项目方近期的真实用途与作用对象。
 3. 做自用版并坚持用它从零制作这些效果；验证改图后实时预览、生成代码、保存和重开结果一致，不靠手写 Shader 补完。
 4. 自用版能支持团队持续创作后，再安排外部创作者试用、对比现有节点工具；第二版再测试跨平台/管线适配与真实项目导入。
 5. 每次确定新范围或改变定位时更新主文档，而不是只保留在聊天记录里。
