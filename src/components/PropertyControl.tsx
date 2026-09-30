@@ -21,7 +21,9 @@ function parse(raw: string, property: PropertyDefinition): JsonValue | undefined
   }
   if (property.type === 'vec2' || property.type === 'vec3' || property.type === 'vec4') {
     const length = Number(property.type.slice(3));
-    const values = raw.split(',').map((part) => Number(part.trim()));
+    const parts = raw.split(',').map((part) => part.trim());
+    if (parts.some((part) => part === '')) return undefined;
+    const values = parts.map(Number);
     return values.length === length && values.every(Number.isFinite) ? values : undefined;
   }
   return raw;

@@ -1,7 +1,7 @@
 import { PropertyControl } from './PropertyControl';
 import { ParameterNameControl } from './ParameterNameControl';
 import type { GraphCommand } from '../graph/commands';
-import { getNodeDefinition } from '../graph/registry';
+import { getGraphKind, getNodeDefinition } from '../graph/registry';
 import type { GraphDocument } from '../graph/schema';
 
 interface Props {
@@ -30,7 +30,7 @@ export function Inspector({ graph, selectedNodeId, dispatch, onDelete }: Props) 
         </div>;
       })}
       <p className="node-signature">{definition.inputs.length} inputs · {definition.outputs.length} outputs</p>
-      <button className="secondary-button" type="button" disabled={node.type === 'foundation.output'} onClick={onDelete}>Delete selected</button>
+      <button className="secondary-button" type="button" disabled={node.type === getGraphKind(graph.graphKind)?.rootNodeType} onClick={onDelete}>Delete selected</button>
     </div> : <p className="panel-note">Select a node to inspect its properties.</p>}
 
     <div className="parameter-section" aria-labelledby="parameter-heading">

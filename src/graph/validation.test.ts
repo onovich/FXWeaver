@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { checkConnection } from './connections';
-import { FOUNDATION_GRAPH_KIND } from './registry';
+import { applyCommand } from './commands';
+import { createProject, parseProject, serializeProject } from './project';
+import { FILTER_GRAPH_KIND, FOUNDATION_GRAPH_KIND } from './registry';
 import { createEmptyGraph, semanticGraphJson, type GraphDocument } from './schema';
 import { validateGraph } from './validation';
 
@@ -61,5 +63,34 @@ describe('graph validation', () => {
       parameters: [{ id: 'p', name: 'Amount', valueType: 'float', sourceNodeId: 'n', sourceKey: 'value', defaultValue: 3 }],
     };
     expect(codes(graph)).toContain('INVALID_PARAMETER');
+  });
+});
+
+describe('Filter graph validation', () => {
+  it('saves an incomplete graph, rejects implicit conversion, and accepts a source to output path', () => {
+    const project = createProject('filter', 'Filter', FILTER_GRAPH_KIND, 'root');
+    expect(codes(project.graph)).toEqual(['MISSING_REQUIRED_INPUT']);
+    expect(parseProject(serializeProject(project))).toMatchObject({ ok: true, issues: [{ code: 'MISSING_REQUIRED_INPUT' }] });
+    const uv = applyCommand(project, { type: 'add-node', nodeId: 'uv', nodeType: 'filter.uv', position: { x: 0, y: 0 } });
+    expect(uv.ok).toBe(true);
+    expect(checkConnection(uv.document.graph, { nodeId: 'uv', portId: 'uv' }, { nodeId: 'root', portId: 'rgba' })?.code).toBe('TYPE_MISMATCH');
+    const source = applyCommand(uv.document, { type: 'add-node', nodeId: 'source', nodeType: 'filter.source', position: { x: 0, y: 100 } });
+    const connected = applyCommand(source.document, { type: 'connect', edgeId: 'source-out',
+      from: { nodeId: 'source', portId: 'rgba' }, to: { nodeId: 'root', portId: 'rgba' } });
+    expect(connected.ok).toBe(true);
+    expect(validateGraph(connected.document.graph)).toEqual([]);
+  });
+
+  it('uses an explicit color conversion and preserves stable exposed value IDs', () => {
+    const base = createProject('color', 'Color', FILTER_GRAPH_KIND, 'root');
+    const color = applyCommand(base, { type: 'add-node', nodeId: 'color', nodeType: 'filter.color', position: { x: 0, y: 0 } });
+    const conversion = applyCommand(color.document, { type: 'add-node', nodeId: 'conversion', nodeType: 'filter.color-rgba', position: { x: 100, y: 0 } });
+    expect(checkConnection(conversion.document.graph, { nodeId: 'color', portId: 'color' }, { nodeId: 'root', portId: 'rgba' })?.code).toBe('TYPE_MISMATCH');
+    const first = applyCommand(conversion.document, { type: 'connect', edgeId: 'a', from: { nodeId: 'color', portId: 'color' }, to: { nodeId: 'conversion', portId: 'color' } });
+    const second = applyCommand(first.document, { type: 'connect', edgeId: 'b', from: { nodeId: 'conversion', portId: 'rgba' }, to: { nodeId: 'root', portId: 'rgba' } });
+    const exposed = applyCommand(second.document, { type: 'expose-parameter', parameterId: 'stable-color-id', nodeId: 'color', propertyId: 'value', name: 'Tint' });
+    expect(validateGraph(exposed.document.graph)).toEqual([]);
+    expect(exposed.document.graph.parameters[0]).toMatchObject({ id: 'stable-color-id', valueType: 'color', defaultValue: '#ffffffff' });
+    expect(parseProject(serializeProject({ ...base, ...exposed.document }))).toMatchObject({ ok: true, issues: [] });
   });
 });
