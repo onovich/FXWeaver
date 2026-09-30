@@ -108,3 +108,37 @@ test('focuses a problem and edits one source value through inspector and exposed
   await expect(page.locator('.inspector-content')).toContainText('Linked to Amount');
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Amount' })).toHaveValue('5');
 });
+
+test('drags a compatible wire and keeps the old wire after an incompatible drop', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Create test graph' }).click();
+  await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Number');
+  await page.locator('.library-list button').filter({ hasText: 'Number' }).click();
+  const input = page.getByRole('button', { name: 'Test Output Value input, float' });
+  const source = page.getByRole('button', { name: 'Number Value output, float' });
+  const from = await source.boundingBox();
+  const to = await input.boundingBox();
+  if (!from || !to) throw new Error('Ports are not visible');
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await expect(input).toHaveClass(/port-accept/);
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 10 });
+  await expect(page.locator('.connection-preview')).toHaveCount(1);
+  await page.mouse.up();
+  await expect(page.locator('.connection-path')).toHaveCount(1);
+  await expect(page.getByText('Problems 0')).toBeVisible();
+
+  await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Vector 2');
+  await page.locator('.library-list button').filter({ hasText: 'Vector 2' }).click();
+  const vector = await page.getByRole('button', { name: 'Vector 2 Value output, vec2' }).boundingBox();
+  const target = await input.boundingBox();
+  if (!vector || !target) throw new Error('Ports are not visible');
+  await page.mouse.move(vector.x + vector.width / 2, vector.y + vector.height / 2);
+  await page.mouse.down();
+  await expect(input).toHaveClass(/port-reject/);
+  await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2, { steps: 10 });
+  await page.mouse.up();
+  await expect(page.getByRole('alert')).toContainText('vec2 cannot connect to float');
+  await expect(page.locator('.connection-path')).toHaveCount(1);
+});

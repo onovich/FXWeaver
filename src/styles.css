@@ -94,6 +94,7 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .canvas-world { position: absolute; left: 0; top: 0; width: 2400px; height: 1600px; transform-origin: 0 0; }
 .connection-layer { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
 .connection-path { fill: none; stroke: #e9b865; stroke-width: 3; }
+.connection-preview { fill: none; stroke: #91e1eb; stroke-width: 2; stroke-dasharray: 6 5; }
 .canvas-node { position: absolute; width: 188px; border: 1px solid #3b9bb1; border-radius: .4rem; overflow: hidden; background: #10232f; box-shadow: 0 8px 22px #0005; }
 .canvas-node.selected { border-color: #78e7ed; box-shadow: 0 0 0 2px #47cad680, 0 8px 22px #0005; }
 .canvas-node-title { display: block; width: 100%; padding: .65rem .8rem; border: 0; border-bottom: 1px solid #31566a; color: #e8f0f5; background: #193b4b; font-size: .82rem; font-weight: 700; text-align: left; touch-action: none; cursor: grab; }
@@ -104,7 +105,7 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .port-button:hover, .port-button:focus-visible { background: #264759; }
 .port-button small { margin-left: auto; color: #8aa6b4; font-size: .65rem; }
 .port-accept { background: #1c493f; }
-.port-reject { background: #503a3a; }
+.port-reject { opacity: .55; }
 .port-active { background: #2d5362; }
 .output-port { justify-content: flex-end; }
 .output-port small { margin-left: 0; }
