@@ -163,6 +163,7 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
 
   return (
     <div ref={canvasRef} className="graph-canvas" aria-label="Node graph canvas" onPointerDown={startPan} onPointerMove={movePan} onPointerUp={() => { panRef.current = null; }} onDoubleClick={onSearch}>
+      <div className="canvas-mode-hint">{layout.viewport.zoom < .75 ? 'Graph overview / Select a node, then Edit selected at 100%' : 'Editing view / Drag nodes or the canvas · Scroll to zoom'}</div>
       <div className="canvas-world" style={{ transform: `translate(${layout.viewport.x}px, ${layout.viewport.y}px) scale(${layout.viewport.zoom})` }}>
         <svg className="connection-layer" width="2400" height="1600" aria-hidden="true">
           {graph.edges.map((edge) => {

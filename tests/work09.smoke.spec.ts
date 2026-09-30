@@ -13,6 +13,7 @@ test('09 hologram graph isolates scan and red-channel offset on a local Sprite',
   await expect(page.getByText('Preview ready')).toBeVisible();
   await expect(page.getByText('Problems 0')).toBeVisible();
   await expect(page.getByTestId('preview-build-id')).toHaveText(manifest.buildId);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Preview host' })).toHaveValue('sprite');
   expect(manifest.usesTime).toBe(true);
   expect(manifest.textureBindings).toHaveLength(0);

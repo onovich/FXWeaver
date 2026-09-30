@@ -79,6 +79,8 @@ test('saves a project file, reopens it, chooses a newer draft, and protects the 
   await expect(page.getByText('Problems 0')).toBeVisible();
   await expect(page.locator('.file-state')).toContainText('Saved to project');
   await expect(page.locator('.canvas-node').filter({ has: page.getByRole('button', { name: 'Select Number node' }) })).toHaveAttribute('style', savedPosition!);
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   const value = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' });
   await expect(value).toHaveValue('4');
 
@@ -88,18 +90,26 @@ test('saves a project file, reopens it, chooses a newer draft, and protects the 
   await page.getByRole('button', { name: 'Open project file' }).click();
   await expect(page.getByRole('heading', { name: 'Choose which project version to open' })).toBeVisible();
   await page.getByRole('button', { name: 'Recover browser draft' }).click();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' })).toHaveValue('6');
 
   await page.locator('.library-file-actions input[type="file"]').setInputFiles({ name: 'bad.fxweave.json', mimeType: 'application/json', buffer: Buffer.from('{') });
   await expect(page.getByRole('status').filter({ hasText: 'Import blocked: INVALID_JSON' })).toBeVisible();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' })).toHaveValue('6');
   await page.locator('.library-file-actions input[type="file"]').setInputFiles({ name: 'old.fxweave.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ ...savedProject, projectVersion: 0 })) });
   await expect(page.getByRole('status').filter({ hasText: 'UNSUPPORTED_PROJECT_VERSION' })).toBeVisible();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' })).toHaveValue('6');
 
   await expect(page.locator('.file-state')).toContainText('Changes not saved to project file');
   await page.reload();
   await page.getByRole('button', { name: 'Recover draft' }).click();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' })).toHaveValue('6');
 });
 

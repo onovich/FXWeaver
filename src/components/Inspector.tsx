@@ -19,10 +19,9 @@ export function Inspector({ graph, assets, selectedNodeId, dispatch, onDelete }:
   const definition = node && getNodeDefinition(graph.graphKind, node.type);
 
   return <section className="inspector-panel" aria-labelledby="inspector-heading">
-    <div className="panel-heading"><p className="section-kicker">SELECTION</p><h2 id="inspector-heading">Inspector</h2></div>
+    <div className="panel-heading"><p className="section-kicker">GRAPH DEFAULTS</p><h2 id="inspector-heading">Inspector</h2></div>
     {node && definition ? <div className="inspector-content">
       <strong>{definition.label}</strong>
-      <p>{definition.description}</p>
       {definition.properties.map((property) => {
         const linked = graph.parameters.find((parameter) => parameter.sourceNodeId === node.id && parameter.sourceKey === property.id);
         return <div key={property.id}>
@@ -35,18 +34,19 @@ export function Inspector({ graph, assets, selectedNodeId, dispatch, onDelete }:
                 <option value={String(node.values[property.id])}>Missing: {String(node.values[property.id])}</option>}
               {assets.dependencies.map((image) => <option key={image.id} value={image.id}>{image.name} · {image.id.slice(0, 8)}</option>)}
             </select>
-          </div> : linked ? <p className="linked-property">{property.label}: Linked to {linked.name} · {linked.id.slice(0, 8)}</p> : <>
+          </div> : linked ? <><PropertyControl id={`linked-default-${node.id}-${property.id}`} property={{ ...property, label: `${linked.name} default`, min: linked.min, max: linked.max }} value={node.values[property.id]} onCommit={(value) => dispatch({ type: 'set-property', nodeId: node.id, propertyId: property.id, value })} /><p className="linked-property">Exposed as {linked.name}. This edits the graph default; Runtime parameters tunes the current scene.</p></> : <>
             <PropertyControl id={`inspector-${node.id}-${property.id}`} property={property} value={node.values[property.id]} onCommit={(value) => dispatch({ type: 'set-property', nodeId: node.id, propertyId: property.id, value })} />
             <button className="text-button" type="button" onClick={() => dispatch({ type: 'expose-parameter', parameterId: crypto.randomUUID(), nodeId: node.id, propertyId: property.id, name: property.label })}>Expose as parameter</button>
           </>}
         </div>;
       })}
+      <details className="node-description"><summary>About this node</summary><p>{definition.description}</p></details>
       <p className="node-signature">{definition.inputs.length} inputs · {definition.outputs.length} outputs</p>
       <button className="secondary-button" type="button" disabled={node.type === getGraphKind(graph.graphKind)?.rootNodeType} onClick={onDelete}>Delete selected</button>
     </div> : <p className="panel-note">Select a node to inspect its properties.</p>}
 
     <div className="parameter-section" aria-labelledby="parameter-heading">
-      <h3 id="parameter-heading">Effect Parameters</h3>
+      <details className="parameter-management"><summary id="parameter-heading">Manage parameter definitions</summary><p className="panel-note">Defaults and ranges are saved in the graph. Tune the current look in Runtime parameters above.</p>
       {graph.parameters.length === 0 && <p className="panel-note">No exposed parameters yet.</p>}
       {graph.parameters.map((parameter) => {
         const source = graph.nodes.find((item) => item.id === parameter.sourceNodeId);
@@ -58,6 +58,7 @@ export function Inspector({ graph, assets, selectedNodeId, dispatch, onDelete }:
           {parameter.valueType === 'float' && <ParameterRangeControl parameter={parameter} onCommit={(min, max) => dispatch({ type: 'set-parameter-range', parameterId: parameter.id, min, max })} />}
         </div>;
       })}
+      </details>
     </div>
   </section>;
 }

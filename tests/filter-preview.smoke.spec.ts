@@ -13,6 +13,7 @@ test('a downscaled large transparent Sprite retains its visible source inside th
     const ctx = canvas.getContext('2d')!; ctx.fillStyle = '#40bada'; ctx.fillRect(200, 200, 800, 900);
     return canvas.toDataURL();
   });
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByLabel('Import preview image').setInputFiles({ name: 'large-transparent.png', mimeType: 'image/png', buffer: Buffer.from(dataUrl.split(',')[1], 'base64') });
   await expect(page.getByText('large-transparent.png added to project preview assets.')).toBeVisible();
   await expect(page.getByText('Preview ready')).toBeVisible();
@@ -24,6 +25,7 @@ test('a downscaled large transparent Sprite retains its visible source inside th
     return count;
   });
   const full = await visible(); expect(full).toBeGreaterThan(1000);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('spinbutton', { name: 'Filter area inset' }).fill('32');
   await expect.poll(visible).toBeLessThan(full);
   await expect.poll(visible).toBeGreaterThan(100);
@@ -51,15 +53,19 @@ test('renders generated Filter on Sprite and Container and marks stale preview a
   });
   expect(await samplePixel()).toBeGreaterThan(0);
 
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Preview host' }).selectOption('container');
   await expect(page.getByText('Preview ready')).toBeVisible();
   expect(await page.getByTestId('preview-build-id').textContent()).toBe(buildId);
   const fullAreaPixels = await samplePixel();
   expect(fullAreaPixels).toBeGreaterThan(0);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('spinbutton', { name: 'Filter area inset' }).fill('32');
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('spinbutton', { name: 'Filter area inset' }).press('Tab');
   await expect(page.getByText('Preview ready')).toBeVisible();
   expect(await samplePixel()).toBeLessThan(fullAreaPixels);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Preview background' }).selectOption('light');
   await expect(page.locator('.preview-stage')).toHaveClass(/preview-background-light/);
 
@@ -108,7 +114,9 @@ test('a delayed image decode cannot replace a newer preview request', async ({ p
       return this.src === blueUrl ? result.then(() => new Promise<void>((resolve) => setTimeout(resolve, 250))) : result;
     };
   }, blue);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Preview source' }).selectOption('blue');
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Preview source' }).selectOption('red');
   await expect(page.getByText('Preview ready')).toBeVisible();
   await page.waitForTimeout(350);
@@ -141,6 +149,7 @@ test('imports a preview image into the project and reports oversize input', asyn
     context.fillRect(0, 0, 4, 4);
     return canvas.toDataURL('image/png');
   });
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByLabel('Import preview image').setInputFiles({ name: 'green.png', mimeType: 'image/png', buffer: Buffer.from(dataUrl.split(',')[1], 'base64') });
   await expect(page.getByText('green.png added to project preview assets.')).toBeVisible();
   await expect(page.getByText('Preview ready')).toBeVisible();
@@ -150,6 +159,7 @@ test('imports a preview image into the project and reports oversize input', asyn
   const project = JSON.parse(await readFile((await download.path())!, 'utf8'));
   expect(project.assets.preview).toMatchObject([{ name: 'green.png', width: 4, height: 4 }]);
   expect(project.preview.sourceAssetId).toBe(project.assets.preview[0].id);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByLabel('Import preview image').setInputFiles({ name: 'large.png', mimeType: 'image/png', buffer: Buffer.alloc(2 * 1024 * 1024 + 1) });
   await expect(page.getByText('An image must be 2 MiB or smaller.')).toBeVisible();
   await expect(page.getByText('Preview ready')).toBeVisible();

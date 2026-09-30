@@ -21,6 +21,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const [pendingFrom, setPendingFrom] = useState<GraphPortRef | null>(null);
   const [actionIssue, setActionIssue] = useState<GraphIssue | null>(null);
   const [search, setSearch] = useState('');
+  const [inspectorOpen, setInspectorOpen] = useState(project.layout.selectedNodeIds.length > 0);
   const [problemsOpen, setProblemsOpen] = useState(false);
   const [fitRequest, setFitRequest] = useState(0);
   const [beforeFitViewport, setBeforeFitViewport] = useState<typeof project.layout.viewport | null>(null);
@@ -63,6 +64,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   }
 
   function setSelection(ids: string[]) {
+    if (ids.length) setInspectorOpen(true);
     setHistory((current) => ({ ...current, present: { ...current.present, layout: { ...current.present.layout, selectedNodeIds: ids } } }));
   }
 
@@ -253,6 +255,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
               <button type="button" onClick={() => changeZoom(1.25)} aria-label="Zoom in">+</button>
               <button type="button" onClick={() => setViewport({ x: 0, y: 0, zoom: 1 })}>Reset view</button>
               <button type="button" onClick={fitAllNodes} aria-keyshortcuts="F" title="Fit all nodes (F)">Fit all nodes</button>
+              <button type="button" disabled={!selectedId} onClick={() => { const p = document.layout.nodePositions[selectedId]; if (p) setViewport({ x: 80 - p.x, y: 100 - p.y, zoom: 1 }); }} title="Center the selected node at a readable editing scale">Edit selected · 100%</button>
               {beforeFitViewport && <button type="button" onClick={() => { setViewport(beforeFitViewport); setBeforeFitViewport(null); }}>Restore view</button>}
             </div>
           </div>
@@ -260,12 +263,12 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
           {actionIssue && <div className="canvas-feedback" role="alert">Connection or edit rejected: {actionIssue.message}</div>}
         </section>
 
-        <aside className="context-panel" aria-label="Preview and inspector">
+        <aside className={`context-panel${inspectorOpen ? ' inspector-open' : ''}`} aria-label="Preview and inspector">
           {graphKind.isTestOnly ? <section className="preview-panel" aria-labelledby="preview-heading">
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
             <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{assetIssues.length ? 'Missing project image' : graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{assetIssues.length ? assetIssues.map((issue) => issue.message).join(' ') : graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
           </section> : <FilterPreview graph={document.graph} assets={projectAssets} scene={safePreviewScene} onSceneChange={setPreviewScene} onAssetsChange={setProjectAssets} />}
-          <Inspector graph={document.graph} assets={projectAssets} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
+          <section className="inspector-drawer"><button className="inspector-toggle" type="button" aria-expanded={inspectorOpen} onClick={() => setInspectorOpen(!inspectorOpen)}>Graph properties <span>{inspectorOpen ? 'Back to live tuning −' : 'Edit graph defaults +'}</span></button><div hidden={!inspectorOpen}><Inspector graph={document.graph} assets={projectAssets} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} /></div></section>
         </aside>
       </div>
 

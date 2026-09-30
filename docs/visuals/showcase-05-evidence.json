@@ -1,0 +1,14 @@
+{
+  "buildId": "f1-f8adda044117f170",
+  "source": "public/art/game/crystal-ward-base.png",
+  "project": "examples/showcase/05-local-melt.fxweave.json",
+  "effect": "docs/visuals/showcase-05-effect.png",
+  "original": "docs/visuals/showcase-05-original.png",
+  "sha256": {
+    "source": "d1275cb41ecbd8f48aba79928b9d152c3d09e2f4ccda4d992d2bc56aa7daaa90",
+    "project": "f26d18d7da52d052dd073f259668b400ea3f304c9d53e1b4258c2a36cbc0a279",
+    "effect": "32b32cac8f1d23d0f4f918436b06612f054ad3d785e4b7c242a3500dd3ab4e4a",
+    "original": "fe91e5e0e583f58b0f775b119b4d09cd9b8fb8bc6378eddfed182a673389c5ff"
+  },
+  "method": "Actual canvas.toDataURL from generated Pixi WebGL2 Filter; original is same host with filters removed."
+}

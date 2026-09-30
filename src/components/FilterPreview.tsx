@@ -109,6 +109,7 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
   const [compareMode, setCompareMode] = useState<'effect' | 'original' | 'split'>('effect');
   const [playing, setPlaying] = useState(false);
   const [displayTime, setDisplayTime] = useState(scene.timeSeconds);
+  const [viewZoom, setViewZoom] = useState(1.5);
   const structuralSceneKey = JSON.stringify({ host: scene.host, sourceAssetId: scene.sourceAssetId,
     width: scene.width, height: scene.height, filterAreaInset: scene.filterAreaInset,
     padding: scene.padding, resolution: scene.resolution, sampling: scene.sampling });
@@ -322,7 +323,7 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
   };
   return <section ref={panelRef} className={`preview-panel filter-preview-panel${expanded ? ' preview-expanded' : ''}`} role={expanded ? 'dialog' : undefined} aria-modal={expanded ? true : undefined} aria-labelledby="preview-heading">
     <div className="panel-heading"><div><p className="section-kicker">PIXIJS WEBGL2 FILTER</p><h2 id="preview-heading">Preview</h2></div><button ref={enlargeButtonRef} className="secondary-button" type="button" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? 'Return to workbench' : 'Enlarge preview'}</button></div>
-    <div className={`preview-stage preview-background-${scene.background}`} ref={mountRef} aria-label="Generated Filter canvas">
+    <div className={`preview-stage preview-background-${scene.background}`} ref={mountRef} style={{ '--preview-view-zoom': viewZoom } as import('react').CSSProperties} aria-label="Generated Filter canvas">
       {originalSnapshot && compareMode !== 'effect' && <img className={`preview-original preview-original-${compareMode}`} src={originalSnapshot} alt="Original host pixels before Filter" />}
     </div>
     <div className={`preview-status preview-status-${state.kind}`} role="status">
@@ -331,6 +332,7 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
       <p>{state.message}</p>
     </div>
     <div className="preview-controls">
+      <label className="preview-view-zoom">Display zoom<select aria-label="Preview display zoom" value={viewZoom} onChange={event => setViewZoom(Number(event.target.value))}><option value="1">100% / entire stage</option><option value="1.5">150% / focus artwork</option></select></label>
       <div className="preview-compare" role="group" aria-label="Preview comparison">
         <button type="button" aria-pressed={compareMode === 'effect'} onClick={() => setCompareMode('effect')}>Effect</button>
         <button type="button" aria-pressed={compareMode === 'original'} onClick={() => setCompareMode('original')}>Original</button>
@@ -342,6 +344,7 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
           setPlaying(next);
         }} onSetTime={setTime} onParameterChange={setParameter}
         onResetParameters={() => update({ parameterValues: {} })} />
+      <details className="scene-settings"><summary>Scene & image settings</summary><div className="scene-settings-content">
       <label>Host<select aria-label="Preview host" value={scene.host} onChange={(event) => update({ host: event.target.value as PreviewScene['host'] })}><option value="sprite">Sprite</option><option value="container">Container</option></select></label>
       <label>Source<select aria-label="Preview source" value={scene.sourceAssetId ?? ''} onChange={(event) => update({ sourceAssetId: event.target.value || null })}><option value="">Built-in transparent sample</option>{assets.preview.map((image) => <option key={image.id} value={image.id}>{image.name}</option>)}</select></label>
       <label>Import preview image<input aria-label="Import preview image" type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => { const file = event.target.files?.[0]; if (file) void addPreviewImage(file); event.target.value = ''; }} /></label>
@@ -357,6 +360,7 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
         <label>Sampling<select aria-label="Texture sampling" value={scene.sampling} onChange={(event) => update({ sampling: event.target.value as PreviewScene['sampling'] })}><option value="linear">Linear</option><option value="nearest">Nearest</option></select></label>
       </div>
       <p className="preview-note">Filter samples the host's rendered pixels; it cannot sample the background outside this host.</p>
+      </div></details>
       <GeneratedOutput build={successfulBuild} current={state.kind === 'ready'} />
     </div>
   </section>;

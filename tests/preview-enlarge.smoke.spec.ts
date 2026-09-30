@@ -46,7 +46,7 @@ test('small enlarged view keeps controls reachable and traps focus inside the di
   await expect(close).toBeFocused();
   await page.keyboard.press('Shift+Tab');
   expect(await dialog.evaluate((element) => element.contains(document.activeElement))).toBe(true);
-  await expect(dialog.locator('summary')).toBeFocused();
+  await expect(dialog.locator('.generated-output > summary')).toBeFocused();
   await page.keyboard.press('Tab'); await expect(close).toBeFocused();
   const value = dialog.locator('.runtime-parameter').getByRole('spinbutton', { name: 'Amplitude' });
   await value.fill('0.05'); await value.press('Enter');

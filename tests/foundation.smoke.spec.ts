@@ -87,7 +87,9 @@ test('focuses a problem and edits one source value through inspector and exposed
   await inspectorValue.press('Enter');
   await expect(inspectorValue).toHaveValue('5');
   await page.getByRole('button', { name: 'Expose as parameter' }).click();
-  await expect(page.locator('.inspector-content')).toContainText('Linked to Value');
+  await expect(page.locator('.inspector-content')).toContainText('Exposed as Value');
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   const parameterValue = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' });
   await parameterValue.fill('7');
   await parameterValue.press('Enter');
@@ -106,7 +108,9 @@ test('focuses a problem and edits one source value through inspector and exposed
   const parameterName = page.locator('.parameter-section').getByRole('textbox', { name: 'Parameter name' });
   await parameterName.fill('Amount');
   await parameterName.press('Enter');
-  await expect(page.locator('.inspector-content')).toContainText('Linked to Amount');
+  await expect(page.locator('.inspector-content')).toContainText('Exposed as Amount');
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Amount' })).toHaveValue('5');
 });
 

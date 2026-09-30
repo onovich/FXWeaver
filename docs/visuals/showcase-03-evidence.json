@@ -1,0 +1,14 @@
+{
+  "buildId": "f1-5f9ea9d2ed4943d9",
+  "source": "public/art/game/crystal-ward-base.png",
+  "project": "examples/showcase/03-radial-burn.fxweave.json",
+  "effect": "docs/visuals/showcase-03-effect.png",
+  "original": "docs/visuals/showcase-03-original.png",
+  "sha256": {
+    "source": "d1275cb41ecbd8f48aba79928b9d152c3d09e2f4ccda4d992d2bc56aa7daaa90",
+    "project": "b5d1b1de09a67108fdfc799ce0a50eb786852cc92abbecd77604b7bfe0e0e75b",
+    "effect": "a7e216758256f7649db65802c861f48ac2b3b06046c1a31ffe149ac28f28e4a7",
+    "original": "fe91e5e0e583f58b0f775b119b4d09cd9b8fb8bc6378eddfed182a673389c5ff"
+  },
+  "method": "Actual canvas.toDataURL from generated Pixi WebGL2 Filter; original is same host with filters removed."
+}

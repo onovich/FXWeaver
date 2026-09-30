@@ -28,6 +28,8 @@ test('edits a Filter constant and exposes a stable parameter through the inspect
   await property.press('Enter');
   await expect(property).toHaveValue('0.75');
   await page.getByRole('button', { name: 'Expose as parameter' }).click();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' })).toHaveValue('0.75');
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export JSON' }).click();

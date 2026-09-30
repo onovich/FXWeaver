@@ -1,0 +1,14 @@
+{
+  "buildId": "f1-eaace75cae26d3d5",
+  "source": "public/art/game/crystal-ward-base.png",
+  "project": "examples/showcase/09-hologram-scan.fxweave.json",
+  "effect": "docs/visuals/showcase-09-effect.png",
+  "original": "docs/visuals/showcase-09-original.png",
+  "sha256": {
+    "source": "d1275cb41ecbd8f48aba79928b9d152c3d09e2f4ccda4d992d2bc56aa7daaa90",
+    "project": "9dd05fb4e9cc9a67029d67e69c099e1897e5ae1ea0d7f8d959a7d591a0ce191a",
+    "effect": "d8b51d88415df5adb7e51ff1d8c5b897dbc2055a5b4d9c30b474cdd1ebda0b4d",
+    "original": "fe91e5e0e583f58b0f775b119b4d09cd9b8fb8bc6378eddfed182a673389c5ff"
+  },
+  "method": "Actual canvas.toDataURL from generated Pixi WebGL2 Filter; original is same host with filters removed."
+}

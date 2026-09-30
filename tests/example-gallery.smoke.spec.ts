@@ -9,7 +9,7 @@ const cases = [
 ];
 
 for (const sample of cases) test(`work ${sample.id} opens as an editable copy and survives Save As and reopen`, async ({ page }) => {
-  const original = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', `${sample.file}.fxweave.json`), 'utf8'));
+  const original = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'showcase', `${sample.file}.fxweave.json`), 'utf8'));
   const manifest = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'generated', `${sample.file}.manifest.json`), 'utf8'));
   await page.addInitScript(() => {
     let saved = '';
@@ -45,7 +45,11 @@ for (const sample of cases) test(`work ${sample.id} opens as an editable copy an
   await expect(page.getByTestId('preview-build-id')).toHaveText(manifest.buildId);
   await expect(page.getByText('Problems 0')).toBeVisible();
   await expect(page.locator('.file-state')).toContainText('no project file');
+  await page.getByRole('button', { name: 'Defaults', exact: true }).click();
   const baseline = await page.locator('.preview-stage canvas').evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL());
+  await page.getByRole('button', { name: /Graph properties/ }).click();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   const property = page.locator('.parameter-section').getByRole('spinbutton', { name: sample.parameter });
   await property.fill(sample.value);
   await property.press('Enter');
@@ -62,11 +66,14 @@ for (const sample of cases) test(`work ${sample.id} opens as an editable copy an
   expect(saved.graph.edges).toHaveLength(original.graph.edges.length);
   expect(saved.graph.nodes).not.toEqual(original.graph.nodes);
   expect(saved.assets).toEqual(original.assets);
-  expect(saved.preview).toEqual(original.preview);
+  expect(saved.preview).toEqual({ ...original.preview, parameterValues: {} });
   await page.getByRole('button', { name: 'Return to project entry' }).click();
   await page.getByRole('button', { name: 'Open project file' }).click();
   await expect(page.getByText('Preview ready')).toBeVisible();
   await expect(page.getByTestId('preview-build-id')).toHaveText(manifest.buildId);
+  await page.getByRole('button', { name: /Graph properties/ }).click();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: sample.parameter })).toHaveValue(sample.value);
   expect(await page.locator('.preview-stage canvas').evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL())).toBe(changed);
 });
@@ -106,6 +113,8 @@ test('saving one derived work leaves the original available for another independ
   await page.goto('/');
   await page.getByRole('button', { name: 'Edit a copy of Radial burn' }).click();
   await expect(page.getByText('Preview ready')).toBeVisible();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   const radius = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Radius' });
   await radius.fill('0.18');
   await radius.press('Enter');
@@ -117,6 +126,9 @@ test('saving one derived work leaves the original available for another independ
   await page.getByRole('button', { name: 'Edit a copy of Radial burn' }).click();
   await expect(page.getByText('Preview ready')).toBeVisible();
   await expect(page.getByTestId('preview-build-id')).toHaveText(manifest.buildId);
+  await page.getByRole('button', { name: /Graph properties/ }).click();
+  if (await page.getByRole("button", { name: /Graph properties/ }).getAttribute("aria-expanded") === "false") await page.getByRole("button", { name: /Graph properties/ }).click();
+  if (!await page.locator(".parameter-management").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Manage parameter definitions", { exact: true }).click();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Radius' })).toHaveValue('0.34');
   const secondDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export JSON' }).click();

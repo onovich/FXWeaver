@@ -36,11 +36,16 @@ test('portable Filter project preserves dependency and preview images through sa
   const dependency = page.getByRole('combobox', { name: 'Dependency image' });
   const dependencyId = await dependency.locator('option').filter({ hasText: 'green.png' }).getAttribute('value');
   await dependency.selectOption(dependencyId!);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByLabel('Import preview image').setInputFiles({ name: 'red.png', mimeType: 'image/png', buffer: Buffer.from(red.split(',')[1], 'base64') });
   await expect(page.getByText('Preview ready')).toBeVisible();
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Preview host' }).selectOption('container');
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Preview background' }).selectOption('light');
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Texture sampling' }).selectOption('nearest');
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('spinbutton', { name: 'Filter area inset' }).fill('12');
   await page.getByRole('spinbutton', { name: 'Fixed preview time' }).fill('1.25');
   await expect(page.getByText('Preview ready')).toBeVisible();
@@ -79,15 +84,18 @@ test('portable Filter project preserves dependency and preview images through sa
   expect(await pixel()).toEqual(before);
   await page.getByRole('button', { name: 'Select Sample Image node' }).click();
   await expect(page.getByRole('combobox', { name: 'Dependency image' })).toHaveValue(saved.assets.dependencies[0].id);
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Preview source' })).toHaveValue(saved.assets.preview[0].id);
   await expect(page.locator('.runtime-parameter').getByRole('spinbutton', { name: 'Value' })).toHaveValue('0.75');
 
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await page.getByRole('combobox', { name: 'Preview background' }).selectOption('dark');
   await expect(page.locator('.file-state')).toContainText('Changes not saved');
   await page.waitForTimeout(450);
   await page.reload();
   await page.getByRole('button', { name: 'Recover draft' }).click();
   await expect(page.getByText('Preview ready')).toBeVisible();
+  if (await page.locator(".scene-settings").count() && !await page.locator(".scene-settings").evaluate(el => (el as HTMLDetailsElement).open)) await page.getByText("Scene & image settings", { exact: true }).click();
   await expect(page.getByRole('combobox', { name: 'Preview background' })).toHaveValue('dark');
   expect(await page.getByTestId('preview-build-id').textContent()).toBe(buildId);
   expect(await pixel()).toEqual(before);

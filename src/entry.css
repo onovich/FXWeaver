@@ -28,14 +28,8 @@
 .example-heading h2, .entry-project-files h2 { margin: .55rem 0 0; font-family: Bahnschrift, "Segoe UI", sans-serif; font-weight: 600; font-size: 1.65rem; letter-spacing: -.025em; }
 .example-heading > p, .entry-project-files p:not(.section-kicker) { margin: 0; color: #97a3b9; font-size: .85rem; line-height: 1.6; }
 .example-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.4rem; }
-.example-card { min-width: 0; overflow: hidden; border: 1px solid #303746; border-radius: 10px; background: #161b24; }
-.example-image { position: relative; background: #111820; border-bottom: 1px solid #303746; }
-.example-image img { display: block; width: 100%; height: 210px; object-fit: contain; }
-.example-image > span { position: absolute; left: .85rem; top: .8rem; padding: .3rem .5rem; border: 1px solid #ffffff1a; border-radius: 4px; background: #10141bd9; color: #b5c0d1; font-size: .62rem; }
 .example-card-body { display: grid; gap: .75rem; padding: 1.2rem; }
-.example-card h3 { margin: 0; font-size: 1.1rem; font-weight: 600; }
 .example-card-body > p { margin: 0; min-height: 2.8em; color: #97a3b9; font-size: .82rem; line-height: 1.5; }
-.example-card .secondary-button { justify-content: space-between; width: 100%; min-height: 40px; padding: .5rem .7rem; font-size: .75rem; }
 .example-details { color: #97a3b9; font-size: .7rem; }
 .example-details summary { cursor: pointer; padding: .2rem 0; }
 .example-details small { display: block; padding-top: .7rem; overflow-wrap: anywhere; }
@@ -88,3 +82,13 @@
   .draft-list li { align-items: start; flex-direction: column; }
   .entry-caveat { flex-direction: column; line-height: 1.6; }
 }
+.example-image { position: relative; border-bottom: 1px solid #303746; overflow:hidden; min-height:245px; background:radial-gradient(ellipse at 50% 55%,#253a4d 0,#111820 65%); }
+.example-image > span { position: absolute; left: .85rem; top: .8rem; padding: .3rem .5rem; border: 1px solid #ffffff1a; border-radius: 4px; background: #10141bd9; font-size: .62rem; z-index:1; color:#d0e2eb; }
+.example-card { min-width: 0; overflow: hidden; border: 1px solid #303746; border-radius: 10px; background: #161b24; border-color:#3b4d5e; }
+.example-card:hover { border-color:#80b7cd; }
+.example-card h3 { margin: 0; font-weight: 600; font-family:Bahnschrift,"Segoe UI",sans-serif; font-size:22px; }
+.example-card .secondary-button { justify-content: space-between; width: 100%; min-height: 40px; padding: .5rem .7rem; font-size:13px; }
+.example-section .section-kicker { color:#8ad3e0; }
+.example-heading h2 { font-size:30px; }
+@media(max-width:600px) { .example-heading h2 { font-size:25px; } .example-image img { height:245px; } }
+.example-image img { display: block; width: 100%; height:245px; object-fit:contain; transform:scale(1.82); }
