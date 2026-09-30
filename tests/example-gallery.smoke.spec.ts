@@ -22,6 +22,7 @@ for (const sample of cases) test(`work ${sample.id} opens as an editable copy an
   });
   await page.goto('/');
   const card = page.locator('.example-card').filter({ hasText: sample.title });
+  await card.getByText('Technical details', { exact: true }).click();
   await expect(card).toContainText(manifest.buildId);
   await expect(card.getByRole('link', { name: 'Download manifest' })).toHaveAttribute('href', /^(data:|\/|https?:)/);
   await expect(card.getByRole('link', { name: 'Download creation record' })).toHaveAttribute('href', /^(data:|\/|https?:)/);
