@@ -1,0 +1,130 @@
+{
+  "buildId": "f1-f8adda044117f170",
+  "backend": "pixi.webgl2",
+  "pixiVersion": "8.21.0",
+  "generatorVersion": 1,
+  "graphSchemaVersion": 1,
+  "irVersion": 1,
+  "parameterBindings": [
+    {
+      "id": "4d402852-699e-45b6-9cfe-3cb7fa478f64",
+      "name": "Speed",
+      "valueType": "float",
+      "sourceNodeId": "a7202503-2d17-49f7-8a9c-fc6878bc869b",
+      "sourceKey": "value",
+      "defaultValue": 2,
+      "min": -10,
+      "max": 10,
+      "uniformName": "uParam0"
+    },
+    {
+      "id": "5064996f-6480-4049-b910-45241ab5705e",
+      "name": "Amplitude",
+      "valueType": "float",
+      "sourceNodeId": "c1ea9652-4486-4c33-ae2a-cc18fb9dc6e8",
+      "sourceKey": "value",
+      "defaultValue": 0.08,
+      "min": 0,
+      "max": 0.25,
+      "uniformName": "uParam1"
+    },
+    {
+      "id": "e6c2bdbe-4eb1-47b9-aa8f-a465b096a035",
+      "name": "Strength",
+      "valueType": "float",
+      "sourceNodeId": "a2bd2c1f-4b55-4b6b-ba6b-36ea3eda8c39",
+      "sourceKey": "value",
+      "defaultValue": 1,
+      "min": 0,
+      "max": 1,
+      "uniformName": "uParam2"
+    },
+    {
+      "id": "f0219df9-3692-44ec-87f0-4b9b311695cf",
+      "name": "Frequency",
+      "valueType": "float",
+      "sourceNodeId": "cd6c09df-cfdb-484c-9cfd-3cb6864b00ca",
+      "sourceKey": "value",
+      "defaultValue": 16,
+      "min": 0,
+      "max": 40,
+      "uniformName": "uParam3"
+    }
+  ],
+  "textureBindings": [],
+  "usesTime": true,
+  "nodeSourceRanges": {
+    "66f670f5-aa1b-416c-a73b-cb9d5c216100": {
+      "firstLine": 22,
+      "lastLine": 22
+    },
+    "97681029-cc85-4685-a075-cc4d91a38b5d": {
+      "firstLine": 23,
+      "lastLine": 24
+    },
+    "a2bd2c1f-4b55-4b6b-ba6b-36ea3eda8c39": {
+      "firstLine": 25,
+      "lastLine": 25
+    },
+    "a7202503-2d17-49f7-8a9c-fc6878bc869b": {
+      "firstLine": 26,
+      "lastLine": 26
+    },
+    "c1ea9652-4486-4c33-ae2a-cc18fb9dc6e8": {
+      "firstLine": 27,
+      "lastLine": 27
+    },
+    "c7eb0421-7577-47b3-9e14-de9baca6ca66": {
+      "firstLine": 28,
+      "lastLine": 28
+    },
+    "52ceb276-b914-4f79-b641-fd589c07633f": {
+      "firstLine": 29,
+      "lastLine": 29
+    },
+    "cd6c09df-cfdb-484c-9cfd-3cb6864b00ca": {
+      "firstLine": 30,
+      "lastLine": 30
+    },
+    "4d346e56-156d-4262-ab14-8f49f7b16b30": {
+      "firstLine": 31,
+      "lastLine": 31
+    },
+    "017461f5-de25-4183-80e9-e3c124ec32ae": {
+      "firstLine": 32,
+      "lastLine": 32
+    },
+    "59b61c9c-eefb-4fbb-9cea-c8c06fa0c133": {
+      "firstLine": 33,
+      "lastLine": 33
+    },
+    "b3cc655c-154c-41ca-9a40-b54ba73ddf5b": {
+      "firstLine": 34,
+      "lastLine": 34
+    },
+    "3459fb47-4439-4e85-a1d3-b26da1195b0c": {
+      "firstLine": 35,
+      "lastLine": 35
+    },
+    "f46bc2ed-2d74-4809-8b02-e383fb7efc81": {
+      "firstLine": 36,
+      "lastLine": 36
+    },
+    "d401267b-4c1c-4a3f-ac89-309039e113f2": {
+      "firstLine": 37,
+      "lastLine": 37
+    },
+    "6efa9e49-5c0e-432d-8da9-592ba9ff0d88": {
+      "firstLine": 38,
+      "lastLine": 38
+    },
+    "a93711ac-4ebf-4747-8716-235c1bcdcd1c": {
+      "firstLine": 39,
+      "lastLine": 39
+    },
+    "9014c5f4-b5ea-4dfa-978d-881d3b3a2f97": {
+      "firstLine": 40,
+      "lastLine": 40
+    }
+  }
+}

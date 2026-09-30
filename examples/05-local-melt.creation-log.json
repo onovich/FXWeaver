@@ -1,0 +1,330 @@
+{
+  "method": "Playwright editor UI from Create Filter graph",
+  "startedAt": "2026-09-30T17:05:24.946Z",
+  "durationSeconds": 3.352,
+  "buildId": "f1-f8adda044117f170",
+  "baselineHash": "c355d85419407897a1d045f36579fbcae8871d496673ee655d859b7c4c55a469",
+  "changedHash": "42cdffc0d69c95e883f4660365bc443c676f378bf6b42a60fd016622b7d8eccd",
+  "operations": [
+    {
+      "action": "add-node",
+      "alias": "uv",
+      "label": "Filter UV",
+      "nodeId": "66f670f5-aa1b-416c-a73b-cb9d5c216100"
+    },
+    {
+      "action": "add-node",
+      "alias": "splitUv",
+      "label": "Split Vector 2",
+      "nodeId": "97681029-cc85-4685-a075-cc4d91a38b5d"
+    },
+    {
+      "action": "add-node",
+      "alias": "time",
+      "label": "Time",
+      "nodeId": "c7eb0421-7577-47b3-9e14-de9baca6ca66"
+    },
+    {
+      "action": "add-node",
+      "alias": "frequency",
+      "label": "Number",
+      "nodeId": "cd6c09df-cfdb-484c-9cfd-3cb6864b00ca"
+    },
+    {
+      "action": "add-node",
+      "alias": "yFrequency",
+      "label": "Multiply",
+      "nodeId": "4d346e56-156d-4262-ab14-8f49f7b16b30"
+    },
+    {
+      "action": "add-node",
+      "alias": "speed",
+      "label": "Number",
+      "nodeId": "a7202503-2d17-49f7-8a9c-fc6878bc869b"
+    },
+    {
+      "action": "add-node",
+      "alias": "timeSpeed",
+      "label": "Multiply",
+      "nodeId": "52ceb276-b914-4f79-b641-fd589c07633f"
+    },
+    {
+      "action": "add-node",
+      "alias": "phase",
+      "label": "Add",
+      "nodeId": "017461f5-de25-4183-80e9-e3c124ec32ae"
+    },
+    {
+      "action": "add-node",
+      "alias": "sine",
+      "label": "Sine",
+      "nodeId": "59b61c9c-eefb-4fbb-9cea-c8c06fa0c133"
+    },
+    {
+      "action": "add-node",
+      "alias": "amplitude",
+      "label": "Number",
+      "nodeId": "c1ea9652-4486-4c33-ae2a-cc18fb9dc6e8"
+    },
+    {
+      "action": "add-node",
+      "alias": "waveAmplitude",
+      "label": "Multiply",
+      "nodeId": "b3cc655c-154c-41ca-9a40-b54ba73ddf5b"
+    },
+    {
+      "action": "add-node",
+      "alias": "strength",
+      "label": "Number",
+      "nodeId": "a2bd2c1f-4b55-4b6b-ba6b-36ea3eda8c39"
+    },
+    {
+      "action": "add-node",
+      "alias": "displacement",
+      "label": "Multiply",
+      "nodeId": "3459fb47-4439-4e85-a1d3-b26da1195b0c"
+    },
+    {
+      "action": "add-node",
+      "alias": "zero",
+      "label": "Number",
+      "nodeId": "f46bc2ed-2d74-4809-8b02-e383fb7efc81"
+    },
+    {
+      "action": "add-node",
+      "alias": "offset",
+      "label": "Compose Vector 2",
+      "nodeId": "d401267b-4c1c-4a3f-ac89-309039e113f2"
+    },
+    {
+      "action": "add-node",
+      "alias": "distortedUv",
+      "label": "Add Vector 2",
+      "nodeId": "6efa9e49-5c0e-432d-8da9-592ba9ff0d88"
+    },
+    {
+      "action": "add-node",
+      "alias": "sample",
+      "label": "Sample Source",
+      "nodeId": "a93711ac-4ebf-4747-8716-235c1bcdcd1c"
+    },
+    {
+      "action": "set-property",
+      "alias": "frequency",
+      "value": "16"
+    },
+    {
+      "action": "set-property",
+      "alias": "speed",
+      "value": "2"
+    },
+    {
+      "action": "set-property",
+      "alias": "amplitude",
+      "value": "0.08"
+    },
+    {
+      "action": "set-property",
+      "alias": "strength",
+      "value": "1"
+    },
+    {
+      "action": "set-property",
+      "alias": "zero",
+      "value": "0"
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "frequency",
+      "name": "Frequency",
+      "range": [
+        0,
+        40
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "speed",
+      "name": "Speed",
+      "range": [
+        -10,
+        10
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "amplitude",
+      "name": "Amplitude",
+      "range": [
+        0,
+        0.25
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "strength",
+      "name": "Strength",
+      "range": [
+        0,
+        1
+      ]
+    },
+    {
+      "action": "connect",
+      "from": "uv",
+      "output": "uv",
+      "to": "splitUv",
+      "input": "vector"
+    },
+    {
+      "action": "connect",
+      "from": "splitUv",
+      "output": "y",
+      "to": "yFrequency",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "frequency",
+      "output": "value",
+      "to": "yFrequency",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "time",
+      "output": "seconds",
+      "to": "timeSpeed",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "speed",
+      "output": "value",
+      "to": "timeSpeed",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "yFrequency",
+      "output": "value",
+      "to": "phase",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "timeSpeed",
+      "output": "value",
+      "to": "phase",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "phase",
+      "output": "value",
+      "to": "sine",
+      "input": "x"
+    },
+    {
+      "action": "connect",
+      "from": "sine",
+      "output": "value",
+      "to": "waveAmplitude",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "amplitude",
+      "output": "value",
+      "to": "waveAmplitude",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "waveAmplitude",
+      "output": "value",
+      "to": "displacement",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "strength",
+      "output": "value",
+      "to": "displacement",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "displacement",
+      "output": "value",
+      "to": "offset",
+      "input": "x"
+    },
+    {
+      "action": "connect",
+      "from": "zero",
+      "output": "value",
+      "to": "offset",
+      "input": "y"
+    },
+    {
+      "action": "connect",
+      "from": "uv",
+      "output": "uv",
+      "to": "distortedUv",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "offset",
+      "output": "value",
+      "to": "distortedUv",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "distortedUv",
+      "output": "value",
+      "to": "sample",
+      "input": "uv"
+    },
+    {
+      "action": "connect",
+      "from": "sample",
+      "output": "rgba",
+      "to": "root",
+      "input": "rgba"
+    },
+    {
+      "action": "import-preview-source",
+      "name": "synthetic-transition-card.png"
+    },
+    {
+      "action": "set-fixed-time",
+      "from": 0.75,
+      "to": 1.2,
+      "baselineHash": "c355d85419407897a1d045f36579fbcae8871d496673ee655d859b7c4c55a469",
+      "changedHash": "42cdffc0d69c95e883f4660365bc443c676f378bf6b42a60fd016622b7d8eccd"
+    }
+  ],
+  "nodeIds": {
+    "root": "9014c5f4-b5ea-4dfa-978d-881d3b3a2f97",
+    "uv": "66f670f5-aa1b-416c-a73b-cb9d5c216100",
+    "splitUv": "97681029-cc85-4685-a075-cc4d91a38b5d",
+    "time": "c7eb0421-7577-47b3-9e14-de9baca6ca66",
+    "frequency": "cd6c09df-cfdb-484c-9cfd-3cb6864b00ca",
+    "yFrequency": "4d346e56-156d-4262-ab14-8f49f7b16b30",
+    "speed": "a7202503-2d17-49f7-8a9c-fc6878bc869b",
+    "timeSpeed": "52ceb276-b914-4f79-b641-fd589c07633f",
+    "phase": "017461f5-de25-4183-80e9-e3c124ec32ae",
+    "sine": "59b61c9c-eefb-4fbb-9cea-c8c06fa0c133",
+    "amplitude": "c1ea9652-4486-4c33-ae2a-cc18fb9dc6e8",
+    "waveAmplitude": "b3cc655c-154c-41ca-9a40-b54ba73ddf5b",
+    "strength": "a2bd2c1f-4b55-4b6b-ba6b-36ea3eda8c39",
+    "displacement": "3459fb47-4439-4e85-a1d3-b26da1195b0c",
+    "zero": "f46bc2ed-2d74-4809-8b02-e383fb7efc81",
+    "offset": "d401267b-4c1c-4a3f-ac89-309039e113f2",
+    "distortedUv": "6efa9e49-5c0e-432d-8da9-592ba9ff0d88",
+    "sample": "a93711ac-4ebf-4747-8716-235c1bcdcd1c"
+  }
+}
