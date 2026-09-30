@@ -56,5 +56,25 @@ export function checkConnection(
     return { code: 'INPUT_OCCUPIED', message: `Input ${input.label} already has a connection.`, nodeId: to.nodeId, portId: to.portId };
   }
 
+  if (createsCycle(graph, from.nodeId, to.nodeId, ignored)) {
+    return { code: 'CYCLE', message: 'This connection would create a cycle.', nodeId: to.nodeId, portId: to.portId };
+  }
+
   return null;
+}
+
+function createsCycle(graph: GraphDocument, sourceId: string, targetId: string, ignored: Set<string>): boolean {
+  if (sourceId === targetId) return true;
+  const visited = new Set<string>();
+  const pending = [targetId];
+  while (pending.length > 0) {
+    const current = pending.pop()!;
+    if (current === sourceId) return true;
+    if (visited.has(current)) continue;
+    visited.add(current);
+    for (const edge of graph.edges) {
+      if (!ignored.has(edge.id) && edge.from.nodeId === current) pending.push(edge.to.nodeId);
+    }
+  }
+  return false;
 }
