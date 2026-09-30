@@ -34,3 +34,39 @@ test('enlarged preview retains the canvas, paused time, build and comparison con
   await expect(page.getByLabel('Preview time', { exact: true })).toHaveText(time);
   await expect(page.getByTestId('preview-build-id')).toHaveText(build);
 });
+
+test('small enlarged view keeps controls reachable and traps focus inside the dialog', async ({ page }) => {
+  await page.setViewportSize({ width: 600, height: 800 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Edit a copy of Local melt' }).click();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  await page.getByRole('button', { name: 'Enlarge preview' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Preview' });
+  const close = dialog.getByRole('button', { name: 'Return to workbench' });
+  await expect(close).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  expect(await dialog.evaluate((element) => element.contains(document.activeElement))).toBe(true);
+  await expect(dialog.locator('summary')).toBeFocused();
+  await page.keyboard.press('Tab'); await expect(close).toBeFocused();
+  const value = dialog.locator('.runtime-parameter').getByRole('spinbutton', { name: 'Amplitude' });
+  await value.fill('0.05'); await value.press('Enter');
+  await expect(value).toHaveValue('0.05');
+  const box = (await value.boundingBox())!;
+  expect(box.x).toBeGreaterThanOrEqual(0); expect(box.x + box.width).toBeLessThanOrEqual(600);
+  await close.click(); await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
+test('enlarging an old preview preserves its diagnostic and last successful frame', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Edit a copy of Hologram scan' }).click();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  const canvas = page.locator('.preview-stage canvas');
+  const hash = async () => createHash('sha256').update(await canvas.evaluate((item: HTMLCanvasElement) => item.toDataURL())).digest('hex');
+  const before = await hash(); const build = await page.getByTestId('preview-build-id').innerText();
+  await page.getByRole('button', { name: 'Disconnect Filter Output RGBA' }).click();
+  await expect(page.getByText('Old preview')).toBeVisible();
+  await page.getByRole('button', { name: 'Enlarge preview' }).click();
+  await expect(page.getByText('Old preview')).toBeVisible();
+  await expect(page.getByTestId('preview-build-id')).toHaveText(build); expect(await hash()).toBe(before);
+  await page.keyboard.press('Escape'); expect(await hash()).toBe(before);
+});
