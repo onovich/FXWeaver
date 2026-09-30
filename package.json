@@ -9,6 +9,7 @@
     "test": "vitest run --passWithNoTests",
     "build": "tsc --noEmit && vite build",
     "smoke": "playwright test",
+    "smoke:preview": "playwright test --config=playwright.preview.config.ts",
     "smoke:webgl": "playwright test tests/webgl-spike.smoke.spec.ts",
     "spike:capture": "node scripts/capture-phase1-spike.mjs",
     "runtime:capture": "node scripts/capture-phase1-generated.mjs",

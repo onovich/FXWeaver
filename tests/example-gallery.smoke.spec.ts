@@ -29,6 +29,16 @@ for (const sample of cases) test(`work ${sample.id} opens as an editable copy an
   const publishedLog = await card.getByRole('link', { name: 'Download creation record' }).getAttribute('href');
   expect(await page.evaluate(async (url) => JSON.parse(await (await fetch(url!)).text()).buildId, publishedManifest)).toBe(manifest.buildId);
   expect(await page.evaluate(async (url) => JSON.parse(await (await fetch(url!)).text()).buildId, publishedLog)).toBe(manifest.buildId);
+  const manifestDownload = page.waitForEvent('download');
+  await card.getByRole('link', { name: 'Download manifest' }).click();
+  const downloadedManifest = await manifestDownload;
+  expect(downloadedManifest.suggestedFilename()).toBe(`work${sample.id}.manifest.json`);
+  expect(JSON.parse(await readFile((await downloadedManifest.path())!, 'utf8')).buildId).toBe(manifest.buildId);
+  const logDownload = page.waitForEvent('download');
+  await card.getByRole('link', { name: 'Download creation record' }).click();
+  const downloadedLog = await logDownload;
+  expect(downloadedLog.suggestedFilename()).toBe(`work${sample.id}.creation-log.json`);
+  expect(JSON.parse(await readFile((await downloadedLog.path())!, 'utf8')).buildId).toBe(manifest.buildId);
   await card.getByRole('button', { name: `Edit a copy of ${sample.title}` }).click();
   await expect(page.getByText('Preview ready')).toBeVisible();
   await expect(page.getByTestId('preview-build-id')).toHaveText(manifest.buildId);
@@ -65,13 +75,13 @@ test('a late example load cannot replace a newer choice', async ({ page }) => {
   let oldRequested!: () => void;
   const held = new Promise<void>((resolve) => { releaseOld = resolve; });
   const requested = new Promise<void>((resolve) => { oldRequested = resolve; });
-  await page.route(/03-radial-burn\.fxweave\.json/, async (route) => {
+  await page.route(/03-radial-burn\.fxweave/, async (route) => {
     oldRequested();
     await held;
     await route.continue();
   });
   await page.goto('/');
-  const oldResponse = page.waitForResponse(/03-radial-burn\.fxweave\.json/);
+  const oldResponse = page.waitForResponse(/03-radial-burn\.fxweave/);
   try {
     await page.getByRole('button', { name: 'Edit a copy of Radial burn' }).click();
     await requested;
