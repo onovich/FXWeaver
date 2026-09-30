@@ -11,9 +11,9 @@ import type { GraphPortRef } from '../graph/schema';
 import { validateGraph } from '../graph/validation';
 import { chooseOpenHandle, chooseSaveHandle, downloadProject, hasFilePicker, readProjectFile, saveRecoveryDraft, writeProjectFile, type ProjectFileHandle } from '../storage/projectStorage';
 
-interface Props { project: ProjectFile; initialHandle?: ProjectFileHandle; initialSavedJson?: string; source: 'new' | 'draft' | 'file'; onOpenSession: (project: ProjectFile, handle?: ProjectFileHandle) => void; onBack: () => void }
+interface Props { project: ProjectFile; initialHandle?: ProjectFileHandle; initialSavedJson?: string; source: 'new' | 'draft' | 'file'; suspended: boolean; onOpenSession: (project: ProjectFile, handle?: ProjectFileHandle) => void; onBack: () => void; onRecoveryWarning: (warning: string | null) => void }
 
-export function WorkspaceShell({ project, initialHandle, initialSavedJson, source, onOpenSession, onBack }: Props) {
+export function WorkspaceShell({ project, initialHandle, initialSavedJson, source, suspended, onOpenSession, onBack, onRecoveryWarning }: Props) {
   const [history, setHistory] = useState(() => createHistory({ graph: project.graph, layout: project.layout }));
   const [pendingFrom, setPendingFrom] = useState<GraphPortRef | null>(null);
   const [actionIssue, setActionIssue] = useState<GraphIssue | null>(null);
@@ -76,11 +76,19 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
     if (position) setViewport({ ...document.layout.viewport, x: 110 - position.x * document.layout.viewport.zoom, y: 110 - position.y * document.layout.viewport.zoom });
   }
 
+  function preserveRecoveryDraft(snapshot: ProjectFile) {
+    try {
+      setDraftSavedAt(saveRecoveryDraft(snapshot).savedAt);
+      onRecoveryWarning(null);
+    } catch (error) {
+      onRecoveryWarning(`Recovery draft unavailable: ${error instanceof Error ? error.message : 'Unknown error'}. Save or export a project file to keep this work.`);
+    }
+  }
+
   async function saveToFile(saveAs = false) {
     try {
       const snapshot = currentProjectRef.current;
-      const draft = saveRecoveryDraft(snapshot);
-      setDraftSavedAt(draft.savedAt);
+      preserveRecoveryDraft(snapshot);
       let handle = saveAs ? null : fileHandle;
       if (!handle) {
         if (!hasFilePicker()) {
@@ -95,21 +103,21 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
       setLastSavedJson(json);
       setSaveNotice(`Saved to ${handle.name}.`);
     } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') setSaveNotice('Save cancelled. The browser recovery draft remains available.');
+      if (error instanceof DOMException && error.name === 'AbortError') setSaveNotice('Save cancelled. Current editor remains open.');
       else setSaveNotice(`Save failed: ${error instanceof Error ? error.message : 'Unknown error'}. The project file was not updated.`);
     }
   }
 
   function returnToEntry() {
     window.setTimeout(() => {
-      try { saveRecoveryDraft(currentProjectRef.current); onBack(); }
-      catch (error) { setSaveNotice(`Could not preserve recovery draft: ${error instanceof Error ? error.message : 'Unknown error'}`); }
+      preserveRecoveryDraft(currentProjectRef.current);
+      onBack();
     }, 0);
   }
 
   async function openProjectFromPicker() {
     try {
-      saveRecoveryDraft(currentProject);
+      preserveRecoveryDraft(currentProjectRef.current);
       const handle = await chooseOpenHandle();
       const result = await readProjectFile(await handle.getFile());
       if (!result.ok) { setSaveNotice(`Open blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
@@ -122,7 +130,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
 
   async function importProjectFile(file: File) {
     try {
-      saveRecoveryDraft(currentProject);
+      preserveRecoveryDraft(currentProjectRef.current);
       const result = await readProjectFile(file);
       if (!result.ok) { setSaveNotice(`Import blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
       onOpenSession(result.project);
@@ -133,13 +141,13 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      try { setDraftSavedAt(saveRecoveryDraft(currentProject).savedAt); }
-      catch (error) { setSaveNotice(`Recovery draft failed: ${error instanceof Error ? error.message : 'Unknown error'}`); }
+      preserveRecoveryDraft(currentProject);
     }, 300);
     return () => window.clearTimeout(timer);
   }, [currentJson]);
 
   useEffect(() => {
+    if (suspended) return;
     function onKeyDown(event: KeyboardEvent) {
       const target = event.target;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {

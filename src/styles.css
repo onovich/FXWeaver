@@ -64,6 +64,8 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .phase-chip { padding: .35rem .6rem; border: 1px solid #586b46; border-radius: .25rem; color: #d5dfa7; background: #30392c; font-size: .72rem; white-space: nowrap; }
 .save-notice { position: absolute; z-index: 10; right: 1rem; top: 64px; display: flex; align-items: start; gap: .8rem; max-width: 360px; padding: .7rem .8rem; border: 1px solid #567380; border-radius: .25rem; color: #e8f1f5; background: #203b49; box-shadow: 0 10px 24px #0007; font-size: .73rem; }
 .save-notice button { border: 0; color: #dceaf0; background: transparent; font-size: 1rem; }
+.recovery-warning { position: fixed; z-index: 20; right: 1rem; bottom: 55px; display: flex; align-items: start; gap: .8rem; max-width: 390px; padding: .7rem .8rem; border: 1px solid #a3764b; border-radius: .25rem; color: #ffead1; background: #493628; box-shadow: 0 10px 24px #0007; font-size: .73rem; }
+.recovery-warning button { border: 0; color: inherit; background: transparent; font-size: 1rem; }
 .workbench-grid { display: grid; grid-template-columns: 220px minmax(400px, 1fr) 354px; min-height: 0; }
 .library-panel, .context-panel { background: var(--surface); }
 .library-panel { min-width: 0; overflow: auto; border-right: 1px solid var(--border); }
