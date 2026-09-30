@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { GraphCanvas } from './GraphCanvas';
+import { Inspector } from './Inspector';
+import { ProblemsPanel } from './ProblemsPanel';
 import type { GraphCommand } from '../graph/commands';
 import { applyHistoryCommand, createHistory, redo, undo } from '../graph/history';
-import { getNodeDefinition, listNodeDefinitions } from '../graph/registry';
+import { listNodeDefinitions } from '../graph/registry';
 import type { ProjectFile } from '../graph/project';
 import type { GraphIssue } from '../graph/diagnostics';
 import type { GraphPortRef } from '../graph/schema';
@@ -15,12 +17,11 @@ export function WorkspaceShell({ project, onBack }: Props) {
   const [pendingFrom, setPendingFrom] = useState<GraphPortRef | null>(null);
   const [actionIssue, setActionIssue] = useState<GraphIssue | null>(null);
   const [search, setSearch] = useState('');
+  const [problemsOpen, setProblemsOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const document = history.present;
   const issues = validateGraph(document.graph);
   const selectedId = document.layout.selectedNodeIds[0];
-  const selected = document.graph.nodes.find((node) => node.id === selectedId);
-  const selectedDefinition = selected && getNodeDefinition(document.graph.graphKind, selected.type);
   const definitions = listNodeDefinitions(document.graph.graphKind).filter((definition) =>
     `${definition.label} ${definition.category} ${definition.description}`.toLowerCase().includes(search.toLowerCase()),
   );
@@ -57,6 +58,13 @@ export function WorkspaceShell({ project, onBack }: Props) {
     setViewport({ ...document.layout.viewport, zoom: Math.min(2, Math.max(.5, Math.round(document.layout.viewport.zoom * factor * 100) / 100)) });
   }
 
+  function focusIssue(issue: GraphIssue) {
+    if (!issue.nodeId) return;
+    const position = document.layout.nodePositions[issue.nodeId];
+    setSelection([issue.nodeId]);
+    if (position) setViewport({ ...document.layout.viewport, x: 110 - position.x * document.layout.viewport.zoom, y: 110 - position.y * document.layout.viewport.zoom });
+  }
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       const target = event.target;
@@ -78,7 +86,7 @@ export function WorkspaceShell({ project, onBack }: Props) {
   });
 
   return (
-    <main className="workbench">
+    <main className={`workbench ${problemsOpen ? 'problems-open' : ''}`}>
       <header className="workbench-header">
         <button className="brand-button" type="button" onClick={onBack} aria-label="Return to project entry">FXWeave</button>
         <div className="header-divider" aria-hidden="true" />
@@ -127,18 +135,11 @@ export function WorkspaceShell({ project, onBack }: Props) {
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
             <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>Renderer not configured</strong><p>The first effect host and web renderer are still to be chosen. This area will run generated output in a later phase.</p></div>
           </section>
-          <section className="inspector-panel" aria-labelledby="inspector-heading">
-            <div className="panel-heading"><p className="section-kicker">SELECTION</p><h2 id="inspector-heading">Inspector</h2></div>
-            {selected && selectedDefinition ? <div className="inspector-content"><strong>{selectedDefinition.label}</strong><p>{selectedDefinition.description}</p><p>{selectedDefinition.inputs.length} inputs · {selectedDefinition.outputs.length} outputs</p><button className="secondary-button" type="button" disabled={selected.type === 'foundation.output'} onClick={() => dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds })}>Delete selected</button></div> : <p className="panel-note">Select a node to inspect its properties.</p>}
-          </section>
+          <Inspector graph={document.graph} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
         </aside>
       </div>
 
-      <section className="problem-bar" aria-label="Graph problems">
-        <strong>Problems {issues.length}</strong>
-        <span>{actionIssue?.message ?? issues[0]?.message ?? 'No graph issues found.'}</span>
-        <span className="problem-context">Test graph · No build</span>
-      </section>
+      <ProblemsPanel issues={issues} expanded={problemsOpen} onToggle={() => setProblemsOpen(!problemsOpen)} onFocus={focusIssue} actionIssue={actionIssue} />
     </main>
   );
 }

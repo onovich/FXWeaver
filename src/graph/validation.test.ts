@@ -54,4 +54,12 @@ describe('graph validation', () => {
     };
     expect(codes(graph)).toEqual(expect.arrayContaining(['UNSUPPORTED_DEFINITION_VERSION', 'INVALID_PROPERTY', 'INVALID_PARAMETER']));
   });
+
+  it('diagnoses a parameter default that diverges from its source property', () => {
+    const graph: GraphDocument = {
+      ...createEmptyGraph(FOUNDATION_GRAPH_KIND), nodes: [root, number],
+      parameters: [{ id: 'p', name: 'Amount', valueType: 'float', sourceNodeId: 'n', sourceKey: 'value', defaultValue: 3 }],
+    };
+    expect(codes(graph)).toContain('INVALID_PARAMETER');
+  });
 });

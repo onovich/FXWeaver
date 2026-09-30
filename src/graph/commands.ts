@@ -15,7 +15,10 @@ export type GraphCommand =
   | { type: 'move-nodes'; positions: Record<string, { x: number; y: number }> }
   | { type: 'connect'; edgeId: string; from: GraphPortRef; to: GraphPortRef; replaceExisting?: boolean }
   | { type: 'disconnect'; edgeId: string }
-  | { type: 'set-property'; nodeId: string; propertyId: string; value: JsonValue };
+  | { type: 'set-property'; nodeId: string; propertyId: string; value: JsonValue }
+  | { type: 'expose-parameter'; parameterId: string; nodeId: string; propertyId: string; name: string }
+  | { type: 'rename-parameter'; parameterId: string; name: string }
+  | { type: 'remove-parameter'; parameterId: string };
 
 export type CommandResult = { ok: true; document: EditorDocument } | { ok: false; document: EditorDocument; issue: GraphIssue };
 
@@ -102,8 +105,36 @@ export function applyCommand(document: EditorDocument, command: GraphCommand): C
       }
       return {
         ok: true,
-        document: { ...document, graph: { ...graph, nodes: graph.nodes.map((item) => item.id === node.id ? { ...item, values: { ...item.values, [property.id]: structuredClone(value) } } : item) } },
+        document: { ...document, graph: {
+          ...graph,
+          nodes: graph.nodes.map((item) => item.id === node.id ? { ...item, values: { ...item.values, [property.id]: structuredClone(value) } } : item),
+          parameters: graph.parameters.map((parameter) => parameter.sourceNodeId === node.id && parameter.sourceKey === property.id ? { ...parameter, defaultValue: structuredClone(value) } : parameter),
+        } },
       };
+    }
+    case 'expose-parameter': {
+      const node = graph.nodes.find((item) => item.id === command.nodeId);
+      const property = node && getNodeDefinition(graph.graphKind, node.type)?.properties.find((item) => item.id === command.propertyId);
+      if (!node || !property || property.type === 'texture') return reject(document, 'Only an existing numeric, vector, or color property can be exposed.', { code: 'INVALID_PARAMETER', nodeId: command.nodeId, portId: command.propertyId });
+      if (!command.name.trim()) return reject(document, 'Parameter name cannot be empty.', { code: 'INVALID_PARAMETER' });
+      if (graph.parameters.some((parameter) => parameter.id === command.parameterId)) return reject(document, 'Parameter ID is already in use.', { code: 'ID_CONFLICT' });
+      if (graph.parameters.some((parameter) => parameter.sourceNodeId === node.id && parameter.sourceKey === property.id)) return reject(document, 'This property is already exposed.', { code: 'INVALID_PARAMETER', nodeId: node.id, portId: property.id });
+      const value = node.values[property.id];
+      if (value === undefined || !isValueOfType(value, property.type)) return reject(document, 'The property has no valid value to expose.', { code: 'INVALID_PROPERTY', nodeId: node.id, portId: property.id });
+      return { ok: true, document: { ...document, graph: { ...graph, parameters: [...graph.parameters, {
+        id: command.parameterId, name: command.name.trim(), valueType: property.type,
+        sourceNodeId: node.id, sourceKey: property.id, defaultValue: structuredClone(value),
+        min: property.min, max: property.max,
+      }] } } };
+    }
+    case 'rename-parameter': {
+      if (!command.name.trim()) return reject(document, 'Parameter name cannot be empty.', { code: 'INVALID_PARAMETER' });
+      if (!graph.parameters.some((parameter) => parameter.id === command.parameterId)) return reject(document, 'Parameter does not exist.', { code: 'INVALID_PARAMETER' });
+      return { ok: true, document: { ...document, graph: { ...graph, parameters: graph.parameters.map((parameter) => parameter.id === command.parameterId ? { ...parameter, name: command.name.trim() } : parameter) } } };
+    }
+    case 'remove-parameter': {
+      if (!graph.parameters.some((parameter) => parameter.id === command.parameterId)) return reject(document, 'Parameter does not exist.', { code: 'INVALID_PARAMETER' });
+      return { ok: true, document: { ...document, graph: { ...graph, parameters: graph.parameters.filter((parameter) => parameter.id !== command.parameterId) } } };
     }
   }
 }

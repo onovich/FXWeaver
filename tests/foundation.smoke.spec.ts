@@ -64,3 +64,41 @@ test('edits a typed test graph and explains a rejected connection', async ({ pag
   await page.mouse.up();
   expect(await world.getAttribute('style')).not.toBe(transformBefore);
 });
+
+test('focuses a problem and edits one source value through inspector and exposed parameter', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Create test graph' }).click();
+  await page.getByRole('button', { name: 'Problems 1' }).click();
+  await page.locator('.problem-list button').first().click();
+  await expect(page.locator('.canvas-node.selected')).toContainText('Test Output');
+  await expect(page.locator('.inspector-content')).toContainText('Test Output');
+
+  await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Number');
+  await page.locator('.library-list button').filter({ hasText: 'Number' }).click();
+  const inspectorValue = page.locator('.inspector-content').getByRole('spinbutton', { name: 'Value' });
+  await inspectorValue.fill('5');
+  await inspectorValue.press('Enter');
+  await expect(inspectorValue).toHaveValue('5');
+  await page.getByRole('button', { name: 'Expose as parameter' }).click();
+  await expect(page.locator('.inspector-content')).toContainText('Linked to Value');
+  const parameterValue = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' });
+  await parameterValue.fill('7');
+  await parameterValue.press('Enter');
+  await expect(parameterValue).toHaveValue('7');
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(parameterValue).toHaveValue('5');
+  await page.getByRole('button', { name: 'Redo' }).click();
+  await expect(parameterValue).toHaveValue('7');
+
+  await parameterValue.fill('999');
+  await parameterValue.press('Enter');
+  await expect(page.getByText('Value rejected; the previous value is preserved.')).toBeVisible();
+  await page.getByRole('button', { name: 'Undo' }).click();
+  await expect(parameterValue).toHaveValue('5');
+  const parameterName = page.locator('.parameter-section').getByRole('textbox', { name: 'Parameter name' });
+  await parameterName.fill('Amount');
+  await parameterName.press('Enter');
+  await expect(page.locator('.inspector-content')).toContainText('Linked to Amount');
+  await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Amount' })).toHaveValue('5');
+});

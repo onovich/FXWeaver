@@ -54,4 +54,19 @@ describe('immutable graph commands', () => {
     expect(rejected.ok).toBe(false);
     expect(rejected.document).toBe(edited);
   });
+
+  it('keeps an exposed parameter and its node property synchronized', () => {
+    const number = execute(createEditorDocument(FOUNDATION_GRAPH_KIND), { type: 'add-node', nodeId: 'number', nodeType: 'foundation.number', position: { x: 0, y: 0 } });
+    const exposed = execute(number, { type: 'expose-parameter', parameterId: 'p', nodeId: 'number', propertyId: 'value', name: 'Amount' });
+    expect(exposed.graph.parameters[0].defaultValue).toBe(0);
+    const edited = execute(exposed, { type: 'set-property', nodeId: 'number', propertyId: 'value', value: 4.5 });
+    expect(edited.graph.nodes[0].values.value).toBe(4.5);
+    expect(edited.graph.parameters[0].defaultValue).toBe(4.5);
+    expect(exposed.graph.parameters[0].defaultValue).toBe(0);
+    const renamed = execute(edited, { type: 'rename-parameter', parameterId: 'p', name: 'Intensity' });
+    expect(renamed.graph.parameters[0]).toMatchObject({ id: 'p', name: 'Intensity', defaultValue: 4.5 });
+    const removed = execute(renamed, { type: 'remove-parameter', parameterId: 'p' });
+    expect(removed.graph.parameters).toEqual([]);
+    expect(removed.graph.nodes[0].values.value).toBe(4.5);
+  });
 });
