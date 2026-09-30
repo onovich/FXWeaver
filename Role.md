@@ -2,7 +2,7 @@
 
 workspace: D:\WebProjects\FXWeaver
 created_at: 2026-09-30T10:42:06.7875194+08:00
-updated_at: 2026-10-01T02:22:27+08:00
+updated_at: 2026-10-01T02:43:23.9117721+08:00
 
 planner:
   role: architect
@@ -19,10 +19,10 @@ executor:
 idempotency:
   active_goal_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
   active_goal_phase: V0 Phase 2 local project asset trial and usability
-  last_planner_dispatch: 2026-09-30T21:51:11.6568650+08:00
+  last_planner_dispatch: 2026-10-01T02:43:23.9117721+08:00
   last_planner_dispatch_status: sent
-  last_planner_dispatch_guide: docs/15-v0-generated-filter-goal-mode-execution-guide.md
-  last_planner_dispatch_commit: 40e9360b72bca80e810b620d7a21cd6ae309d09c
+  last_planner_dispatch_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
+  last_planner_dispatch_commit: bd348f06a2fd9a84780c7211b9e5d5f0f8aa4884
   last_executor_report_commit: e630cefed003ea95fd9e9ef8236621c61dd81c03
   last_executor_report_status: sent
   last_executor_report_at: 2026-10-01T02:22:27+08:00
