@@ -1,6 +1,6 @@
 # FXWeave V0 Phase 0 验收报告
 
-日期：2026-09-30。阶段：节点图与编辑器基础。状态：规划验收反馈的缺陷已修复，待规划验收负责人重跑 `$checkandgoal`。第 16 轮提交 `b11cb34130509414e1311bc200747e6b02e27482` 已推送到 `origin/main`；本报告在验收修复后更新。执行依据为 [16 轮指南](./09-v0-graph-foundation-goal-mode-execution-guide.md)。
+日期：2026-09-30。阶段：节点图与编辑器基础。状态：**规划验收 PASS**，独立检查见[架构验收记录](./12-phase0-planner-acceptance.md)。第 16 轮提交 `b11cb34130509414e1311bc200747e6b02e27482` 及后续验收修复已推送到 `origin/main`。执行依据为 [16 轮指南](./09-v0-graph-foundation-goal-mode-execution-guide.md)。
 
 ## 阶段结果与边界
 

@@ -4,7 +4,7 @@
 
 FXWeave 是一个面向游戏效果的网页低代码节点创作工具。平台中的 Shader 都由这套节点工具生成。**第一步先做项目方自用版**，用它实际制作和迭代自己的效果；随后推出面向用户的网页第一版，让用户搭建节点图并生成所见即所得的 Shader 和效果；第二版在代码生成/编译层扩展到不同平台，并按需要适配各自的渲染管线。作品社区与分享是后续围绕同一节点源图发展的产品层。
 
-**状态：V0 Phase 0 节点图与编辑器基础已实现，待架构验收。** 现在可以在桌面 Chrome 中创建、编辑、校验、保存并重开测试图。此阶段尚无 Shader 生成或真实实时预览；首个效果宿主、网页渲染后端、第二版目标平台和商业模式仍待确定。文档中的「已确定」「建议」「待验证」有不同含义，不能将建议当作已批准的实现需求。
+**状态：V0 Phase 0 节点图与编辑器基础已实现并通过架构验收。** 现在可以在桌面 Chrome 中创建、编辑、校验、保存并重开测试图。此阶段尚无 Shader 生成或真实实时预览；首个效果宿主、网页渲染后端、第二版目标平台和商业模式仍待确定。文档中的「已确定」「建议」「待验证」有不同含义，不能将建议当作已批准的实现需求。
 
 ## 运行 Phase 0
 
@@ -17,7 +17,7 @@ npm run dev
 
 打开终端给出的本地地址，选择 **Create test graph**。依次添加 Number、从 Number 输出端连到 Test Output 输入端、修改数值、撤销和重做，再用 **Save As** 保存为 `.fxweave.json`，返回入口后重新打开。没有文件选择器的浏览器可以用 **Export JSON** 和 **Import JSON**。恢复草稿保存在本机浏览器中，与工程文件分开。
 
-完整验收记录、测试命令及已知边界见 [Phase 0 验收报告](./docs/11-phase0-validation-report.md)。[工作台截图](./docs/visuals/phase0-workbench.png)、[拒绝连接截图](./docs/visuals/phase0-rejected-connection.png) 与 [浏览器演示录像](./docs/visuals/phase0-demo.webm) 均由 `npm run demo:capture` 从实际编辑器生成。
+开发记录、测试命令及已知边界见 [Phase 0 开发报告](./docs/11-phase0-validation-report.md)；独立检查结论见 [Phase 0 架构验收](./docs/12-phase0-planner-acceptance.md)。[工作台截图](./docs/visuals/phase0-workbench.png)、[拒绝连接截图](./docs/visuals/phase0-rejected-connection.png) 与 [浏览器演示录像](./docs/visuals/phase0-demo.webm) 均由 `npm run demo:capture` 从实际编辑器生成。
 
 ## 从这里开始
 
@@ -32,6 +32,7 @@ npm run dev
 9. [自用版界面原画](./docs/08-v0-ui-concept.md)：桌面工作台视觉稿与生成提示词。
 10. [V0 Phase 0 执行指南](./docs/09-v0-graph-foundation-goal-mode-execution-guide.md)：节点图与编辑器基础，16 轮开发和验收门槛。
 11. [V0 Phase 0 验收报告](./docs/11-phase0-validation-report.md)：实现范围、16 轮提交、复现步骤、验证结果和后续决策。
+12. [V0 Phase 0 架构验收](./docs/12-phase0-planner-acceptance.md)：独立复验、修复记录及通过范围。
 
 此前讨论形成的完整研究文档存放在 [研究历史目录](./docs/research-history/INDEX.md)；它们保留原貌供追溯，以上主文档是当前项目口径。
 
@@ -54,4 +55,4 @@ npm run dev
 
 本目录是后续会话的项目工作区。继续推进时先阅读主文档，并把新决策更新到这里。
 
-**V0 Phase 0** 已交付可编辑、可校验、可保存重开的测试源图，下一步是架构验收。正式 Shader 生成和实时预览在首个渲染目标确定后的阶段进行。开发执行与架构验收由 `Role.md` 中的两个会话分别负责。
+**V0 Phase 0** 已通过架构验收，交付可编辑、可校验、可保存重开的测试源图。下一步需确定首个真实效果及渲染目标。正式 Shader 生成和实时预览在目标确定后的阶段进行。开发执行与架构验收由 `Role.md` 中的两个会话分别负责。

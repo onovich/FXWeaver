@@ -38,10 +38,10 @@
 
 ## 新会话推荐起点
 
-当前已建立分工：开发会话已按 [V0 Phase 0 执行指南](./09-v0-graph-foundation-goal-mode-execution-guide.md) 完成 **16 轮**节点图与编辑器基础开发；[验收报告](./11-phase0-validation-report.md) 记录实现、测试、演示和缺口。架构验收会话负责检查 Phase 0 与规划后续目标。会话路由见根目录 `Role.md`。Phase 0 没有选定正式渲染宿主；生成 Shader 与同源预览留在后续阶段，待首个网页目标明确后推进。
+当前已建立分工：开发会话已按 [V0 Phase 0 执行指南](./09-v0-graph-foundation-goal-mode-execution-guide.md) 完成 **16 轮**节点图与编辑器基础开发；[开发报告](./11-phase0-validation-report.md) 记录实现、测试、演示和缺口，[架构验收](./12-phase0-planner-acceptance.md) 为 **PASS**。架构验收会话负责规划后续目标。会话路由见根目录 `Role.md`。Phase 0 没有选定正式渲染宿主；生成 Shader 与同源预览留在后续阶段，待首个网页目标明确后推进。
 
 1. 阅读 [定位](./01-vision-positioning.md)、[产品设计](./02-product-design.md)、[技术草案](./03-technical-design.md)、[阶段草案](./04-roadmap-validation.md)、[可执行路线图建议稿](./06-roadmap-proposal.md) 和 [自用版功能与交互设计](./07-self-use-product-spec.md)。
-2. 先验收 Phase 0；再从项目方近期真正需要制作的效果里选 2–3 个，确定自用版的**一个**网页渲染后端与效果类型。
+2. 从项目方近期真正需要制作的效果里选 2–3 个，确定自用版的**一个**网页渲染后端与效果类型。
 3. 做自用版并坚持用它从零制作这些效果；验证改图后实时预览、生成代码、保存和重开结果一致，不靠手写 Shader 补完。
 4. 自用版能支持团队持续创作后，再安排外部创作者试用、对比现有节点工具；第二版再测试跨平台/管线适配与真实项目导入。
 5. 每次确定新范围或改变定位时更新主文档，而不是只保留在聊天记录里。
