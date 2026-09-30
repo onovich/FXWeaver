@@ -91,6 +91,9 @@ function createHost(scene: PreviewScene, texture: Texture): Container {
 }
 
 export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsChange }: Props) {
+  const panelRef = useRef<HTMLElement>(null);
+  const enlargeButtonRef = useRef<HTMLButtonElement>(null);
+  const [expanded, setExpanded] = useState(false);
   const mountRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const displayRef = useRef<Display | null>(null);
@@ -109,6 +112,29 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
   const structuralSceneKey = JSON.stringify({ host: scene.host, sourceAssetId: scene.sourceAssetId,
     width: scene.width, height: scene.height, filterAreaInset: scene.filterAreaInset,
     padding: scene.padding, resolution: scene.resolution, sampling: scene.sampling });
+
+  useEffect(() => {
+    if (!expanded) return;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    enlargeButtonRef.current?.focus();
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setExpanded(false); }
+      if (event.key !== 'Tab') return;
+      const controls = [...(panelRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), select:not(:disabled), summary, a[href]') ?? [])]
+        .filter((element) => element.getClientRects().length > 0);
+      const first = controls[0]; const last = controls.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
+    };
+  }, [expanded]);
 
   useEffect(() => {
     let disposed = false;
@@ -294,8 +320,8 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
       setAssetMessage(cause instanceof Error ? cause.message : String(cause));
     }
   };
-  return <section className="preview-panel filter-preview-panel" aria-labelledby="preview-heading">
-    <div className="panel-heading"><p className="section-kicker">PIXIJS WEBGL2 FILTER</p><h2 id="preview-heading">Preview</h2></div>
+  return <section ref={panelRef} className={`preview-panel filter-preview-panel${expanded ? ' preview-expanded' : ''}`} role={expanded ? 'dialog' : undefined} aria-modal={expanded ? true : undefined} aria-labelledby="preview-heading">
+    <div className="panel-heading"><div><p className="section-kicker">PIXIJS WEBGL2 FILTER</p><h2 id="preview-heading">Preview</h2></div><button ref={enlargeButtonRef} className="secondary-button" type="button" aria-expanded={expanded} onClick={() => setExpanded(!expanded)}>{expanded ? 'Return to workbench' : 'Enlarge preview'}</button></div>
     <div className={`preview-stage preview-background-${scene.background}`} ref={mountRef} aria-label="Generated Filter canvas">
       {originalSnapshot && compareMode !== 'effect' && <img className={`preview-original preview-original-${compareMode}`} src={originalSnapshot} alt="Original host pixels before Filter" />}
     </div>

@@ -1,0 +1,36 @@
+import { expect, test } from '@playwright/test';
+import { createHash } from 'node:crypto';
+
+test('enlarged preview retains the canvas, paused time, build and comparison controls', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Edit a copy of Local melt' }).click();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  const canvas = page.locator('.preview-stage canvas');
+  const hash = async () => createHash('sha256').update(await canvas.evaluate((item: HTMLCanvasElement) => item.toDataURL())).digest('hex');
+  await canvas.evaluate((item) => Object.assign(item, { retainedCanvas: true }));
+  const before = await hash();
+  const build = await page.getByTestId('preview-build-id').innerText();
+  const time = await page.getByLabel('Preview time', { exact: true }).innerText();
+  const small = (await canvas.boundingBox())!;
+  await page.getByRole('button', { name: 'Enlarge preview' }).click();
+  await expect(page.getByRole('dialog', { name: 'Preview' })).toBeVisible();
+  const big = (await canvas.boundingBox())!; expect(big.width).toBeGreaterThan(small.width * 2);
+  expect(await canvas.evaluate((item) => (item as unknown as { retainedCanvas: boolean }).retainedCanvas)).toBe(true);
+  expect(await hash()).toBe(before);
+  await expect(page.getByLabel('Preview time', { exact: true })).toHaveText(time);
+  await expect(page.getByTestId('preview-build-id')).toHaveText(build);
+  await page.getByRole('button', { name: 'Original', exact: true }).click();
+  await expect(page.getByAltText('Original host pixels before Filter')).toBeVisible();
+  await page.getByRole('button', { name: 'Split', exact: true }).click();
+  await expect(page.getByAltText('Original host pixels before Filter')).toHaveClass(/split/);
+  await page.getByRole('button', { name: 'Effect', exact: true }).click();
+  const amplitude = page.locator('.runtime-parameter').getByRole('spinbutton', { name: 'Amplitude' });
+  await amplitude.fill('0'); await amplitude.press('Enter');
+  const changed = await hash(); expect(changed).not.toBe(before);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Enlarge preview' })).toBeFocused();
+  expect(await hash()).toBe(changed);
+  await expect(page.getByLabel('Preview time', { exact: true })).toHaveText(time);
+  await expect(page.getByTestId('preview-build-id')).toHaveText(build);
+});
