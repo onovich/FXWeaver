@@ -31,7 +31,11 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const importRef = useRef<HTMLInputElement>(null);
   const document = history.present;
   const graphKind = getGraphKind(document.graph.graphKind)!;
-  const currentProject = { ...withEditorDocument(project, document), assets: projectAssets, preview: previewScene };
+  const activeParameterIds = new Set(document.graph.parameters.map((parameter) => parameter.id));
+  const activeParameterValues = Object.fromEntries(Object.entries(previewScene.parameterValues).filter(([id]) => activeParameterIds.has(id)));
+  const safePreviewScene = Object.keys(activeParameterValues).length === Object.keys(previewScene.parameterValues).length
+    ? previewScene : { ...previewScene, parameterValues: activeParameterValues };
+  const currentProject = { ...withEditorDocument(project, document), assets: projectAssets, preview: safePreviewScene };
   const currentProjectRef = useRef(currentProject);
   currentProjectRef.current = currentProject;
   const currentJson = serializeProject(currentProject);
@@ -240,7 +244,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
           {graphKind.isTestOnly ? <section className="preview-panel" aria-labelledby="preview-heading">
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
             <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{assetIssues.length ? 'Missing project image' : graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{assetIssues.length ? assetIssues.map((issue) => issue.message).join(' ') : graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
-          </section> : <FilterPreview graph={document.graph} assets={projectAssets} scene={previewScene} onSceneChange={setPreviewScene} onAssetsChange={setProjectAssets} />}
+          </section> : <FilterPreview graph={document.graph} assets={projectAssets} scene={safePreviewScene} onSceneChange={setPreviewScene} onAssetsChange={setProjectAssets} />}
           <Inspector graph={document.graph} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
         </aside>
       </div>

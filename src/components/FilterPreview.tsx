@@ -1,19 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { Application, Container, Rectangle, Sprite, Texture, type WebGLRenderer } from 'pixi.js';
+import { GeneratedOutput } from './GeneratedOutput';
+import { RuntimeControls } from './RuntimeControls';
 import { generateFilter, type GeneratedFilter } from '../compiler/generate';
 import { lowerFilterGraph } from '../compiler/ir';
 import type { EmbeddedImage, PreviewScene, ProjectAssets } from '../graph/assets';
 import { checkProjectAssets, findAssetIssues, MAX_IMAGE_BYTES, MAX_IMAGE_DIMENSION } from '../graph/assets';
-import type { GraphDocument } from '../graph/schema';
+import type { GraphDocument, JsonValue } from '../graph/schema';
 import { createFilterRuntime, type FilterRuntime } from '../runtime/filterRuntime';
 
 interface Props {
   graph: GraphDocument;
   assets: ProjectAssets;
   scene: PreviewScene;
-  onSceneChange: (scene: PreviewScene) => void;
+  onSceneChange: Dispatch<SetStateAction<PreviewScene>>;
   onAssetsChange: (assets: ProjectAssets) => void;
-  onSuccessfulBuild?: (build: GeneratedFilter | null) => void;
 }
 
 type PreviewState = { kind: 'initial' | 'building' | 'ready' | 'old' | 'error' | 'unavailable'; message: string; buildId?: string };
@@ -85,14 +86,25 @@ function createHost(scene: PreviewScene, texture: Texture): Container {
   return host;
 }
 
-export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsChange, onSuccessfulBuild }: Props) {
+export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsChange }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const displayRef = useRef<Display | null>(null);
   const requestRef = useRef(0);
+  const sceneRef = useRef(scene);
+  sceneRef.current = scene;
+  const timeRef = useRef(scene.timeSeconds);
   const [ready, setReady] = useState(false);
   const [state, setState] = useState<PreviewState>({ kind: 'initial', message: 'Checking WebGL2…' });
   const [assetMessage, setAssetMessage] = useState<string | null>(null);
+  const [successfulBuild, setSuccessfulBuild] = useState<GeneratedFilter | null>(null);
+  const [originalSnapshot, setOriginalSnapshot] = useState<string | null>(null);
+  const [compareMode, setCompareMode] = useState<'effect' | 'original' | 'split'>('effect');
+  const [playing, setPlaying] = useState(false);
+  const [displayTime, setDisplayTime] = useState(scene.timeSeconds);
+  const structuralSceneKey = JSON.stringify({ host: scene.host, sourceAssetId: scene.sourceAssetId,
+    width: scene.width, height: scene.height, filterAreaInset: scene.filterAreaInset,
+    padding: scene.padding, resolution: scene.resolution, sampling: scene.sampling });
 
   useEffect(() => {
     let disposed = false;
@@ -165,15 +177,23 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
         const result = createFilterRuntime((app.renderer as WebGLRenderer).gl, generated, dependencies, scene);
         if (!result.ok) throw new Error(`${result.error.code}: ${result.error.message}${result.error.nodeIds?.length ? ` (nodes: ${result.error.nodeIds.join(', ')})` : ''}`);
         runtime = result.runtime;
-        const updated = runtime.update(scene.timeSeconds, scene.parameterValues);
+        const updated = runtime.update(timeRef.current, sceneRef.current.parameterValues);
         if (!updated.ok) throw new Error(updated.error.message);
         host = createHost(scene, source);
         host.filters = [runtime.filter];
         const previous = displayRef.current;
         if (previous) app.stage.removeChild(previous.host);
         app.stage.addChild(host);
-        try { app.renderer.render(app.stage); }
+        let original: string;
+        try {
+          host.filters = [];
+          app.renderer.render(app.stage);
+          original = app.canvas.toDataURL('image/png');
+          host.filters = [runtime.filter];
+          app.renderer.render(app.stage);
+        }
         catch (cause) {
+          host.filters = [];
           app.stage.removeChild(host);
           if (previous) { app.stage.addChild(previous.host); app.renderer.render(app.stage); }
           throw cause;
@@ -187,8 +207,9 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
         runtime = null;
         host = null;
         if (previous) destroyDisplay(previous);
+        setOriginalSnapshot(original);
+        setSuccessfulBuild(generated);
         setState({ kind: 'ready', message: 'Generated Filter rendered in WebGL2.', buildId: generated.buildId });
-        onSuccessfulBuild?.(generated);
       } catch (cause) {
         fail(cause instanceof Error ? cause.message : String(cause));
       } finally {
@@ -200,9 +221,62 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
     };
     void build();
     return () => { requestRef.current++; };
-  }, [ready, graph, assets, scene]);
+  }, [ready, graph, assets, structuralSceneKey]);
 
-  const update = (patch: Partial<PreviewScene>) => onSceneChange({ ...scene, ...patch });
+  useEffect(() => {
+    if (playing) return;
+    timeRef.current = scene.timeSeconds;
+    setDisplayTime(scene.timeSeconds);
+  }, [scene.timeSeconds, playing]);
+
+  useEffect(() => {
+    if (state.kind !== 'ready') return;
+    const display = displayRef.current;
+    const app = appRef.current;
+    if (!display || !app) return;
+    const result = display.runtime.update(timeRef.current, scene.parameterValues);
+    if (!result.ok) {
+      setState({ kind: 'old', message: result.error.message, buildId: display.build.buildId });
+      return;
+    }
+    app.renderer.render(app.stage);
+  }, [scene.timeSeconds, scene.parameterValues, state.kind]);
+
+  useEffect(() => {
+    if (!playing) return;
+    let frame = 0;
+    let last = performance.now();
+    let lastLabel = last;
+    let lastCheckpoint = last;
+    const tick = (now: number) => {
+      timeRef.current += Math.min((now - last) / 1000, 0.1);
+      last = now;
+      if (state.kind === 'ready' && displayRef.current && appRef.current) {
+        const result = displayRef.current.runtime.update(timeRef.current, sceneRef.current.parameterValues);
+        if (result.ok) appRef.current.renderer.render(appRef.current.stage);
+        else setState({ kind: 'old', message: result.error.message, buildId: displayRef.current.build.buildId });
+      }
+      if (now - lastLabel >= 100) { setDisplayTime(timeRef.current); lastLabel = now; }
+      if (now - lastCheckpoint >= 500) {
+        onSceneChange((current) => ({ ...current, timeSeconds: timeRef.current }));
+        lastCheckpoint = now;
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [playing, state.kind, onSceneChange]);
+
+  const update = (patch: Partial<PreviewScene>) => onSceneChange((current) => ({ ...current, ...patch }));
+  const setTime = (seconds: number) => {
+    setPlaying(false);
+    timeRef.current = seconds;
+    setDisplayTime(seconds);
+    update({ timeSeconds: seconds });
+  };
+  const setParameter = (id: string, value: JsonValue) => {
+    onSceneChange((current) => ({ ...current, parameterValues: { ...current.parameterValues, [id]: value } }));
+  };
   const addPreviewImage = async (file: File) => {
     try {
       if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Use a PNG, JPEG, or WebP image.');
@@ -233,13 +307,26 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
   };
   return <section className="preview-panel filter-preview-panel" aria-labelledby="preview-heading">
     <div className="panel-heading"><p className="section-kicker">PIXIJS WEBGL2 FILTER</p><h2 id="preview-heading">Preview</h2></div>
-    <div className={`preview-stage preview-background-${scene.background}`} ref={mountRef} aria-label="Generated Filter canvas" />
+    <div className={`preview-stage preview-background-${scene.background}`} ref={mountRef} aria-label="Generated Filter canvas">
+      {originalSnapshot && compareMode !== 'effect' && <img className={`preview-original preview-original-${compareMode}`} src={originalSnapshot} alt="Original host pixels before Filter" />}
+    </div>
     <div className={`preview-status preview-status-${state.kind}`} role="status">
       <strong>{state.kind === 'old' ? 'Old preview' : state.kind === 'ready' ? 'Preview ready' : state.kind === 'building' ? 'Building preview' : state.kind === 'unavailable' ? 'WebGL2 unavailable' : 'Preview unavailable'}</strong>
       {state.buildId && <code data-testid="preview-build-id">{state.buildId}</code>}
       <p>{state.message}</p>
     </div>
     <div className="preview-controls">
+      <div className="preview-compare" role="group" aria-label="Preview comparison">
+        <button type="button" aria-pressed={compareMode === 'effect'} onClick={() => setCompareMode('effect')}>Effect</button>
+        <button type="button" aria-pressed={compareMode === 'original'} onClick={() => setCompareMode('original')}>Original</button>
+        <button type="button" aria-pressed={compareMode === 'split'} onClick={() => setCompareMode('split')}>Split</button>
+      </div>
+      <RuntimeControls graph={graph} scene={scene} playing={playing} displayTime={displayTime}
+        onPlayChange={(next) => {
+          if (!next) update({ timeSeconds: timeRef.current });
+          setPlaying(next);
+        }} onSetTime={setTime} onParameterChange={setParameter}
+        onResetParameters={() => update({ parameterValues: {} })} />
       <label>Host<select aria-label="Preview host" value={scene.host} onChange={(event) => update({ host: event.target.value as PreviewScene['host'] })}><option value="sprite">Sprite</option><option value="container">Container</option></select></label>
       <label>Source<select aria-label="Preview source" value={scene.sourceAssetId ?? ''} onChange={(event) => update({ sourceAssetId: event.target.value || null })}><option value="">Built-in transparent sample</option>{assets.preview.map((image) => <option key={image.id} value={image.id}>{image.name}</option>)}</select></label>
       <label>Import preview image<input aria-label="Import preview image" type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => { const file = event.target.files?.[0]; if (file) void addPreviewImage(file); event.target.value = ''; }} /></label>
@@ -255,6 +342,7 @@ export function FilterPreview({ graph, assets, scene, onSceneChange, onAssetsCha
         <label>Sampling<select aria-label="Texture sampling" value={scene.sampling} onChange={(event) => update({ sampling: event.target.value as PreviewScene['sampling'] })}><option value="linear">Linear</option><option value="nearest">Nearest</option></select></label>
       </div>
       <p className="preview-note">Filter samples the host's rendered pixels; it cannot sample the background outside this host.</p>
+      <GeneratedOutput build={successfulBuild} current={state.kind === 'ready'} />
     </div>
   </section>;
 }
