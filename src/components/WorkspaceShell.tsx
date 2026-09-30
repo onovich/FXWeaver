@@ -5,21 +5,29 @@ import { ProblemsPanel } from './ProblemsPanel';
 import type { GraphCommand } from '../graph/commands';
 import { applyHistoryCommand, createHistory, redo, undo } from '../graph/history';
 import { listNodeDefinitions } from '../graph/registry';
-import type { ProjectFile } from '../graph/project';
+import { serializeProject, withEditorDocument, type ProjectFile } from '../graph/project';
 import type { GraphIssue } from '../graph/diagnostics';
 import type { GraphPortRef } from '../graph/schema';
 import { validateGraph } from '../graph/validation';
+import { chooseOpenHandle, chooseSaveHandle, downloadProject, hasFilePicker, readProjectFile, saveRecoveryDraft, writeProjectFile, type ProjectFileHandle } from '../storage/projectStorage';
 
-interface Props { project: ProjectFile; onBack: () => void }
+interface Props { project: ProjectFile; initialHandle?: ProjectFileHandle; initialSavedJson?: string; source: 'new' | 'draft' | 'file'; onOpenSession: (project: ProjectFile, handle?: ProjectFileHandle) => void; onBack: () => void }
 
-export function WorkspaceShell({ project, onBack }: Props) {
+export function WorkspaceShell({ project, initialHandle, initialSavedJson, source, onOpenSession, onBack }: Props) {
   const [history, setHistory] = useState(() => createHistory({ graph: project.graph, layout: project.layout }));
   const [pendingFrom, setPendingFrom] = useState<GraphPortRef | null>(null);
   const [actionIssue, setActionIssue] = useState<GraphIssue | null>(null);
   const [search, setSearch] = useState('');
   const [problemsOpen, setProblemsOpen] = useState(false);
+  const [fileHandle, setFileHandle] = useState<ProjectFileHandle | null>(initialHandle ?? null);
+  const [lastSavedJson, setLastSavedJson] = useState<string | null>(initialSavedJson ?? null);
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const importRef = useRef<HTMLInputElement>(null);
   const document = history.present;
+  const currentProject = withEditorDocument(project, document);
+  const currentJson = serializeProject(currentProject);
   const issues = validateGraph(document.graph);
   const selectedId = document.layout.selectedNodeIds[0];
   const definitions = listNodeDefinitions(document.graph.graphKind).filter((definition) =>
@@ -65,6 +73,66 @@ export function WorkspaceShell({ project, onBack }: Props) {
     if (position) setViewport({ ...document.layout.viewport, x: 110 - position.x * document.layout.viewport.zoom, y: 110 - position.y * document.layout.viewport.zoom });
   }
 
+  async function saveToFile(saveAs = false) {
+    try {
+      const draft = saveRecoveryDraft(currentProject);
+      setDraftSavedAt(draft.savedAt);
+      let handle = saveAs ? null : fileHandle;
+      if (!handle) {
+        if (!hasFilePicker()) {
+          downloadProject(currentProject);
+          setSaveNotice('Project JSON downloaded. No working file is linked; future edits still need export.');
+          return;
+        }
+        handle = await chooseSaveHandle(currentProject);
+      }
+      const json = await writeProjectFile(handle, currentProject);
+      setFileHandle(handle);
+      setLastSavedJson(json);
+      setSaveNotice(`Saved to ${handle.name}.`);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') setSaveNotice('Save cancelled. The browser recovery draft remains available.');
+      else setSaveNotice(`Save failed: ${error instanceof Error ? error.message : 'Unknown error'}. The project file was not updated.`);
+    }
+  }
+
+  function returnToEntry() {
+    try { saveRecoveryDraft(currentProject); onBack(); }
+    catch (error) { setSaveNotice(`Could not preserve recovery draft: ${error instanceof Error ? error.message : 'Unknown error'}`); }
+  }
+
+  async function openProjectFromPicker() {
+    try {
+      saveRecoveryDraft(currentProject);
+      const handle = await chooseOpenHandle();
+      const result = await readProjectFile(await handle.getFile());
+      if (!result.ok) { setSaveNotice(`Open blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
+      onOpenSession(result.project, handle);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      setSaveNotice(`Open failed: ${error instanceof Error ? error.message : 'Unknown error'}. Current project unchanged.`);
+    }
+  }
+
+  async function importProjectFile(file: File) {
+    try {
+      saveRecoveryDraft(currentProject);
+      const result = await readProjectFile(file);
+      if (!result.ok) { setSaveNotice(`Import blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
+      onOpenSession(result.project);
+    } catch (error) {
+      setSaveNotice(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}. Current project unchanged.`);
+    }
+  }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try { setDraftSavedAt(saveRecoveryDraft(currentProject).savedAt); }
+      catch (error) { setSaveNotice(`Recovery draft failed: ${error instanceof Error ? error.message : 'Unknown error'}`); }
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [currentJson]);
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       const target = event.target;
@@ -73,6 +141,9 @@ export function WorkspaceShell({ project, onBack }: Props) {
         event.preventDefault();
         setHistory((current) => event.shiftKey ? redo(current) : undo(current));
         setActionIssue(null);
+      } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        void saveToFile();
       } else if (event.key === 'Delete' && document.layout.selectedNodeIds.length > 0) {
         event.preventDefault();
         dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds });
@@ -88,15 +159,19 @@ export function WorkspaceShell({ project, onBack }: Props) {
   return (
     <main className={`workbench ${problemsOpen ? 'problems-open' : ''}`}>
       <header className="workbench-header">
-        <button className="brand-button" type="button" onClick={onBack} aria-label="Return to project entry">FXWeave</button>
+        <button className="brand-button" type="button" onClick={returnToEntry} aria-label="Return to project entry">FXWeave</button>
         <div className="header-divider" aria-hidden="true" />
         <div className="project-heading"><strong>{project.name}</strong><span>Foundation test graph</span></div>
         <div className="header-spacer" />
-        <span className="file-state">Draft only · Not saved to file</span>
+        <span className="file-state">{fileHandle ? lastSavedJson === currentJson ? `Saved to project · ${fileHandle.name}` : 'Changes not saved to project file' : source === 'file' ? 'Opened from file · Save As required' : draftSavedAt ? 'Recovery draft saved · no project file' : 'Draft only · Not saved to file'}</span>
         <button className="header-tool" type="button" disabled={history.past.length === 0} onClick={() => setHistory(undo(history))}>Undo</button>
         <button className="header-tool" type="button" disabled={history.future.length === 0} onClick={() => setHistory(redo(history))}>Redo</button>
+        <button className="header-tool" type="button" onClick={() => void saveToFile()}>Save</button>
+        <button className="header-tool" type="button" onClick={() => void saveToFile(true)}>Save As</button>
+        <button className="header-tool" type="button" onClick={() => { downloadProject(currentProject); setSaveNotice('Project JSON downloaded; this is a separate copy.'); }}>Export JSON</button>
         <span className="phase-chip">Renderer pending</span>
       </header>
+      {saveNotice && <div className="save-notice" role="status">{saveNotice}<button type="button" onClick={() => setSaveNotice(null)} aria-label="Dismiss save notice">×</button></div>}
 
       <div className="workbench-grid">
         <aside className="library-panel" aria-labelledby="library-heading">
@@ -113,6 +188,12 @@ export function WorkspaceShell({ project, onBack }: Props) {
           </ul>
           {definitions.length === 0 && <p className="panel-note" role="status">No matching nodes.</p>}
           {pendingFrom && <p className="pending-help" role="status">Choose a compatible input port. Press Esc to cancel.</p>}
+          <div className="library-file-actions">
+            <p className="section-kicker">PROJECT FILE</p>
+            <button className="secondary-button" type="button" onClick={() => void openProjectFromPicker()}>Open project file</button>
+            <button className="secondary-button" type="button" onClick={() => importRef.current?.click()}>Import JSON</button>
+            <input ref={importRef} type="file" accept=".json,application/json" className="visually-hidden" aria-label="Import project JSON" onChange={(event) => { const file = event.target.files?.[0]; if (file) void importProjectFile(file); event.target.value = ''; }} />
+          </div>
         </aside>
 
         <section className="graph-panel" aria-labelledby="graph-heading">
