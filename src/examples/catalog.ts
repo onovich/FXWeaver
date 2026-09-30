@@ -1,6 +1,3 @@
-import work03 from '../../examples/03-radial-burn.fxweave.json?raw';
-import work05 from '../../examples/05-local-melt.fxweave.json?raw';
-import work09 from '../../examples/09-hologram-scan.fxweave.json?raw';
 import manifest03 from '../../examples/generated/03-radial-burn.manifest.json?raw';
 import manifest05 from '../../examples/generated/05-local-melt.manifest.json?raw';
 import manifest09 from '../../examples/generated/09-hologram-scan.manifest.json?raw';
@@ -19,7 +16,7 @@ interface ExampleSource {
   id: string;
   title: string;
   purpose: string;
-  projectJson: string;
+  loadProject: () => Promise<string>;
   manifestJson: string;
   manifestUrl: string;
   creationLogUrl: string;
@@ -27,21 +24,21 @@ interface ExampleSource {
 }
 
 const sources: ExampleSource[] = [
-  { id: '03', title: 'Radial burn', purpose: 'A local reveal with a noise edge and transparent cutout.', projectJson: work03, manifestJson: manifest03, manifestUrl: manifest03Url, creationLogUrl: log03Url, imageUrl: image03 },
-  { id: '05', title: 'Local melt', purpose: 'A time driven wave that resamples the host image.', projectJson: work05, manifestJson: manifest05, manifestUrl: manifest05Url, creationLogUrl: log05Url, imageUrl: image05 },
-  { id: '09', title: 'Hologram scan', purpose: 'Local scan lines and a small red channel offset.', projectJson: work09, manifestJson: manifest09, manifestUrl: manifest09Url, creationLogUrl: log09Url, imageUrl: image09 },
+  { id: '03', title: 'Radial burn', purpose: 'A local reveal with a noise edge and transparent cutout.', loadProject: async () => (await import('../../examples/03-radial-burn.fxweave.json?raw')).default, manifestJson: manifest03, manifestUrl: manifest03Url, creationLogUrl: log03Url, imageUrl: image03 },
+  { id: '05', title: 'Local melt', purpose: 'A time driven wave that resamples the host image.', loadProject: async () => (await import('../../examples/05-local-melt.fxweave.json?raw')).default, manifestJson: manifest05, manifestUrl: manifest05Url, creationLogUrl: log05Url, imageUrl: image05 },
+  { id: '09', title: 'Hologram scan', purpose: 'Local scan lines and a small red channel offset.', loadProject: async () => (await import('../../examples/09-hologram-scan.fxweave.json?raw')).default, manifestJson: manifest09, manifestUrl: manifest09Url, creationLogUrl: log09Url, imageUrl: image09 },
 ];
 
-export const examples = sources.map(({ projectJson, manifestJson, ...item }) => ({
+export const examples = sources.map(({ loadProject: _loadProject, manifestJson, ...item }) => ({
   ...item,
   buildId: (JSON.parse(manifestJson) as { buildId: string }).buildId,
 }));
 
 /** Parse the committed source afresh so every editor session has its own mutable project identity. */
-export function deriveExample(id: string, projectId: string): ProjectFile {
+export async function deriveExample(id: string, projectId: string): Promise<ProjectFile> {
   const source = sources.find((item) => item.id === id);
   if (!source) throw new Error(`Example ${id} is unavailable.`);
-  const result = parseProject(source.projectJson);
+  const result = parseProject(await source.loadProject());
   if (!result.ok) throw new Error(`Example ${id} is invalid: ${result.code}: ${result.message}`);
   return { ...result.project, id: projectId, name: `${result.project.name} copy` };
 }

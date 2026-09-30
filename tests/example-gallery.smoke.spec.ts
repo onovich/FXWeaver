@@ -59,3 +59,28 @@ for (const sample of cases) test(`work ${sample.id} opens as an editable copy an
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: sample.parameter })).toHaveValue(sample.value);
   expect(await page.locator('.preview-stage canvas').evaluate((canvas: HTMLCanvasElement) => canvas.toDataURL())).toBe(changed);
 });
+
+test('a late example load cannot replace a newer choice', async ({ page }) => {
+  let releaseOld!: () => void;
+  let oldRequested!: () => void;
+  const held = new Promise<void>((resolve) => { releaseOld = resolve; });
+  const requested = new Promise<void>((resolve) => { oldRequested = resolve; });
+  await page.route(/03-radial-burn\.fxweave\.json/, async (route) => {
+    oldRequested();
+    await held;
+    await route.continue();
+  });
+  await page.goto('/');
+  const oldResponse = page.waitForResponse(/03-radial-burn\.fxweave\.json/);
+  try {
+    await page.getByRole('button', { name: 'Edit a copy of Radial burn' }).click();
+    await requested;
+    await page.getByRole('button', { name: 'Edit a copy of Local melt' }).click();
+    await expect(page.locator('.project-heading')).toContainText('05 · Local Melt / Wave Distortion copy');
+    await expect(page.getByText('Preview ready')).toBeVisible();
+  } finally {
+    releaseOld();
+  }
+  await oldResponse;
+  await expect(page.locator('.project-heading')).toContainText('05 · Local Melt / Wave Distortion copy');
+});

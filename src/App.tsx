@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ProjectStart } from './components/ProjectStart';
 import { RecoveryChoice } from './components/RecoveryChoice';
 import { WorkspaceShell } from './components/WorkspaceShell';
@@ -15,15 +15,19 @@ interface ActiveSession {
 }
 
 export function App() {
+  const exampleRequest = useRef(0);
   const [session, setSession] = useState<ActiveSession | null>(null);
   const [sessionToken, setSessionToken] = useState(0);
   const [draftRead, setDraftRead] = useState(() => readRecoveryDrafts());
   const [entryError, setEntryError] = useState<string | null>(null);
+  const [loadingExampleId, setLoadingExampleId] = useState<string | null>(null);
   const [recoveryReadWarning, setRecoveryReadWarning] = useState<string | null>(draftRead.error);
   const [recoveryWriteWarning, setRecoveryWriteWarning] = useState<string | null>(null);
   const [choice, setChoice] = useState<{ file: ActiveSession; draft: DraftProject; origin: 'entry' | 'editor' } | null>(null);
 
   function activate(next: ActiveSession) {
+    exampleRequest.current++;
+    setLoadingExampleId(null);
     setSession(next);
     setSessionToken((value) => value + 1);
   }
@@ -33,13 +37,18 @@ export function App() {
     activate({ project: createProject(crypto.randomUUID(), graphKind === FILTER_GRAPH_KIND ? 'Untitled filter' : 'Untitled test graph', graphKind, crypto.randomUUID()), source: 'new' });
   }
 
-  function createFromExample(exampleId: string) {
+  async function createFromExample(exampleId: string) {
+    const request = ++exampleRequest.current;
+    setLoadingExampleId(exampleId);
     try {
-      const project = deriveExample(exampleId, crypto.randomUUID());
+      const project = await deriveExample(exampleId, crypto.randomUUID());
+      if (request !== exampleRequest.current) return;
       setEntryError(null);
       activate({ project, source: 'new' });
     } catch (error) {
-      setEntryError(error instanceof Error ? error.message : 'Could not open the example.');
+      if (request === exampleRequest.current) setEntryError(error instanceof Error ? error.message : 'Could not open the example.');
+    } finally {
+      if (request === exampleRequest.current) setLoadingExampleId(null);
     }
   }
 
@@ -84,7 +93,7 @@ export function App() {
 
   return <>
     {session && <div style={choice?.origin === 'editor' ? { display: 'none' } : undefined}><WorkspaceShell key={sessionToken} project={session.project} initialHandle={session.fileHandle} initialSavedJson={session.savedJson} source={session.source} suspended={choice?.origin === 'editor'} onOpenSession={(project, handle, migrated) => openResolved({ project, fileHandle: handle, savedJson: migrated ? undefined : serializeProject(project), source: 'file' }, 'editor')} onBack={returnToEntry} onRecoveryWarning={setRecoveryWriteWarning} /></div>}
-    {choice ? <RecoveryChoice file={choice.file.project} draft={choice.draft} onChooseFile={() => { activate(choice.file); setChoice(null); }} onChooseDraft={() => { activate({ ...choice.file, project: choice.draft.project, source: 'draft' }); setChoice(null); }} onCancel={() => { if (choice.origin === 'entry') setSession(null); setChoice(null); }} /> : !session && <ProjectStart onCreate={createNewProject} onCreateFromExample={createFromExample} onOpen={openFromPicker} onImport={importFile} onRecover={(draft) => activate({ project: draft.project, source: 'draft' })} drafts={draftRead.value} error={entryError} />}
+    {choice ? <RecoveryChoice file={choice.file.project} draft={choice.draft} onChooseFile={() => { activate(choice.file); setChoice(null); }} onChooseDraft={() => { activate({ ...choice.file, project: choice.draft.project, source: 'draft' }); setChoice(null); }} onCancel={() => { if (choice.origin === 'entry') setSession(null); setChoice(null); }} /> : !session && <ProjectStart onCreate={createNewProject} onCreateFromExample={createFromExample} loadingExampleId={loadingExampleId} onOpen={openFromPicker} onImport={importFile} onRecover={(draft) => activate({ project: draft.project, source: 'draft' })} drafts={draftRead.value} error={entryError} />}
     {(recoveryWriteWarning ?? recoveryReadWarning) && <div className="recovery-warning" role="status">{recoveryWriteWarning ?? recoveryReadWarning}<button type="button" onClick={() => { setRecoveryWriteWarning(null); setRecoveryReadWarning(null); }} aria-label="Dismiss recovery warning">×</button></div>}
   </>;
 }

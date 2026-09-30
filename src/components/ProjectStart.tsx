@@ -6,6 +6,7 @@ import type { DraftProject } from '../storage/projectStorage';
 interface Props {
   onCreate: (graphKind: typeof FILTER_GRAPH_KIND | typeof FOUNDATION_GRAPH_KIND) => void;
   onCreateFromExample: (exampleId: string) => void;
+  loadingExampleId: string | null;
   onOpen: () => void;
   onImport: (file: File) => void;
   onRecover: (draft: DraftProject) => void;
@@ -13,7 +14,7 @@ interface Props {
   error: string | null;
 }
 
-export function ProjectStart({ onCreate, onCreateFromExample, onOpen, onImport, onRecover, drafts, error }: Props) {
+export function ProjectStart({ onCreate, onCreateFromExample, loadingExampleId, onOpen, onImport, onRecover, drafts, error }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <main className="entry-shell">
@@ -38,7 +39,7 @@ export function ProjectStart({ onCreate, onCreateFromExample, onOpen, onImport, 
           <div className="example-grid">{examples.map((example) => <article className="example-card" key={example.id}>
             <img src={example.imageUrl} alt={`${example.title} fixed WebGL2 preview`} loading="lazy" />
             <div className="example-card-body"><p className="section-kicker">WORK {example.id}</p><h3>{example.title}</h3><p>{example.purpose}</p><small>Recorded build <code>{example.buildId}</code></small>
-              <button className="secondary-button" type="button" onClick={() => onCreateFromExample(example.id)}>Edit a copy of {example.title}</button>
+              <button className="secondary-button" type="button" onClick={() => onCreateFromExample(example.id)}>{loadingExampleId === example.id ? `Opening ${example.title}…` : `Edit a copy of ${example.title}`}</button>
               <div className="example-evidence"><a href={example.manifestUrl} download={`work${example.id}.manifest.json`}>Download manifest</a><a href={example.creationLogUrl} download={`work${example.id}.creation-log.json`}>Download creation record</a></div>
             </div>
           </article>)}</div>
