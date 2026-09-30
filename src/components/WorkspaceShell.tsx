@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { GraphCanvas } from './GraphCanvas';
 import { Inspector } from './Inspector';
 import { ProblemsPanel } from './ProblemsPanel';
+import { findAssetIssues } from '../graph/assets';
 import type { GraphCommand } from '../graph/commands';
 import { applyHistoryCommand, createHistory, redo, undo } from '../graph/history';
 import { getGraphKind, listNodeDefinitions } from '../graph/registry';
@@ -32,6 +33,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   currentProjectRef.current = currentProject;
   const currentJson = serializeProject(currentProject);
   const issues = validateGraph(document.graph);
+  const assetIssues = findAssetIssues(document.graph, currentProject.assets, currentProject.preview);
   const selectedId = document.layout.selectedNodeIds[0];
   const definitions = listNodeDefinitions(document.graph.graphKind).filter((definition) =>
     `${definition.label} ${definition.category} ${definition.description}`.toLowerCase().includes(search.toLowerCase()),
@@ -234,7 +236,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
         <aside className="context-panel" aria-label="Preview and inspector">
           <section className="preview-panel" aria-labelledby="preview-heading">
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
-            <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
+            <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{assetIssues.length ? 'Missing project image' : graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{assetIssues.length ? assetIssues.map((issue) => issue.message).join(' ') : graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
           </section>
           <Inspector graph={document.graph} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
         </aside>

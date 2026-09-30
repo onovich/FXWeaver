@@ -1,10 +1,12 @@
 import { applyCommand, createEditorDocument, type EditorDocument } from './commands';
+import { checkProjectAssets, createDefaultPreviewScene, createEmptyAssets, findAssetIssues, isPreviewScene, type AssetIssue, type PreviewScene, type ProjectAssets } from './assets';
 import type { GraphIssue } from './diagnostics';
 import { FILTER_GRAPH_KIND, FOUNDATION_GRAPH_KIND, getGraphKind } from './registry';
-import { GRAPH_SCHEMA_VERSION, graphFingerprint, semanticGraphJson, type GraphDocument, type GraphLayout, type ValueType } from './schema';
+import { GRAPH_SCHEMA_VERSION, canonicalJsonValue, graphFingerprint, semanticGraphJson, type GraphDocument, type GraphLayout, type ValueType } from './schema';
 import { validateGraph } from './validation';
+import { isValueOfType } from './values';
 
-export const PROJECT_FILE_VERSION = 2 as const;
+export const PROJECT_FILE_VERSION = 3 as const;
 export const PROJECT_EXTENSION = '.fxweave.json';
 export const FILTER_RENDERER_TARGET = 'pixi.webgl2' as const;
 export type RendererTarget = null | typeof FILTER_RENDERER_TARGET;
@@ -16,6 +18,8 @@ export interface ProjectFile {
   rendererTarget: RendererTarget;
   graph: GraphDocument;
   layout: GraphLayout;
+  assets: ProjectAssets;
+  preview: PreviewScene;
 }
 
 export type ProjectImportErrorCode =
@@ -24,10 +28,12 @@ export type ProjectImportErrorCode =
   | 'UNSUPPORTED_PROJECT_VERSION'
   | 'UNSUPPORTED_GRAPH_SCHEMA'
   | 'UNSUPPORTED_GRAPH_KIND'
+  | 'INVALID_ASSET'
+  | 'ASSET_TOO_LARGE'
   | 'INCOMPATIBLE_GRAPH';
 
 export type ProjectImportResult =
-  | { ok: true; project: ProjectFile; issues: GraphIssue[]; migratedFromVersion?: 1 }
+  | { ok: true; project: ProjectFile; issues: GraphIssue[]; assetIssues: AssetIssue[]; migratedFromVersion?: 1 | 2 }
   | { ok: false; code: ProjectImportErrorCode; message: string };
 
 export function createProject(id: string, name: string, graphKind: string, rootNodeId: string): ProjectFile {
@@ -37,7 +43,8 @@ export function createProject(id: string, name: string, graphKind: string, rootN
   const result = applyCommand(initial, { type: 'add-node', nodeId: rootNodeId, nodeType: kind.rootNodeType, position: { x: 520, y: 260 } });
   if (!result.ok) throw new Error(result.issue.message);
   return { projectVersion: PROJECT_FILE_VERSION, id, name,
-    rendererTarget: graphKind === FILTER_GRAPH_KIND ? FILTER_RENDERER_TARGET : null, ...result.document };
+    rendererTarget: graphKind === FILTER_GRAPH_KIND ? FILTER_RENDERER_TARGET : null,
+    ...result.document, assets: createEmptyAssets(), preview: createDefaultPreviewScene() };
 }
 
 export function withEditorDocument(project: ProjectFile, document: EditorDocument): ProjectFile {
@@ -53,6 +60,11 @@ export function serializeProject(project: ProjectFile): string {
     name: project.name,
     rendererTarget: project.rendererTarget,
     graph: JSON.parse(semanticGraphJson(project.graph)) as GraphDocument,
+    assets: canonicalJsonValue({
+      dependencies: [...project.assets.dependencies].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+      preview: [...project.assets.preview].sort((a, b) => a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    }),
+    preview: canonicalJsonValue(project.preview),
     layout: {
       nodePositions,
       viewport: { x: project.layout.viewport.x, y: project.layout.viewport.y, zoom: project.layout.viewport.zoom },
@@ -92,7 +104,7 @@ export function parseProject(json: string): ProjectImportResult {
   try { value = JSON.parse(json); }
   catch { return { ok: false, code: 'INVALID_JSON', message: 'The file is not valid JSON.' }; }
   if (!isRecord(value)) return { ok: false, code: 'INVALID_PROJECT', message: 'The file is not an FXWeave project object.' };
-  if (value.projectVersion !== 1 && value.projectVersion !== PROJECT_FILE_VERSION) {
+  if (value.projectVersion !== 1 && value.projectVersion !== 2 && value.projectVersion !== PROJECT_FILE_VERSION) {
     return { ok: false, code: 'UNSUPPORTED_PROJECT_VERSION', message: `Project version ${String(value.projectVersion)} is not supported.` };
   }
   if (!isRecord(value.graph) || value.graph.schemaVersion !== GRAPH_SCHEMA_VERSION) {
@@ -105,20 +117,32 @@ export function parseProject(json: string): ProjectImportResult {
     value.graph.parameters.some((parameter) => !valueTypes.has(parameter.valueType))) {
     return { ok: false, code: 'INVALID_PROJECT', message: 'The project has missing or malformed fields.' };
   }
-  const legacy = value.projectVersion === 1;
-  if (legacy && (value.graph.graphKind !== FOUNDATION_GRAPH_KIND || value.rendererTarget !== null)) {
+  const sourceVersion = value.projectVersion as 1 | 2 | 3;
+  if (sourceVersion === 1 && (value.graph.graphKind !== FOUNDATION_GRAPH_KIND || value.rendererTarget !== null)) {
     return { ok: false, code: 'INVALID_PROJECT', message: 'Version 1 can only contain a foundation.test graph without a renderer.' };
   }
-  if (!legacy && ((value.graph.graphKind === FOUNDATION_GRAPH_KIND && value.rendererTarget !== null) ||
+  if (sourceVersion !== 1 && ((value.graph.graphKind === FOUNDATION_GRAPH_KIND && value.rendererTarget !== null) ||
     (value.graph.graphKind === FILTER_GRAPH_KIND && value.rendererTarget !== FILTER_RENDERER_TARGET))) {
     return { ok: false, code: 'INVALID_PROJECT', message: 'Renderer target does not match the graph kind.' };
   }
-  // A V1 file becomes a V2 in-memory project. Its graph, layout, and identity are left intact.
-  const project = { ...value, projectVersion: PROJECT_FILE_VERSION } as unknown as ProjectFile;
+  const assetsResult = sourceVersion === 3 ? checkProjectAssets(value.assets) : { ok: true as const, assets: createEmptyAssets() };
+  if (!assetsResult.ok) return assetsResult;
+  const preview = sourceVersion === 3 ? value.preview : createDefaultPreviewScene();
+  if (!isPreviewScene(preview)) return { ok: false, code: 'INVALID_PROJECT', message: 'The preview scene is malformed.' };
+  const graph = value.graph as GraphDocument;
+  if (Object.entries(preview.parameterValues).some(([id, parameterValue]) => {
+    const parameter = graph.parameters.find((item) => item.id === id);
+    return !parameter || !isValueOfType(parameterValue, parameter.valueType) ||
+      (typeof parameterValue === 'number' && ((parameter.min !== undefined && parameterValue < parameter.min) ||
+        (parameter.max !== undefined && parameterValue > parameter.max)));
+  })) return { ok: false, code: 'INVALID_PROJECT', message: 'Preview values must match stable graph parameter IDs and types.' };
+  // Earlier files become V3 in memory. Their graph, layout, and identity are left intact.
+  const project = { ...value, projectVersion: PROJECT_FILE_VERSION, assets: assetsResult.assets, preview } as unknown as ProjectFile;
   const issues = validateGraph(project.graph);
   const incompatible = issues.find((issue) => ['UNKNOWN_NODE_TYPE', 'UNSUPPORTED_DEFINITION_VERSION', 'DUPLICATE_NODE_ID', 'DUPLICATE_EDGE_ID'].includes(issue.code));
   if (incompatible) return { ok: false, code: 'INCOMPATIBLE_GRAPH', message: incompatible.message };
-  return { ok: true, project, issues, ...(legacy ? { migratedFromVersion: 1 as const } : {}) };
+  return { ok: true, project, issues, assetIssues: findAssetIssues(project.graph, project.assets, project.preview),
+    ...(sourceVersion === 1 || sourceVersion === 2 ? { migratedFromVersion: sourceVersion } : {}) };
 }
 
 export function projectSemanticFingerprint(project: ProjectFile): string {

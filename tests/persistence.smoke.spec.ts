@@ -11,7 +11,11 @@ test('creates a Filter graph and opens a Phase 0 file without changing its kind'
   await page.getByRole('button', { name: 'Export JSON' }).click();
   const download = await downloadPromise;
   const filter = JSON.parse(await (await import('node:fs/promises')).readFile((await download.path())!, 'utf8'));
-  expect(filter).toMatchObject({ projectVersion: 2, rendererTarget: 'pixi.webgl2', graph: { graphKind: 'pixi.filter2d' } });
+  expect(filter).toMatchObject({ projectVersion: 3, rendererTarget: 'pixi.webgl2', graph: { graphKind: 'pixi.filter2d' } });
+  const missingFilter = { ...filter, id: 'missing-image-project', preview: { ...filter.preview, sourceAssetId: 'absent' } };
+  await page.locator('.library-file-actions input[type="file"]').setInputFiles({ name: 'missing-image.fxweave.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(missingFilter)) });
+  await expect(page.getByText('Missing project image')).toBeVisible();
+  await expect(page.locator('.project-heading')).toContainText('PixiJS 2D Filter');
 
   const legacy = {
     projectVersion: 1, id: 'phase0-legacy', name: 'Old graph', rendererTarget: null,
@@ -24,7 +28,7 @@ test('creates a Filter graph and opens a Phase 0 file without changing its kind'
   const migratedDownload = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export JSON' }).click();
   const migrated = JSON.parse(await (await import('node:fs/promises')).readFile((await (await migratedDownload).path())!, 'utf8'));
-  expect(migrated).toMatchObject({ projectVersion: 2, id: 'phase0-legacy', rendererTarget: null, graph: legacy.graph, layout: legacy.layout });
+  expect(migrated).toMatchObject({ projectVersion: 3, id: 'phase0-legacy', rendererTarget: null, graph: legacy.graph, layout: legacy.layout });
 });
 
 test('saves a project file, reopens it, chooses a newer draft, and protects the current graph on bad import', async ({ page }) => {

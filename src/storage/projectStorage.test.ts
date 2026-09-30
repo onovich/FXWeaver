@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createProject } from '../graph/project';
-import { FOUNDATION_GRAPH_KIND } from '../graph/registry';
+import { FILTER_GRAPH_KIND, FOUNDATION_GRAPH_KIND } from '../graph/registry';
 import { listRecoveryDrafts, loadRecoveryDraft, projectFilename, readRecoveryDraft, readRecoveryDrafts, saveRecoveryDraft } from './projectStorage';
 
 function memoryStorage(): Storage {
@@ -26,6 +26,15 @@ describe('browser recovery boundary', () => {
     expect(record.projectId).toBe(project.id);
     expect(loadRecoveryDraft(project.id)?.project).toEqual(project);
     expect(listRecoveryDrafts().map((draft) => draft.projectId)).toEqual(['p-1']);
+  });
+
+  it('recovers a versioned Filter draft with embedded dependency and preview scene', () => {
+    const base = createProject('filter-draft', 'With image', FILTER_GRAPH_KIND, 'root');
+    const image = { id: 'host-image', name: 'host.png', mimeType: 'image/png' as const, dataUrl: 'data:image/png;base64,AA==', width: 1, height: 1 };
+    const project = { ...base, assets: { dependencies: [], preview: [image] },
+      preview: { ...base.preview, sourceAssetId: image.id, timeSeconds: 1.25 } };
+    saveRecoveryDraft(project);
+    expect(loadRecoveryDraft(project.id)?.project).toEqual(project);
   });
 
   it('ignores corrupted local recovery records', () => {

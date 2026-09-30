@@ -56,11 +56,11 @@ export function createEmptyLayout(): GraphLayout {
   return { nodePositions: {}, viewport: { x: 0, y: 0, zoom: 1 }, selectedNodeIds: [] };
 }
 
-function canonicalValue(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(canonicalValue);
+export function canonicalJsonValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalJsonValue);
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value).sort(([a], [b]) => compareIds(a, b)).map(([key, item]) => [key, canonicalValue(item)]),
+      Object.entries(value).sort(([a], [b]) => compareIds(a, b)).map(([key, item]) => [key, canonicalJsonValue(item)]),
     );
   }
   return value;
@@ -72,7 +72,7 @@ function compareIds(a: string, b: string): number {
 
 /** Stable representation of the authored semantics, independent of array and object-key order. */
 export function semanticGraphJson(graph: GraphDocument): string {
-  return JSON.stringify(canonicalValue({
+  return JSON.stringify(canonicalJsonValue({
     schemaVersion: graph.schemaVersion,
     graphKind: graph.graphKind,
     nodes: [...graph.nodes].sort((a, b) => compareIds(a.id, b.id)),
