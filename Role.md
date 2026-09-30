@@ -17,12 +17,12 @@ executor:
   evidence: user requested a separate development session for V0 implementation.
 
 idempotency:
-  active_goal_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
-  active_goal_phase: V0 Phase 2 local project asset trial and usability
-  last_planner_dispatch: 2026-10-01T02:43:23.9117721+08:00
+  active_goal_guide: docs/35-phase3-visual-goal-mode-execution-guide.md
+  active_goal_phase: V0 Phase 3 homepage and studio visual refresh
+  last_planner_dispatch: 2026-10-01T03:51:15.1269648+08:00
   last_planner_dispatch_status: sent
-  last_planner_dispatch_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
-  last_planner_dispatch_commit: bd348f06a2fd9a84780c7211b9e5d5f0f8aa4884
+  last_planner_dispatch_guide: docs/35-phase3-visual-goal-mode-execution-guide.md
+  last_planner_dispatch_commit: 034b49d
   last_executor_report_commit: 80dc092ba0b94f3a0400fbeb2aeb03ab3e72939c
   last_executor_report_status: sent
   last_executor_report_at: 2026-10-01T03:31:44.0081459+08:00
