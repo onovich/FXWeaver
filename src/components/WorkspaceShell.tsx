@@ -4,14 +4,14 @@ import { Inspector } from './Inspector';
 import { ProblemsPanel } from './ProblemsPanel';
 import type { GraphCommand } from '../graph/commands';
 import { applyHistoryCommand, createHistory, redo, undo } from '../graph/history';
-import { listNodeDefinitions } from '../graph/registry';
+import { getGraphKind, listNodeDefinitions } from '../graph/registry';
 import { serializeProject, withEditorDocument, type ProjectFile } from '../graph/project';
 import type { GraphIssue } from '../graph/diagnostics';
 import type { GraphPortRef } from '../graph/schema';
 import { validateGraph } from '../graph/validation';
 import { chooseOpenHandle, chooseSaveHandle, downloadProject, hasFilePicker, readProjectFile, saveRecoveryDraft, writeProjectFile, type ProjectFileHandle } from '../storage/projectStorage';
 
-interface Props { project: ProjectFile; initialHandle?: ProjectFileHandle; initialSavedJson?: string; source: 'new' | 'draft' | 'file'; suspended: boolean; onOpenSession: (project: ProjectFile, handle?: ProjectFileHandle) => void; onBack: () => void; onRecoveryWarning: (warning: string | null) => void }
+interface Props { project: ProjectFile; initialHandle?: ProjectFileHandle; initialSavedJson?: string; source: 'new' | 'draft' | 'file'; suspended: boolean; onOpenSession: (project: ProjectFile, handle?: ProjectFileHandle, migrated?: boolean) => void; onBack: () => void; onRecoveryWarning: (warning: string | null) => void }
 
 export function WorkspaceShell({ project, initialHandle, initialSavedJson, source, suspended, onOpenSession, onBack, onRecoveryWarning }: Props) {
   const [history, setHistory] = useState(() => createHistory({ graph: project.graph, layout: project.layout }));
@@ -26,6 +26,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const searchRef = useRef<HTMLInputElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const document = history.present;
+  const graphKind = getGraphKind(document.graph.graphKind)!;
   const currentProject = withEditorDocument(project, document);
   const currentProjectRef = useRef(currentProject);
   currentProjectRef.current = currentProject;
@@ -121,7 +122,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
       const handle = await chooseOpenHandle();
       const result = await readProjectFile(await handle.getFile());
       if (!result.ok) { setSaveNotice(`Open blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
-      onOpenSession(result.project, handle);
+      onOpenSession(result.project, handle, !!result.migratedFromVersion);
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
       setSaveNotice(`Open failed: ${error instanceof Error ? error.message : 'Unknown error'}. Current project unchanged.`);
@@ -133,7 +134,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
       preserveRecoveryDraft(currentProjectRef.current);
       const result = await readProjectFile(file);
       if (!result.ok) { setSaveNotice(`Import blocked: ${result.code}: ${result.message} Current project unchanged.`); return; }
-      onOpenSession(result.project);
+      onOpenSession(result.project, undefined, !!result.migratedFromVersion);
     } catch (error) {
       setSaveNotice(`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}. Current project unchanged.`);
     }
@@ -180,7 +181,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
       <header className="workbench-header">
         <button className="brand-button" type="button" onClick={returnToEntry} aria-label="Return to project entry">FXWeave</button>
         <div className="header-divider" aria-hidden="true" />
-        <div className="project-heading"><strong>{project.name}</strong><span>Foundation test graph</span></div>
+        <div className="project-heading"><strong>{project.name}</strong><span>{graphKind.label}</span></div>
         <div className="header-spacer" />
         <span className="file-state">{fileHandle ? lastSavedJson === currentJson ? `Saved to project · ${fileHandle.name}` : 'Changes not saved to project file' : source === 'file' ? 'Opened from file · Save As required' : draftSavedAt ? 'Recovery draft saved · no project file' : 'Draft only · Not saved to file'}</span>
         <button className="header-tool" type="button" disabled={history.past.length === 0} onClick={() => setHistory(undo(history))}>Undo</button>
@@ -188,7 +189,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
         <button className="header-tool" type="button" onClick={() => void saveToFile()}>Save</button>
         <button className="header-tool" type="button" onClick={() => void saveToFile(true)}>Save As</button>
         <button className="header-tool" type="button" onClick={() => { downloadProject(currentProject); setSaveNotice('Project JSON downloaded; this is a separate copy.'); }}>Export JSON</button>
-        <span className="phase-chip">Renderer pending</span>
+        <span className="phase-chip">{project.rendererTarget ?? 'Renderer pending'}</span>
       </header>
       {saveNotice && <div className="save-notice" role="status">{saveNotice}<button type="button" onClick={() => setSaveNotice(null)} aria-label="Dismiss save notice">×</button></div>}
 
@@ -197,11 +198,11 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
           <div className="panel-heading"><p className="section-kicker">GRAPH TOOLS</p><h2 id="library-heading">Nodes</h2></div>
           <label className="search-label" htmlFor="node-search">Search nodes</label>
           <input id="node-search" ref={searchRef} className="node-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name or purpose" />
-          <p className="panel-note">Test nodes only. No Shader code is generated.</p>
+          <p className="panel-note">{graphKind.isTestOnly ? 'Test nodes only. No Shader code is generated.' : 'Filter graph nodes. Build and preview are coming next.'}</p>
           <ul className="library-list">
             {definitions.map((definition) => {
               const rootExists = document.graph.nodes.some((node) => node.type === definition.type);
-              const isRoot = definition.type === 'foundation.output';
+              const isRoot = definition.type === graphKind.rootNodeType;
               return <li key={definition.type}><button type="button" onClick={() => addNode(definition.type)} disabled={isRoot && rootExists} title={definition.description}><span className="library-category">{definition.category}</span><strong>{definition.label}</strong></button></li>;
             })}
           </ul>
@@ -233,7 +234,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
         <aside className="context-panel" aria-label="Preview and inspector">
           <section className="preview-panel" aria-labelledby="preview-heading">
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
-            <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>Renderer not configured</strong><p>The first effect host and web renderer are still to be chosen. This area will run generated output in a later phase.</p></div>
+            <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
           </section>
           <Inspector graph={document.graph} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
         </aside>

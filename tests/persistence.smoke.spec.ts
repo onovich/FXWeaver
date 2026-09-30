@@ -1,5 +1,32 @@
 import { expect, test } from '@playwright/test';
 
+test('creates a Filter graph and opens a Phase 0 file without changing its kind', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Create Filter graph' }).click();
+  await expect(page.locator('.project-heading')).toContainText('PixiJS 2D Filter');
+  await expect(page.locator('.phase-chip')).toHaveText('pixi.webgl2');
+  await expect(page.getByRole('button', { name: 'Select Filter Output node' })).toBeVisible();
+  await expect(page.getByText('Problems 1')).toBeVisible();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export JSON' }).click();
+  const download = await downloadPromise;
+  const filter = JSON.parse(await (await import('node:fs/promises')).readFile((await download.path())!, 'utf8'));
+  expect(filter).toMatchObject({ projectVersion: 2, rendererTarget: 'pixi.webgl2', graph: { graphKind: 'pixi.filter2d' } });
+
+  const legacy = {
+    projectVersion: 1, id: 'phase0-legacy', name: 'Old graph', rendererTarget: null,
+    graph: { schemaVersion: 1, graphKind: 'foundation.test', nodes: [{ id: 'root', type: 'foundation.output', definitionVersion: 1, values: {} }], edges: [], parameters: [] },
+    layout: { nodePositions: { root: { x: 520, y: 260 } }, viewport: { x: 0, y: 0, zoom: 1 }, selectedNodeIds: [] },
+  };
+  await page.locator('.library-file-actions input[type="file"]').setInputFiles({ name: 'phase0.fxweave.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(legacy)) });
+  await expect(page.locator('.project-heading')).toContainText('Foundation test graph');
+  await expect(page.getByRole('button', { name: 'Select Test Output node' })).toBeVisible();
+  const migratedDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export JSON' }).click();
+  const migrated = JSON.parse(await (await import('node:fs/promises')).readFile((await (await migratedDownload).path())!, 'utf8'));
+  expect(migrated).toMatchObject({ projectVersion: 2, id: 'phase0-legacy', rendererTarget: null, graph: legacy.graph, layout: legacy.layout });
+});
+
 test('saves a project file, reopens it, chooses a newer draft, and protects the current graph on bad import', async ({ page }) => {
   await page.addInitScript(() => {
     let fileText = '';

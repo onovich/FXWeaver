@@ -1,17 +1,19 @@
 import { applyCommand, createEditorDocument, type EditorDocument } from './commands';
 import type { GraphIssue } from './diagnostics';
-import { getGraphKind } from './registry';
+import { FILTER_GRAPH_KIND, FOUNDATION_GRAPH_KIND, getGraphKind } from './registry';
 import { GRAPH_SCHEMA_VERSION, graphFingerprint, semanticGraphJson, type GraphDocument, type GraphLayout, type ValueType } from './schema';
 import { validateGraph } from './validation';
 
-export const PROJECT_FILE_VERSION = 1 as const;
+export const PROJECT_FILE_VERSION = 2 as const;
 export const PROJECT_EXTENSION = '.fxweave.json';
+export const FILTER_RENDERER_TARGET = 'pixi.webgl2' as const;
+export type RendererTarget = null | typeof FILTER_RENDERER_TARGET;
 
 export interface ProjectFile {
   projectVersion: typeof PROJECT_FILE_VERSION;
   id: string;
   name: string;
-  rendererTarget: null;
+  rendererTarget: RendererTarget;
   graph: GraphDocument;
   layout: GraphLayout;
 }
@@ -25,7 +27,7 @@ export type ProjectImportErrorCode =
   | 'INCOMPATIBLE_GRAPH';
 
 export type ProjectImportResult =
-  | { ok: true; project: ProjectFile; issues: GraphIssue[] }
+  | { ok: true; project: ProjectFile; issues: GraphIssue[]; migratedFromVersion?: 1 }
   | { ok: false; code: ProjectImportErrorCode; message: string };
 
 export function createProject(id: string, name: string, graphKind: string, rootNodeId: string): ProjectFile {
@@ -34,7 +36,8 @@ export function createProject(id: string, name: string, graphKind: string, rootN
   const initial = createEditorDocument(graphKind);
   const result = applyCommand(initial, { type: 'add-node', nodeId: rootNodeId, nodeType: kind.rootNodeType, position: { x: 520, y: 260 } });
   if (!result.ok) throw new Error(result.issue.message);
-  return { projectVersion: PROJECT_FILE_VERSION, id, name, rendererTarget: null, ...result.document };
+  return { projectVersion: PROJECT_FILE_VERSION, id, name,
+    rendererTarget: graphKind === FILTER_GRAPH_KIND ? FILTER_RENDERER_TARGET : null, ...result.document };
 }
 
 export function withEditorDocument(project: ProjectFile, document: EditorDocument): ProjectFile {
@@ -89,7 +92,7 @@ export function parseProject(json: string): ProjectImportResult {
   try { value = JSON.parse(json); }
   catch { return { ok: false, code: 'INVALID_JSON', message: 'The file is not valid JSON.' }; }
   if (!isRecord(value)) return { ok: false, code: 'INVALID_PROJECT', message: 'The file is not an FXWeave project object.' };
-  if (value.projectVersion !== PROJECT_FILE_VERSION) {
+  if (value.projectVersion !== 1 && value.projectVersion !== PROJECT_FILE_VERSION) {
     return { ok: false, code: 'UNSUPPORTED_PROJECT_VERSION', message: `Project version ${String(value.projectVersion)} is not supported.` };
   }
   if (!isRecord(value.graph) || value.graph.schemaVersion !== GRAPH_SCHEMA_VERSION) {
@@ -98,15 +101,24 @@ export function parseProject(json: string): ProjectImportResult {
   if (!isString(value.graph.graphKind) || !getGraphKind(value.graph.graphKind)) {
     return { ok: false, code: 'UNSUPPORTED_GRAPH_KIND', message: `Graph kind ${String(value.graph.graphKind)} is not supported.` };
   }
-  if (!isString(value.id) || !isString(value.name) || value.rendererTarget !== null || !isGraphShape(value.graph) || !isLayoutShape(value.layout) ||
+  if (!isString(value.id) || !isString(value.name) || !isGraphShape(value.graph) || !isLayoutShape(value.layout) ||
     value.graph.parameters.some((parameter) => !valueTypes.has(parameter.valueType))) {
     return { ok: false, code: 'INVALID_PROJECT', message: 'The project has missing or malformed fields.' };
   }
-  const project = value as unknown as ProjectFile;
+  const legacy = value.projectVersion === 1;
+  if (legacy && (value.graph.graphKind !== FOUNDATION_GRAPH_KIND || value.rendererTarget !== null)) {
+    return { ok: false, code: 'INVALID_PROJECT', message: 'Version 1 can only contain a foundation.test graph without a renderer.' };
+  }
+  if (!legacy && ((value.graph.graphKind === FOUNDATION_GRAPH_KIND && value.rendererTarget !== null) ||
+    (value.graph.graphKind === FILTER_GRAPH_KIND && value.rendererTarget !== FILTER_RENDERER_TARGET))) {
+    return { ok: false, code: 'INVALID_PROJECT', message: 'Renderer target does not match the graph kind.' };
+  }
+  // A V1 file becomes a V2 in-memory project. Its graph, layout, and identity are left intact.
+  const project = { ...value, projectVersion: PROJECT_FILE_VERSION } as unknown as ProjectFile;
   const issues = validateGraph(project.graph);
   const incompatible = issues.find((issue) => ['UNKNOWN_NODE_TYPE', 'UNSUPPORTED_DEFINITION_VERSION', 'DUPLICATE_NODE_ID', 'DUPLICATE_EDGE_ID'].includes(issue.code));
   if (incompatible) return { ok: false, code: 'INCOMPATIBLE_GRAPH', message: incompatible.message };
-  return { ok: true, project, issues };
+  return { ok: true, project, issues, ...(legacy ? { migratedFromVersion: 1 as const } : {}) };
 }
 
 export function projectSemanticFingerprint(project: ProjectFile): string {

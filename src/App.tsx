@@ -3,7 +3,7 @@ import { ProjectStart } from './components/ProjectStart';
 import { RecoveryChoice } from './components/RecoveryChoice';
 import { WorkspaceShell } from './components/WorkspaceShell';
 import { createProject, serializeProject, type ProjectFile } from './graph/project';
-import { FOUNDATION_GRAPH_KIND } from './graph/registry';
+import { FILTER_GRAPH_KIND, FOUNDATION_GRAPH_KIND } from './graph/registry';
 import { chooseOpenHandle, readRecoveryDraft, readRecoveryDrafts, readProjectFile, type DraftProject, type ProjectFileHandle } from './storage/projectStorage';
 
 interface ActiveSession {
@@ -27,9 +27,9 @@ export function App() {
     setSessionToken((value) => value + 1);
   }
 
-  function createNewProject() {
+  function createNewProject(graphKind: typeof FOUNDATION_GRAPH_KIND | typeof FILTER_GRAPH_KIND) {
     setEntryError(null);
-    activate({ project: createProject(crypto.randomUUID(), 'Untitled test graph', FOUNDATION_GRAPH_KIND, crypto.randomUUID()), source: 'new' });
+    activate({ project: createProject(crypto.randomUUID(), graphKind === FILTER_GRAPH_KIND ? 'Untitled filter' : 'Untitled test graph', graphKind, crypto.randomUUID()), source: 'new' });
   }
 
   function openResolved(next: ActiveSession, origin: 'entry' | 'editor') {
@@ -53,7 +53,7 @@ export function App() {
       const result = await readProjectFile(file);
       if (!result.ok) { setEntryError(`${result.code}: ${result.message}`); return; }
       setEntryError(null);
-      openResolved({ project: result.project, fileHandle: handle, savedJson: serializeProject(result.project), source: 'file' }, 'entry');
+      openResolved({ project: result.project, fileHandle: handle, savedJson: result.migratedFromVersion ? undefined : serializeProject(result.project), source: 'file' }, 'entry');
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
       setEntryError(error instanceof Error ? error.message : 'Could not open the project file.');
@@ -65,14 +65,14 @@ export function App() {
       const result = await readProjectFile(file);
       if (!result.ok) { setEntryError(`${result.code}: ${result.message}`); return; }
       setEntryError(null);
-      openResolved({ project: result.project, savedJson: serializeProject(result.project), source: 'file' }, 'entry');
+      openResolved({ project: result.project, savedJson: result.migratedFromVersion ? undefined : serializeProject(result.project), source: 'file' }, 'entry');
     } catch (error) {
       setEntryError(error instanceof Error ? error.message : 'Could not read the project file.');
     }
   }
 
   return <>
-    {session && <div style={choice?.origin === 'editor' ? { display: 'none' } : undefined}><WorkspaceShell key={sessionToken} project={session.project} initialHandle={session.fileHandle} initialSavedJson={session.savedJson} source={session.source} suspended={choice?.origin === 'editor'} onOpenSession={(project, handle) => openResolved({ project, fileHandle: handle, savedJson: serializeProject(project), source: 'file' }, 'editor')} onBack={returnToEntry} onRecoveryWarning={setRecoveryWriteWarning} /></div>}
+    {session && <div style={choice?.origin === 'editor' ? { display: 'none' } : undefined}><WorkspaceShell key={sessionToken} project={session.project} initialHandle={session.fileHandle} initialSavedJson={session.savedJson} source={session.source} suspended={choice?.origin === 'editor'} onOpenSession={(project, handle, migrated) => openResolved({ project, fileHandle: handle, savedJson: migrated ? undefined : serializeProject(project), source: 'file' }, 'editor')} onBack={returnToEntry} onRecoveryWarning={setRecoveryWriteWarning} /></div>}
     {choice ? <RecoveryChoice file={choice.file.project} draft={choice.draft} onChooseFile={() => { activate(choice.file); setChoice(null); }} onChooseDraft={() => { activate({ ...choice.file, project: choice.draft.project, source: 'draft' }); setChoice(null); }} onCancel={() => { if (choice.origin === 'entry') setSession(null); setChoice(null); }} /> : !session && <ProjectStart onCreate={createNewProject} onOpen={openFromPicker} onImport={importFile} onRecover={(draft) => activate({ project: draft.project, source: 'draft' })} drafts={draftRead.value} error={entryError} />}
     {(recoveryWriteWarning ?? recoveryReadWarning) && <div className="recovery-warning" role="status">{recoveryWriteWarning ?? recoveryReadWarning}<button type="button" onClick={() => { setRecoveryWriteWarning(null); setRecoveryReadWarning(null); }} aria-label="Dismiss recovery warning">×</button></div>}
   </>;

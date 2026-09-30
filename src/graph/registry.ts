@@ -38,8 +38,14 @@ export interface GraphKindDefinition {
 
 /** A graph kind used solely to prove editor and source-graph behavior. */
 export const FOUNDATION_GRAPH_KIND = 'foundation.test';
+export const FILTER_GRAPH_KIND = 'pixi.filter2d';
 
 const nodeDefinitions: Record<string, NodeDefinition> = {
+  'filter.output': {
+    type: 'filter.output', version: 1, label: 'Filter Output', category: 'Output',
+    description: 'Final RGBA for the host content. A source connection will be required before build.',
+    inputs: [{ id: 'rgba', label: 'RGBA', type: 'vec4', required: true }], outputs: [], properties: [],
+  },
   'foundation.output': {
     type: 'foundation.output', version: 1, label: 'Test Output', category: 'Output',
     description: 'Completes a test graph. It has no Shader meaning.',
@@ -75,6 +81,13 @@ const nodeDefinitions: Record<string, NodeDefinition> = {
 };
 
 const graphKinds: Record<string, GraphKindDefinition> = {
+  [FILTER_GRAPH_KIND]: {
+    id: FILTER_GRAPH_KIND,
+    label: 'PixiJS 2D Filter',
+    rootNodeType: 'filter.output',
+    nodeTypes: ['filter.output'],
+    isTestOnly: false,
+  },
   [FOUNDATION_GRAPH_KIND]: {
     id: FOUNDATION_GRAPH_KIND,
     label: 'Foundation test graph',
