@@ -102,6 +102,7 @@ test('focuses a problem and edits one source value through inspector and exposed
   await expect(page.getByText('Value rejected; the previous value is preserved.')).toBeVisible();
   await page.getByRole('button', { name: 'Undo' }).click();
   await expect(parameterValue).toHaveValue('5');
+  await page.getByRole('button', { name: 'Rename Value' }).click();
   const parameterName = page.locator('.parameter-section').getByRole('textbox', { name: 'Parameter name' });
   await parameterName.fill('Amount');
   await parameterName.press('Enter');

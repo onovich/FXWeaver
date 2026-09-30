@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "build": "tsc --noEmit && vite build",
-    "smoke": "playwright test"
+    "smoke": "playwright test",
+    "demo:capture": "node scripts/capture-phase0-demo.mjs"
   },
   "dependencies": {
     "react": "^19.3.0",

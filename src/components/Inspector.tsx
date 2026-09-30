@@ -41,8 +41,7 @@ export function Inspector({ graph, selectedNodeId, dispatch, onDelete }: Props) 
         const property = source && getNodeDefinition(graph.graphKind, source.type)?.properties.find((item) => item.id === parameter.sourceKey);
         if (!source || !property) return <p key={parameter.id} className="field-error">{parameter.name}: source property unavailable.</p>;
         return <div className="parameter-item" key={parameter.id}>
-          <div className="parameter-title"><strong>{parameter.name}</strong><button type="button" className="text-button" onClick={() => dispatch({ type: 'remove-parameter', parameterId: parameter.id })}>Remove</button></div>
-          <ParameterNameControl id={`parameter-name-${parameter.id}`} name={parameter.name} onCommit={(name) => dispatch({ type: 'rename-parameter', parameterId: parameter.id, name })} />
+          <div className="parameter-title"><strong>{parameter.name}</strong><div className="parameter-title-actions"><ParameterNameControl id={`parameter-name-${parameter.id}`} name={parameter.name} onCommit={(name) => dispatch({ type: 'rename-parameter', parameterId: parameter.id, name })} /><button type="button" className="text-button" onClick={() => dispatch({ type: 'remove-parameter', parameterId: parameter.id })}>Remove</button></div></div>
           <PropertyControl id={`parameter-${parameter.id}`} property={{ ...property, label: parameter.name }} value={source.values[property.id]} onCommit={(value) => dispatch({ type: 'set-property', nodeId: source.id, propertyId: property.id, value })} />
         </div>;
       })}
