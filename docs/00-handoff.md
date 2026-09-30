@@ -1,6 +1,6 @@
 # 新会话接续说明
 
-更新：2026-09-30。
+更新：2026-10-01。Phase 1 开发交付待规划会话独立验收。
 
 ## 背景
 
@@ -34,16 +34,16 @@
 
 - 没有真实用户访谈、付费测试或可量化的市场需求结论。
 - 没有完成竞品的同任务上手对比，也没有运行时视觉回归数据。
-- 尚未完成 V0 首批三件真实效果，也未选定第二版的首批目标平台/渲染管线。Phase 0 编辑器工具链为 React、TypeScript、Vite；V0 首个网页渲染目标已选为 PixiJS 8 WebGL 的 Sprite/Container Filter，Phase 1 将 `pixi.js` 锁定为 8.21.0 并验证 WebGL2。
-- 尚无 Shader 生成、真实实时预览、公开站点、域名或商标审查。Phase 0 已建立可运行的内部测试图编辑器与工程文件。
+- Phase 1 已交付三件 **合成测试素材上的**可编辑作品及真实 Chrome/WebGL2 预览；尚未由规划会话独立验收，也未使用项目方的授权实素材完成接入复验。自用版规格中的“隔天继续编辑”尚未进行真实跨日验证。第二版的首批平台/渲染管线尚未选定。
+- 尚无公开站点、域名或商标审查。当前 WebGL2 Filter 后端与 PixiJS 8.21.0 锁定，WebGPU、Unity 导出及其他渲染管线不在 Phase 1 范围。
 
 ## 新会话推荐起点
 
-当前已建立分工：开发会话已按 [V0 Phase 0 执行指南](./09-v0-graph-foundation-goal-mode-execution-guide.md) 完成 **16 轮**节点图与编辑器基础开发；[开发报告](./11-phase0-validation-report.md) 记录实现、测试、演示和缺口，[架构验收](./12-phase0-planner-acceptance.md) 为 **PASS**。用户已确定首批 03、05、09。下一步由开发会话按 [Phase 1 执行指南](./15-v0-generated-filter-goal-mode-execution-guide.md) 用 **20 轮**完成节点生成 Filter、同源预览和三件作品，规划验收会话独立验收。会话路由见根目录 `Role.md`。
+当前分工：Phase 0 的[开发报告](./11-phase0-validation-report.md)与[独立验收](./12-phase0-planner-acceptance.md)已完成，结论 **PASS**。Phase 1 开发会话也已按[20 轮执行指南](./15-v0-generated-filter-goal-mode-execution-guide.md)提交节点生成 Filter、同源预览和 03/05/09 三件作品；[Phase 1 开发报告](./27-phase1-validation-report.md)列出提交、源码、画面、测试与边界。规划验收会话现在应使用 `$checkandgoal` 独立复验，验收前不要宣布 V0 自用版完成或派发下一阶段。会话路由见根目录 `Role.md`。
 
 1. 阅读 [定位](./01-vision-positioning.md)、[产品设计](./02-product-design.md)、[技术草案](./03-technical-design.md)、[阶段草案](./04-roadmap-validation.md)、[可执行路线图建议稿](./06-roadmap-proposal.md) 和 [自用版功能与交互设计](./07-self-use-product-spec.md)。
-2. 按已批准的 [03、05、09 首批范围](./13-v0-2d-effect-candidates.md)制作三件作品，记录项目方近期的真实用途与作用对象。
-3. 做自用版并坚持用它从零制作这些效果；验证改图后实时预览、生成代码、保存和重开结果一致，不靠手写 Shader 补完。
+2. 复验 [03](./22-work03-radial-burn.md)、[05](./23-work05-local-melt.md)、[09](./24-work09-hologram-scan.md) 的真实 WebGL2 构建身份、图变化、固定画面、另存与重开。运行 `npm run smoke`，并在 `npm run build` 后运行 `npm run smoke:preview`。
+3. 规划验收给出结论后，再由项目方用授权实素材和真实跨日编辑补自用反馈；这些尚不能以现有合成测试与模拟重开代替。
 4. 自用版能支持团队持续创作后，再安排外部创作者试用、对比现有节点工具；第二版再测试跨平台/管线适配与真实项目导入。
 5. 每次确定新范围或改变定位时更新主文档，而不是只保留在聊天记录里。
 

@@ -1,6 +1,6 @@
 # Phase 1 restart checkpoint
 
-Pause requested before a Codex client restart and upgrade. **Stop after round 15. Do not start round 16 until the user explicitly says to continue.** This checkpoint belongs to the 20-round [Phase 1 execution guide](./15-v0-generated-filter-goal-mode-execution-guide.md); the overall goal is still in progress.
+Historical checkpoint for the Codex client restart after round 15. The user explicitly resumed work on 2026-10-01; rounds 16–20 are recorded in the [Phase 1 development report](./27-phase1-validation-report.md). The stop instruction below applied only during that pause.
 
 ## Saved state
 

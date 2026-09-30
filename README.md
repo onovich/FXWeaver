@@ -4,9 +4,9 @@
 
 FXWeave 是一个面向游戏效果的网页低代码节点创作工具。平台中的 Shader 都由这套节点工具生成。**第一步先做项目方自用版**，用它实际制作和迭代自己的效果；随后推出面向用户的网页第一版，让用户搭建节点图并生成所见即所得的 Shader 和效果；第二版在代码生成/编译层扩展到不同平台，并按需要适配各自的渲染管线。作品社区与分享是后续围绕同一节点源图发展的产品层。
 
-**状态：V0 Phase 0 节点图与编辑器基础已实现并通过架构验收；Phase 1 已规划，待开发验收。** 现在可以在桌面 Chrome 中创建、编辑、校验、保存并重开测试图。V0 首个网页目标已确定为 PixiJS 8 WebGL 的 Sprite/Container Filter，首批确定为 **03 径向燃烧／烧蚀、05 局部溶融／波纹扭曲、09 单形态局部全息扫描／信号故障**；目前仍无 Shader 生成或真实实时预览。第二版目标平台和商业模式仍待确定。
+**状态：Phase 0 已通过独立验收；Phase 1 的 20 轮开发已提交，正在等待规划会话独立验收。** 桌面 Chrome 中已有 PixiJS **8.21.0 WebGL2** Sprite/Container Filter 节点图、生成 GLSL、同源实时预览与可搬迁工程。首批 **03 径向燃烧、05 局部溶融、09 局部全息扫描** 均由编辑器从空图创作；示例入口可派生独立副本。Phase 1 的开发通过不等于 V0 自用版最终验收。第二版目标平台和商业模式仍待确定。
 
-## 运行 Phase 0
+## 运行与验证
 
 需要 Node.js 24 与 Chrome。克隆仓库后运行：
 
@@ -15,9 +15,19 @@ npm ci
 npm run dev
 ```
 
-打开终端给出的本地地址，选择 **Create test graph**。依次添加 Number、从 Number 输出端连到 Test Output 输入端、修改数值、撤销和重做，再用 **Save As** 保存为 `.fxweave.json`，返回入口后重新打开。没有文件选择器的浏览器可以用 **Export JSON** 和 **Import JSON**。恢复草稿保存在本机浏览器中，与工程文件分开。
+打开终端给出的本地地址。选择 **Create Filter graph** 从空图开始，或在示例卡片点 **Edit a copy**。右侧 WebGL2 画面与只读生成代码来自同一次成功构建；修改节点、参数、时间或素材后可以检查变化。用 **Save As** 保存 `.fxweave.json`，再用 **Open project file** 重开。没有文件选择器的浏览器可以用 **Export JSON** 和 **Import JSON**；恢复草稿保存在本机浏览器中，与工程文件分开。入口上的清单和创作记录是原始示例的固定证据，编辑副本后的当前清单在工作台的生成结果区下载。
 
-开发记录、测试命令及已知边界见 [Phase 0 开发报告](./docs/11-phase0-validation-report.md)；独立检查结论见 [Phase 0 架构验收](./docs/12-phase0-planner-acceptance.md)。[工作台截图](./docs/visuals/phase0-workbench.png)、[拒绝连接截图](./docs/visuals/phase0-rejected-connection.png) 与 [浏览器演示录像](./docs/visuals/phase0-demo.webm) 均由 `npm run demo:capture` 从实际编辑器生成。
+```powershell
+npm run typecheck
+npm test
+npm run build
+npm run smoke
+npm run smoke:preview
+```
+
+`smoke:preview` 使用前一条 `build` 生成的生产文件。真实 Chrome/WebGL2 作品演示包含在 `smoke` 中；`npm run gallery:capture` 可重采集[示例入口](./docs/visuals/phase1-example-gallery.png)。
+
+Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phase1-validation-report.md)。三件作品各有可编辑工程、固定画面、构建清单和创作记录：[03](./docs/22-work03-radial-burn.md)、[05](./docs/23-work05-local-melt.md)、[09](./docs/24-work09-hologram-scan.md)。Phase 0 的[开发报告](./docs/11-phase0-validation-report.md)与[独立验收](./docs/12-phase0-planner-acceptance.md)仍可追溯；其测试图 `foundation.test` 继续受支持。
 
 ## 从这里开始
 
@@ -36,6 +46,7 @@ npm run dev
 13. [V0 2D 游戏效果候选](./docs/13-v0-2d-effect-candidates.md)：已定首批作品及其余候选的用途、节点能力和边界。
 14. [UnregisteredScene Shader 使用核查](./docs/14-unregisteredscene-shader-usage-review.md)：根据实际运行时资产和代码接线调整首批推荐。
 15. [V0 Phase 1 执行指南](./docs/15-v0-generated-filter-goal-mode-execution-guide.md)：节点生成 Filter、同源预览和三件作品，**20 轮**开发及验收门槛。
+16. [V0 Phase 1 开发报告](./docs/27-phase1-validation-report.md)：20 轮提交、三件作品、WebGL2 验证与待独立验收项。
 
 此前讨论形成的完整研究文档存放在 [研究历史目录](./docs/research-history/INDEX.md)；它们保留原貌供追溯，以上主文档是当前项目口径。
 
@@ -53,10 +64,10 @@ npm run dev
 
 ## 当前建议，尚未定案
 
-- 自用版先在已选的网页渲染目标上证明「搭节点 → 实时预览 → 生成 Shader/效果 → 保存并再次编辑」，并让项目方用它完成数个真实作品；首批效果见候选清单。
-- 自用版稳定后再打磨为面向用户的网页第一版。
+- 已在合成测试素材上证明「搭节点 → 实时预览 → 生成 Shader/效果 → 保存并再次编辑」；项目方真实授权素材和跨日持续编辑仍需验证。
+- Phase 1 经独立验收且自用版持续使用稳定后，再考虑面向用户的网页第一版。
 - 第二版再实现平台/管线适配及其验证；创作者社区和交易市场按实际使用情况推进。
 
 本目录是后续会话的项目工作区。继续推进时先阅读主文档，并把新决策更新到这里。
 
-**V0 Phase 0** 已通过架构验收，交付可编辑、可校验、可保存重开的测试源图。下一步按 [Phase 1 指南](./docs/15-v0-generated-filter-goal-mode-execution-guide.md)完成节点生成 Shader、同源实时预览与已选的三件作品，计划 **20 轮**。开发执行与架构验收由 `Role.md` 中的两个会话分别负责。
+**V0 Phase 0** 已通过架构验收。**Phase 1** 已按[执行指南](./docs/15-v0-generated-filter-goal-mode-execution-guide.md)完成 20 轮开发并提交，下一门槛是 `Role.md` 中规划验收会话用 `$checkandgoal` 独立检查[开发报告](./docs/27-phase1-validation-report.md)。在其给出结论前，不把 Phase 1 开发结果称为 V0 自用版最终通过。

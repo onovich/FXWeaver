@@ -10,6 +10,7 @@
     "build": "tsc --noEmit && vite build",
     "smoke": "playwright test",
     "smoke:preview": "playwright test --config=playwright.preview.config.ts",
+    "gallery:capture": "playwright test --config=playwright.capture.config.ts tests/phase1-gallery.capture.spec.ts",
     "smoke:webgl": "playwright test tests/webgl-spike.smoke.spec.ts",
     "spike:capture": "node scripts/capture-phase1-spike.mjs",
     "runtime:capture": "node scripts/capture-phase1-generated.mjs",
