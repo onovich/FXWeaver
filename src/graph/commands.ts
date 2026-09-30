@@ -13,7 +13,7 @@ export type GraphCommand =
   | { type: 'add-node'; nodeId: string; nodeType: string; position: { x: number; y: number } }
   | { type: 'delete-nodes'; nodeIds: string[] }
   | { type: 'move-nodes'; positions: Record<string, { x: number; y: number }> }
-  | { type: 'connect'; edgeId: string; from: GraphPortRef; to: GraphPortRef }
+  | { type: 'connect'; edgeId: string; from: GraphPortRef; to: GraphPortRef; replaceExisting?: boolean }
   | { type: 'disconnect'; edgeId: string }
   | { type: 'set-property'; nodeId: string; propertyId: string; value: JsonValue };
 
@@ -80,9 +80,11 @@ export function applyCommand(document: EditorDocument, command: GraphCommand): C
     }
     case 'connect': {
       if (graph.edges.some((edge) => edge.id === command.edgeId)) return reject(document, `Edge ID ${command.edgeId} is already in use.`, { code: 'ID_CONFLICT', edgeId: command.edgeId });
-      const issue = checkConnection(graph, command.from, command.to);
+      const occupied = graph.edges.find((edge) => edge.to.nodeId === command.to.nodeId && edge.to.portId === command.to.portId);
+      const replacedId = command.replaceExisting ? occupied?.id : undefined;
+      const issue = checkConnection(graph, command.from, command.to, { ignoreEdgeIds: replacedId ? [replacedId] : [] });
       if (issue) return { ok: false, document, issue };
-      return { ok: true, document: { ...document, graph: { ...graph, edges: [...graph.edges, { id: command.edgeId, from: { ...command.from }, to: { ...command.to } }] } } };
+      return { ok: true, document: { ...document, graph: { ...graph, edges: [...graph.edges.filter((edge) => edge.id !== replacedId), { id: command.edgeId, from: { ...command.from }, to: { ...command.to } }] } } };
     }
     case 'disconnect': {
       if (!graph.edges.some((edge) => edge.id === command.edgeId)) return reject(document, `Edge ${command.edgeId} does not exist.`, { edgeId: command.edgeId });
