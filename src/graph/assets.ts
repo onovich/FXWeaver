@@ -27,6 +27,7 @@ export interface PreviewScene {
   width: number;
   height: number;
   padding: number;
+  filterAreaInset: number;
   resolution: number;
   sampling: 'nearest' | 'linear';
   timeSeconds: number;
@@ -44,7 +45,7 @@ export function createEmptyAssets(): ProjectAssets { return { dependencies: [], 
 
 export function createDefaultPreviewScene(): PreviewScene {
   return { host: 'sprite', sourceAssetId: null, background: 'checker', width: 400, height: 320,
-    padding: 0, resolution: 1, sampling: 'linear', timeSeconds: 0, parameterValues: {} };
+    padding: 0, filterAreaInset: 0, resolution: 1, sampling: 'linear', timeSeconds: 0, parameterValues: {} };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -97,6 +98,7 @@ export function isPreviewScene(value: unknown): value is PreviewScene {
     isPositiveInteger(value.width) && value.width <= 2048 &&
     isPositiveInteger(value.height) && value.height <= 2048 &&
     typeof value.padding === 'number' && Number.isFinite(value.padding) && value.padding >= 0 && value.padding <= 256 &&
+    typeof value.filterAreaInset === 'number' && Number.isFinite(value.filterAreaInset) && value.filterAreaInset >= 0 && value.filterAreaInset <= 64 &&
     typeof value.resolution === 'number' && [0.5, 1, 2].includes(value.resolution) &&
     ['nearest', 'linear'].includes(value.sampling as string) &&
     typeof value.timeSeconds === 'number' && Number.isFinite(value.timeSeconds) && value.timeSeconds >= 0 &&

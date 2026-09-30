@@ -6,7 +6,7 @@ import { GRAPH_SCHEMA_VERSION, canonicalJsonValue, graphFingerprint, semanticGra
 import { validateGraph } from './validation';
 import { isValueOfType } from './values';
 
-export const PROJECT_FILE_VERSION = 3 as const;
+export const PROJECT_FILE_VERSION = 4 as const;
 export const PROJECT_EXTENSION = '.fxweave.json';
 export const FILTER_RENDERER_TARGET = 'pixi.webgl2' as const;
 export type RendererTarget = null | typeof FILTER_RENDERER_TARGET;
@@ -33,7 +33,7 @@ export type ProjectImportErrorCode =
   | 'INCOMPATIBLE_GRAPH';
 
 export type ProjectImportResult =
-  | { ok: true; project: ProjectFile; issues: GraphIssue[]; assetIssues: AssetIssue[]; migratedFromVersion?: 1 | 2 }
+  | { ok: true; project: ProjectFile; issues: GraphIssue[]; assetIssues: AssetIssue[]; migratedFromVersion?: 1 | 2 | 3 }
   | { ok: false; code: ProjectImportErrorCode; message: string };
 
 export function createProject(id: string, name: string, graphKind: string, rootNodeId: string): ProjectFile {
@@ -104,7 +104,7 @@ export function parseProject(json: string): ProjectImportResult {
   try { value = JSON.parse(json); }
   catch { return { ok: false, code: 'INVALID_JSON', message: 'The file is not valid JSON.' }; }
   if (!isRecord(value)) return { ok: false, code: 'INVALID_PROJECT', message: 'The file is not an FXWeave project object.' };
-  if (value.projectVersion !== 1 && value.projectVersion !== 2 && value.projectVersion !== PROJECT_FILE_VERSION) {
+  if (value.projectVersion !== 1 && value.projectVersion !== 2 && value.projectVersion !== 3 && value.projectVersion !== PROJECT_FILE_VERSION) {
     return { ok: false, code: 'UNSUPPORTED_PROJECT_VERSION', message: `Project version ${String(value.projectVersion)} is not supported.` };
   }
   if (!isRecord(value.graph) || value.graph.schemaVersion !== GRAPH_SCHEMA_VERSION) {
@@ -117,7 +117,7 @@ export function parseProject(json: string): ProjectImportResult {
     value.graph.parameters.some((parameter) => !valueTypes.has(parameter.valueType))) {
     return { ok: false, code: 'INVALID_PROJECT', message: 'The project has missing or malformed fields.' };
   }
-  const sourceVersion = value.projectVersion as 1 | 2 | 3;
+  const sourceVersion = value.projectVersion as 1 | 2 | 3 | 4;
   if (sourceVersion === 1 && (value.graph.graphKind !== FOUNDATION_GRAPH_KIND || value.rendererTarget !== null)) {
     return { ok: false, code: 'INVALID_PROJECT', message: 'Version 1 can only contain a foundation.test graph without a renderer.' };
   }
@@ -125,9 +125,11 @@ export function parseProject(json: string): ProjectImportResult {
     (value.graph.graphKind === FILTER_GRAPH_KIND && value.rendererTarget !== FILTER_RENDERER_TARGET))) {
     return { ok: false, code: 'INVALID_PROJECT', message: 'Renderer target does not match the graph kind.' };
   }
-  const assetsResult = sourceVersion === 3 ? checkProjectAssets(value.assets) : { ok: true as const, assets: createEmptyAssets() };
+  const assetsResult = sourceVersion >= 3 ? checkProjectAssets(value.assets) : { ok: true as const, assets: createEmptyAssets() };
   if (!assetsResult.ok) return assetsResult;
-  const preview = sourceVersion === 3 ? value.preview : createDefaultPreviewScene();
+  const preview = sourceVersion >= 3
+    ? sourceVersion === 3 && isRecord(value.preview) ? { ...value.preview, filterAreaInset: 0 } : value.preview
+    : createDefaultPreviewScene();
   if (!isPreviewScene(preview)) return { ok: false, code: 'INVALID_PROJECT', message: 'The preview scene is malformed.' };
   const graph = value.graph as GraphDocument;
   if (Object.entries(preview.parameterValues).some(([id, parameterValue]) => {
@@ -136,13 +138,13 @@ export function parseProject(json: string): ProjectImportResult {
       (typeof parameterValue === 'number' && ((parameter.min !== undefined && parameterValue < parameter.min) ||
         (parameter.max !== undefined && parameterValue > parameter.max)));
   })) return { ok: false, code: 'INVALID_PROJECT', message: 'Preview values must match stable graph parameter IDs and types.' };
-  // Earlier files become V3 in memory. Their graph, layout, and identity are left intact.
+  // Earlier files become V4 in memory. Their graph, layout, and identity are left intact.
   const project = { ...value, projectVersion: PROJECT_FILE_VERSION, assets: assetsResult.assets, preview } as unknown as ProjectFile;
   const issues = validateGraph(project.graph);
   const incompatible = issues.find((issue) => ['UNKNOWN_NODE_TYPE', 'UNSUPPORTED_DEFINITION_VERSION', 'DUPLICATE_NODE_ID', 'DUPLICATE_EDGE_ID'].includes(issue.code));
   if (incompatible) return { ok: false, code: 'INCOMPATIBLE_GRAPH', message: incompatible.message };
   return { ok: true, project, issues, assetIssues: findAssetIssues(project.graph, project.assets, project.preview),
-    ...(sourceVersion === 1 || sourceVersion === 2 ? { migratedFromVersion: sourceVersion } : {}) };
+    ...(sourceVersion === 4 ? {} : { migratedFromVersion: sourceVersion }) };
 }
 
 export function projectSemanticFingerprint(project: ProjectFile): string {

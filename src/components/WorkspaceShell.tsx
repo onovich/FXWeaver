@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { GraphCanvas } from './GraphCanvas';
 import { Inspector } from './Inspector';
 import { ProblemsPanel } from './ProblemsPanel';
+import { FilterPreview } from './FilterPreview';
 import { findAssetIssues } from '../graph/assets';
 import type { GraphCommand } from '../graph/commands';
 import { applyHistoryCommand, createHistory, redo, undo } from '../graph/history';
@@ -24,11 +25,13 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const [lastSavedJson, setLastSavedJson] = useState<string | null>(initialSavedJson ?? null);
   const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const [previewScene, setPreviewScene] = useState(project.preview);
+  const [projectAssets, setProjectAssets] = useState(project.assets);
   const searchRef = useRef<HTMLInputElement>(null);
   const importRef = useRef<HTMLInputElement>(null);
   const document = history.present;
   const graphKind = getGraphKind(document.graph.graphKind)!;
-  const currentProject = withEditorDocument(project, document);
+  const currentProject = { ...withEditorDocument(project, document), assets: projectAssets, preview: previewScene };
   const currentProjectRef = useRef(currentProject);
   currentProjectRef.current = currentProject;
   const currentJson = serializeProject(currentProject);
@@ -200,7 +203,7 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
           <div className="panel-heading"><p className="section-kicker">GRAPH TOOLS</p><h2 id="library-heading">Nodes</h2></div>
           <label className="search-label" htmlFor="node-search">Search nodes</label>
           <input id="node-search" ref={searchRef} className="node-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Name or purpose" />
-          <p className="panel-note">{graphKind.isTestOnly ? 'Test nodes only. No Shader code is generated.' : 'Filter graph nodes. Build and preview are coming next.'}</p>
+          <p className="panel-note">{graphKind.isTestOnly ? 'Test nodes only. No Shader code is generated.' : 'Filter graph nodes generate the live WebGL2 preview.'}</p>
           <ul className="library-list">
             {definitions.map((definition) => {
               const rootExists = document.graph.nodes.some((node) => node.type === definition.type);
@@ -234,10 +237,10 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
         </section>
 
         <aside className="context-panel" aria-label="Preview and inspector">
-          <section className="preview-panel" aria-labelledby="preview-heading">
+          {graphKind.isTestOnly ? <section className="preview-panel" aria-labelledby="preview-heading">
             <div className="panel-heading"><p className="section-kicker">TARGET STATUS</p><h2 id="preview-heading">Preview</h2></div>
             <div className="preview-unconfigured" role="status"><span className="preview-mark" aria-hidden="true">◇</span><strong>{assetIssues.length ? 'Missing project image' : graphKind.isTestOnly ? 'Renderer not configured' : 'Filter preview not yet available'}</strong><p>{assetIssues.length ? assetIssues.map((issue) => issue.message).join(' ') : graphKind.isTestOnly ? 'This foundation graph tests editing and has no Shader target.' : 'This graph targets PixiJS WebGL2. Generated output will appear here when the compiler is connected.'}</p></div>
-          </section>
+          </section> : <FilterPreview graph={document.graph} assets={projectAssets} scene={previewScene} onSceneChange={setPreviewScene} onAssetsChange={setProjectAssets} />}
           <Inspector graph={document.graph} selectedNodeId={selectedId} dispatch={dispatch} onDelete={() => { dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds }); }} />
         </aside>
       </div>

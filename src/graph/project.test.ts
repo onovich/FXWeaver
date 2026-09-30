@@ -7,7 +7,7 @@ import { FILTER_GRAPH_KIND, FOUNDATION_GRAPH_KIND } from './registry';
 describe('project file', () => {
   it('creates a distinct Filter graph with a WebGL2 target and one undeletable root', () => {
     const filter = createProject('filter-1', 'New Filter', FILTER_GRAPH_KIND, 'output');
-    expect(filter).toMatchObject({ projectVersion: 3, rendererTarget: 'pixi.webgl2', graph: { graphKind: FILTER_GRAPH_KIND } });
+    expect(filter).toMatchObject({ projectVersion: 4, rendererTarget: 'pixi.webgl2', graph: { graphKind: FILTER_GRAPH_KIND } });
     expect(filter.graph.nodes.map((node) => node.type)).toEqual(['filter.output']);
     expect(parseProject(serializeProject(filter))).toMatchObject({ ok: true, project: filter });
     expect(applyCommand({ graph: filter.graph, layout: filter.layout }, { type: 'delete-nodes', nodeIds: ['output'] }).ok).toBe(false);
@@ -32,6 +32,13 @@ describe('project file', () => {
     const { assets: _assets, preview: _preview, ...previous } = current;
     const result = parseProject(JSON.stringify({ ...previous, projectVersion: 2 }));
     expect(result).toMatchObject({ ok: true, migratedFromVersion: 2, project: current });
+  });
+
+  it('migrates a version 3 scene with the default filter area inset', () => {
+    const current = createProject('previous-scene', 'Filter', FILTER_GRAPH_KIND, 'root');
+    const { filterAreaInset: _inset, ...previousScene } = current.preview;
+    const result = parseProject(JSON.stringify({ ...current, projectVersion: 3, preview: previousScene }));
+    expect(result).toMatchObject({ ok: true, migratedFromVersion: 3, project: current });
   });
 
   it('round-trips dependency and preview images in separate lists with stable IDs and scene settings', () => {
@@ -129,12 +136,12 @@ describe('project file', () => {
   it.each([
     ['not JSON', '{', 'INVALID_JSON'],
     ['old project', '{"projectVersion":0}', 'UNSUPPORTED_PROJECT_VERSION'],
-    ['future project', '{"projectVersion":4}', 'UNSUPPORTED_PROJECT_VERSION'],
+    ['future project', '{"projectVersion":5}', 'UNSUPPORTED_PROJECT_VERSION'],
     ['old graph schema', serializeProject(createProject('p', 'Test', FOUNDATION_GRAPH_KIND, 'root')).replace('"schemaVersion": 1', '"schemaVersion": 0'), 'UNSUPPORTED_GRAPH_SCHEMA'],
     ['unknown graph kind', serializeProject(createProject('p', 'Test', FOUNDATION_GRAPH_KIND, 'root')).replace('foundation.test', 'unknown.kind'), 'UNSUPPORTED_GRAPH_KIND'],
     ['unsupported node version', serializeProject(createProject('p', 'Test', FOUNDATION_GRAPH_KIND, 'root')).replace('"definitionVersion": 1', '"definitionVersion": 3'), 'INCOMPATIBLE_GRAPH'],
     ['wrong filter target', serializeProject(createProject('p', 'Filter', FILTER_GRAPH_KIND, 'root')).replace('pixi.webgl2', 'pixi.webgpu'), 'INVALID_PROJECT'],
-    ['legacy filter spoof', serializeProject(createProject('p', 'Filter', FILTER_GRAPH_KIND, 'root')).replace('"projectVersion": 3', '"projectVersion": 1'), 'INVALID_PROJECT'],
+    ['legacy filter spoof', serializeProject(createProject('p', 'Filter', FILTER_GRAPH_KIND, 'root')).replace('"projectVersion": 4', '"projectVersion": 1'), 'INVALID_PROJECT'],
   ])('rejects %s with %s', (_label, json, code) => {
     const result = parseProject(json);
     expect(result.ok).toBe(false);
