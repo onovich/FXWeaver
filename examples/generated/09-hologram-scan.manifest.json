@@ -1,0 +1,175 @@
+{
+  "buildId": "f1-eaace75cae26d3d5",
+  "backend": "pixi.webgl2",
+  "pixiVersion": "8.21.0",
+  "generatorVersion": 1,
+  "graphSchemaVersion": 1,
+  "irVersion": 1,
+  "parameterBindings": [
+    {
+      "id": "56b8f675-5422-4d64-bcbf-44aebb6d2c4d",
+      "name": "Red channel offset",
+      "valueType": "vec2",
+      "sourceNodeId": "56b29027-be50-4443-b3ce-13774c07cc48",
+      "sourceKey": "value",
+      "defaultValue": [
+        0.015,
+        0
+      ],
+      "uniformName": "uParam0"
+    },
+    {
+      "id": "771ca85f-65b2-4e86-851c-e29648cc07b0",
+      "name": "Scan intensity",
+      "valueType": "float",
+      "sourceNodeId": "7e8b8bbc-f8f2-48c2-b04b-b57aea372aa3",
+      "sourceKey": "value",
+      "defaultValue": 0.32,
+      "min": 0,
+      "max": 0.6,
+      "uniformName": "uParam1"
+    },
+    {
+      "id": "7bd030e2-c8c8-4233-b10b-0aff0dc9130a",
+      "name": "Line frequency",
+      "valueType": "float",
+      "sourceNodeId": "751a98fe-6088-421e-a40f-0438c86c1350",
+      "sourceKey": "value",
+      "defaultValue": 72,
+      "min": 20,
+      "max": 120,
+      "uniformName": "uParam2"
+    },
+    {
+      "id": "e23d3f0d-194f-43f5-94d1-4168416fdc26",
+      "name": "Scan speed",
+      "valueType": "float",
+      "sourceNodeId": "13ec9e05-703a-4f63-a4f0-11e135e58c61",
+      "sourceKey": "value",
+      "defaultValue": 3,
+      "min": -10,
+      "max": 10,
+      "uniformName": "uParam3"
+    }
+  ],
+  "textureBindings": [],
+  "usesTime": true,
+  "nodeSourceRanges": {
+    "0842ad01-1d82-4ee4-8523-3c33a2be376c": {
+      "firstLine": 22,
+      "lastLine": 22
+    },
+    "13ec9e05-703a-4f63-a4f0-11e135e58c61": {
+      "firstLine": 23,
+      "lastLine": 23
+    },
+    "56b29027-be50-4443-b3ce-13774c07cc48": {
+      "firstLine": 24,
+      "lastLine": 24
+    },
+    "5b88dddc-b657-4b85-b3bc-a09aa98fb09e": {
+      "firstLine": 25,
+      "lastLine": 25
+    },
+    "751a98fe-6088-421e-a40f-0438c86c1350": {
+      "firstLine": 26,
+      "lastLine": 26
+    },
+    "7ac27ff0-1ded-4007-aaf8-4c456fecd660": {
+      "firstLine": 27,
+      "lastLine": 27
+    },
+    "7b82f1dd-1a47-4f2a-ae65-ca2f88b9bfb1": {
+      "firstLine": 28,
+      "lastLine": 28
+    },
+    "7e8b8bbc-f8f2-48c2-b04b-b57aea372aa3": {
+      "firstLine": 29,
+      "lastLine": 29
+    },
+    "87bb3924-d8b0-499d-9718-e71fbb9faf54": {
+      "firstLine": 30,
+      "lastLine": 30
+    },
+    "98dabb11-fcd3-43f5-a496-f31f8f8769a0": {
+      "firstLine": 31,
+      "lastLine": 31
+    },
+    "9f6bb808-3dc1-4b29-9b6f-3f15f5d2d902": {
+      "firstLine": 32,
+      "lastLine": 32
+    },
+    "162591f9-785f-467e-a1ca-255aeb3e563d": {
+      "firstLine": 33,
+      "lastLine": 33
+    },
+    "1d1c12db-d074-4dcc-971d-95822236c183": {
+      "firstLine": 34,
+      "lastLine": 34
+    },
+    "c5bcc474-3d1b-4f31-840f-12321cebae50": {
+      "firstLine": 35,
+      "lastLine": 38
+    },
+    "d44c4f6b-3e2f-4e57-a136-45f0d99c2080": {
+      "firstLine": 39,
+      "lastLine": 42
+    },
+    "10e1acf3-d1a6-4063-a45b-7ec4dec8a787": {
+      "firstLine": 43,
+      "lastLine": 43
+    },
+    "7beda429-427d-4c8d-86e1-1302f52acd12": {
+      "firstLine": 44,
+      "lastLine": 44
+    },
+    "d773138c-25fb-40bb-ac7d-9a6d154bb245": {
+      "firstLine": 45,
+      "lastLine": 46
+    },
+    "239f00e0-9287-474d-a084-0d49fe3cb7d8": {
+      "firstLine": 47,
+      "lastLine": 47
+    },
+    "ee8c35a3-b4eb-4e29-9ac3-595cfe2f9a66": {
+      "firstLine": 48,
+      "lastLine": 48
+    },
+    "d62e70f1-52e2-4f0d-81aa-348f7f50b3c2": {
+      "firstLine": 49,
+      "lastLine": 49
+    },
+    "07b53221-ceb2-420f-8e7a-7fae64d9cec6": {
+      "firstLine": 50,
+      "lastLine": 50
+    },
+    "6910b01a-9cb7-43ef-8921-f46aec5fd14a": {
+      "firstLine": 51,
+      "lastLine": 51
+    },
+    "7a1551f4-50cc-4866-994e-e4175d11a1b2": {
+      "firstLine": 52,
+      "lastLine": 52
+    },
+    "76a8205f-d97e-450b-9fb2-05ade6f7dc54": {
+      "firstLine": 53,
+      "lastLine": 53
+    },
+    "364b1089-67f2-47fc-842d-7210eba4905d": {
+      "firstLine": 54,
+      "lastLine": 54
+    },
+    "3e3beca5-8d59-424a-ab6b-c864f3a0059e": {
+      "firstLine": 55,
+      "lastLine": 55
+    },
+    "e03b24c3-f09c-464b-88d8-830585d79ee4": {
+      "firstLine": 56,
+      "lastLine": 56
+    },
+    "13e64307-f51b-4b38-847f-ae8d52d6a0eb": {
+      "firstLine": 57,
+      "lastLine": 57
+    }
+  }
+}

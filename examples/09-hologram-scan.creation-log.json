@@ -1,0 +1,523 @@
+{
+  "method": "Playwright editor UI from Create Filter graph",
+  "startedAt": "2026-09-30T17:13:04.143Z",
+  "durationSeconds": 4.595,
+  "buildId": "f1-eaace75cae26d3d5",
+  "baselineHash": "ec4465cf966d2d71d8ba9e4a14cd8a3fb292aee793902d76d38db86248a5f88a",
+  "changedHash": "62943b11d278025460b9b559c59f87c97507f11543952352119fd34fa2f6f40d",
+  "operations": [
+    {
+      "action": "add-node",
+      "alias": "uv",
+      "label": "Filter UV",
+      "nodeId": "9f6bb808-3dc1-4b29-9b6f-3f15f5d2d902"
+    },
+    {
+      "action": "add-node",
+      "alias": "splitUv",
+      "label": "Split Vector 2",
+      "nodeId": "d773138c-25fb-40bb-ac7d-9a6d154bb245"
+    },
+    {
+      "action": "add-node",
+      "alias": "time",
+      "label": "Time",
+      "nodeId": "5b88dddc-b657-4b85-b3bc-a09aa98fb09e"
+    },
+    {
+      "action": "add-node",
+      "alias": "frequency",
+      "label": "Number",
+      "nodeId": "751a98fe-6088-421e-a40f-0438c86c1350"
+    },
+    {
+      "action": "add-node",
+      "alias": "yFrequency",
+      "label": "Multiply",
+      "nodeId": "239f00e0-9287-474d-a084-0d49fe3cb7d8"
+    },
+    {
+      "action": "add-node",
+      "alias": "speed",
+      "label": "Number",
+      "nodeId": "13ec9e05-703a-4f63-a4f0-11e135e58c61"
+    },
+    {
+      "action": "add-node",
+      "alias": "timeSpeed",
+      "label": "Multiply",
+      "nodeId": "ee8c35a3-b4eb-4e29-9ac3-595cfe2f9a66"
+    },
+    {
+      "action": "add-node",
+      "alias": "phase",
+      "label": "Add",
+      "nodeId": "d62e70f1-52e2-4f0d-81aa-348f7f50b3c2"
+    },
+    {
+      "action": "add-node",
+      "alias": "sine",
+      "label": "Sine",
+      "nodeId": "07b53221-ceb2-420f-8e7a-7fae64d9cec6"
+    },
+    {
+      "action": "add-node",
+      "alias": "one",
+      "label": "Number",
+      "nodeId": "7ac27ff0-1ded-4007-aaf8-4c456fecd660"
+    },
+    {
+      "action": "add-node",
+      "alias": "sinPlusOne",
+      "label": "Add",
+      "nodeId": "6910b01a-9cb7-43ef-8921-f46aec5fd14a"
+    },
+    {
+      "action": "add-node",
+      "alias": "half",
+      "label": "Number",
+      "nodeId": "0842ad01-1d82-4ee4-8523-3c33a2be376c"
+    },
+    {
+      "action": "add-node",
+      "alias": "wave01",
+      "label": "Multiply",
+      "nodeId": "7a1551f4-50cc-4866-994e-e4175d11a1b2"
+    },
+    {
+      "action": "add-node",
+      "alias": "low",
+      "label": "Number",
+      "nodeId": "87bb3924-d8b0-499d-9718-e71fbb9faf54"
+    },
+    {
+      "action": "add-node",
+      "alias": "high",
+      "label": "Number",
+      "nodeId": "7b82f1dd-1a47-4f2a-ae65-ca2f88b9bfb1"
+    },
+    {
+      "action": "add-node",
+      "alias": "smooth",
+      "label": "Smoothstep",
+      "nodeId": "76a8205f-d97e-450b-9fb2-05ade6f7dc54"
+    },
+    {
+      "action": "add-node",
+      "alias": "intensity",
+      "label": "Number",
+      "nodeId": "7e8b8bbc-f8f2-48c2-b04b-b57aea372aa3"
+    },
+    {
+      "action": "add-node",
+      "alias": "scanAmount",
+      "label": "Multiply",
+      "nodeId": "364b1089-67f2-47fc-842d-7210eba4905d"
+    },
+    {
+      "action": "add-node",
+      "alias": "brightness",
+      "label": "Subtract",
+      "nodeId": "3e3beca5-8d59-424a-ab6b-c864f3a0059e"
+    },
+    {
+      "action": "add-node",
+      "alias": "source",
+      "label": "Source RGBA",
+      "nodeId": "98dabb11-fcd3-43f5-a496-f31f8f8769a0"
+    },
+    {
+      "action": "add-node",
+      "alias": "channelOffset",
+      "label": "Vector 2",
+      "nodeId": "56b29027-be50-4443-b3ce-13774c07cc48"
+    },
+    {
+      "action": "add-node",
+      "alias": "redUv",
+      "label": "Add Vector 2",
+      "nodeId": "162591f9-785f-467e-a1ca-255aeb3e563d"
+    },
+    {
+      "action": "add-node",
+      "alias": "redSample",
+      "label": "Sample Source",
+      "nodeId": "1d1c12db-d074-4dcc-971d-95822236c183"
+    },
+    {
+      "action": "add-node",
+      "alias": "baseSplit",
+      "label": "Split RGBA",
+      "nodeId": "c5bcc474-3d1b-4f31-840f-12321cebae50"
+    },
+    {
+      "action": "add-node",
+      "alias": "redSplit",
+      "label": "Split RGBA",
+      "nodeId": "d44c4f6b-3e2f-4e57-a136-45f0d99c2080"
+    },
+    {
+      "action": "add-node",
+      "alias": "redPremul",
+      "label": "Multiply",
+      "nodeId": "10e1acf3-d1a6-4063-a45b-7ec4dec8a787"
+    },
+    {
+      "action": "add-node",
+      "alias": "compose",
+      "label": "Compose Vector 4",
+      "nodeId": "7beda429-427d-4c8d-86e1-1302f52acd12"
+    },
+    {
+      "action": "add-node",
+      "alias": "dimmed",
+      "label": "Scale Vector 4",
+      "nodeId": "e03b24c3-f09c-464b-88d8-830585d79ee4"
+    },
+    {
+      "action": "set-property",
+      "alias": "frequency",
+      "value": "72"
+    },
+    {
+      "action": "set-property",
+      "alias": "speed",
+      "value": "3"
+    },
+    {
+      "action": "set-property",
+      "alias": "one",
+      "value": "1"
+    },
+    {
+      "action": "set-property",
+      "alias": "half",
+      "value": "0.5"
+    },
+    {
+      "action": "set-property",
+      "alias": "low",
+      "value": "0.72"
+    },
+    {
+      "action": "set-property",
+      "alias": "high",
+      "value": "0.9"
+    },
+    {
+      "action": "set-property",
+      "alias": "intensity",
+      "value": "0.32"
+    },
+    {
+      "action": "set-property",
+      "alias": "channelOffset",
+      "value": "0.015, 0"
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "frequency",
+      "name": "Line frequency",
+      "range": [
+        20,
+        120
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "speed",
+      "name": "Scan speed",
+      "range": [
+        -10,
+        10
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "intensity",
+      "name": "Scan intensity",
+      "range": [
+        0,
+        0.6
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "channelOffset",
+      "name": "Red channel offset"
+    },
+    {
+      "action": "connect",
+      "from": "uv",
+      "output": "uv",
+      "to": "splitUv",
+      "input": "vector"
+    },
+    {
+      "action": "connect",
+      "from": "splitUv",
+      "output": "y",
+      "to": "yFrequency",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "frequency",
+      "output": "value",
+      "to": "yFrequency",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "time",
+      "output": "seconds",
+      "to": "timeSpeed",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "speed",
+      "output": "value",
+      "to": "timeSpeed",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "yFrequency",
+      "output": "value",
+      "to": "phase",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "timeSpeed",
+      "output": "value",
+      "to": "phase",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "phase",
+      "output": "value",
+      "to": "sine",
+      "input": "x"
+    },
+    {
+      "action": "connect",
+      "from": "sine",
+      "output": "value",
+      "to": "sinPlusOne",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "one",
+      "output": "value",
+      "to": "sinPlusOne",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "sinPlusOne",
+      "output": "value",
+      "to": "wave01",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "half",
+      "output": "value",
+      "to": "wave01",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "low",
+      "output": "value",
+      "to": "smooth",
+      "input": "low"
+    },
+    {
+      "action": "connect",
+      "from": "high",
+      "output": "value",
+      "to": "smooth",
+      "input": "high"
+    },
+    {
+      "action": "connect",
+      "from": "wave01",
+      "output": "value",
+      "to": "smooth",
+      "input": "x"
+    },
+    {
+      "action": "connect",
+      "from": "smooth",
+      "output": "value",
+      "to": "scanAmount",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "intensity",
+      "output": "value",
+      "to": "scanAmount",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "one",
+      "output": "value",
+      "to": "brightness",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "scanAmount",
+      "output": "value",
+      "to": "brightness",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "uv",
+      "output": "uv",
+      "to": "redUv",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "channelOffset",
+      "output": "value",
+      "to": "redUv",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "redUv",
+      "output": "value",
+      "to": "redSample",
+      "input": "uv"
+    },
+    {
+      "action": "connect",
+      "from": "source",
+      "output": "rgba",
+      "to": "baseSplit",
+      "input": "rgba"
+    },
+    {
+      "action": "connect",
+      "from": "redSample",
+      "output": "rgba",
+      "to": "redSplit",
+      "input": "rgba"
+    },
+    {
+      "action": "connect",
+      "from": "redSplit",
+      "output": "r",
+      "to": "redPremul",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "baseSplit",
+      "output": "a",
+      "to": "redPremul",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "redPremul",
+      "output": "value",
+      "to": "compose",
+      "input": "x"
+    },
+    {
+      "action": "connect",
+      "from": "baseSplit",
+      "output": "g",
+      "to": "compose",
+      "input": "y"
+    },
+    {
+      "action": "connect",
+      "from": "baseSplit",
+      "output": "b",
+      "to": "compose",
+      "input": "z"
+    },
+    {
+      "action": "connect",
+      "from": "baseSplit",
+      "output": "a",
+      "to": "compose",
+      "input": "w"
+    },
+    {
+      "action": "connect",
+      "from": "compose",
+      "output": "value",
+      "to": "dimmed",
+      "input": "vector"
+    },
+    {
+      "action": "connect",
+      "from": "brightness",
+      "output": "value",
+      "to": "dimmed",
+      "input": "scale"
+    },
+    {
+      "action": "connect",
+      "from": "dimmed",
+      "output": "value",
+      "to": "root",
+      "input": "rgba"
+    },
+    {
+      "action": "import-preview-source",
+      "name": "synthetic-terminal-panel.png"
+    },
+    {
+      "action": "set-fixed-time",
+      "from": 0.5,
+      "to": 1.4,
+      "baselineHash": "ec4465cf966d2d71d8ba9e4a14cd8a3fb292aee793902d76d38db86248a5f88a",
+      "changedHash": "62943b11d278025460b9b559c59f87c97507f11543952352119fd34fa2f6f40d"
+    }
+  ],
+  "nodeIds": {
+    "root": "13e64307-f51b-4b38-847f-ae8d52d6a0eb",
+    "uv": "9f6bb808-3dc1-4b29-9b6f-3f15f5d2d902",
+    "splitUv": "d773138c-25fb-40bb-ac7d-9a6d154bb245",
+    "time": "5b88dddc-b657-4b85-b3bc-a09aa98fb09e",
+    "frequency": "751a98fe-6088-421e-a40f-0438c86c1350",
+    "yFrequency": "239f00e0-9287-474d-a084-0d49fe3cb7d8",
+    "speed": "13ec9e05-703a-4f63-a4f0-11e135e58c61",
+    "timeSpeed": "ee8c35a3-b4eb-4e29-9ac3-595cfe2f9a66",
+    "phase": "d62e70f1-52e2-4f0d-81aa-348f7f50b3c2",
+    "sine": "07b53221-ceb2-420f-8e7a-7fae64d9cec6",
+    "one": "7ac27ff0-1ded-4007-aaf8-4c456fecd660",
+    "sinPlusOne": "6910b01a-9cb7-43ef-8921-f46aec5fd14a",
+    "half": "0842ad01-1d82-4ee4-8523-3c33a2be376c",
+    "wave01": "7a1551f4-50cc-4866-994e-e4175d11a1b2",
+    "low": "87bb3924-d8b0-499d-9718-e71fbb9faf54",
+    "high": "7b82f1dd-1a47-4f2a-ae65-ca2f88b9bfb1",
+    "smooth": "76a8205f-d97e-450b-9fb2-05ade6f7dc54",
+    "intensity": "7e8b8bbc-f8f2-48c2-b04b-b57aea372aa3",
+    "scanAmount": "364b1089-67f2-47fc-842d-7210eba4905d",
+    "brightness": "3e3beca5-8d59-424a-ab6b-c864f3a0059e",
+    "source": "98dabb11-fcd3-43f5-a496-f31f8f8769a0",
+    "channelOffset": "56b29027-be50-4443-b3ce-13774c07cc48",
+    "redUv": "162591f9-785f-467e-a1ca-255aeb3e563d",
+    "redSample": "1d1c12db-d074-4dcc-971d-95822236c183",
+    "baseSplit": "c5bcc474-3d1b-4f31-840f-12321cebae50",
+    "redSplit": "d44c4f6b-3e2f-4e57-a136-45f0d99c2080",
+    "redPremul": "10e1acf3-d1a6-4063-a45b-7ec4dec8a787",
+    "compose": "7beda429-427d-4c8d-86e1-1302f52acd12",
+    "dimmed": "e03b24c3-f09c-464b-88d8-830585d79ee4"
+  }
+}

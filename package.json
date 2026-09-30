@@ -14,6 +14,7 @@
     "runtime:capture": "node scripts/capture-phase1-generated.mjs",
     "work03:capture": "playwright test --config=playwright.capture.config.ts tests/work03.capture.spec.ts",
     "work05:capture": "playwright test --config=playwright.capture.config.ts tests/work05.capture.spec.ts",
+    "work09:capture": "playwright test --config=playwright.capture.config.ts tests/work09.capture.spec.ts",
     "demo:capture": "node scripts/capture-phase0-demo.mjs"
   },
   "dependencies": {
