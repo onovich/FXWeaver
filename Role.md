@@ -23,10 +23,10 @@ idempotency:
   last_planner_dispatch_status: sent
   last_planner_dispatch_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
   last_planner_dispatch_commit: bd348f06a2fd9a84780c7211b9e5d5f0f8aa4884
-  last_executor_report_commit: e630cefed003ea95fd9e9ef8236621c61dd81c03
+  last_executor_report_commit: 80dc092ba0b94f3a0400fbeb2aeb03ab3e72939c
   last_executor_report_status: sent
-  last_executor_report_at: 2026-10-01T02:22:27+08:00
-  last_executor_report_guide: docs/15-v0-generated-filter-goal-mode-execution-guide.md
+  last_executor_report_at: 2026-10-01T03:31:44.0081459+08:00
+  last_executor_report_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
   last_check_status: pass
   last_check_phase: V0 Phase 1 generated Filter and three internal effects
   last_check_report: docs/28-phase1-planner-acceptance.md
