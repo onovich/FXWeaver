@@ -53,8 +53,9 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
 
   function addNode(nodeType: string) {
     const nodeId = crypto.randomUUID();
-    const count = document.graph.nodes.length;
-    if (dispatch({ type: 'add-node', nodeId, nodeType, position: { x: 80 + (count % 4) * 46, y: 110 + (count % 5) * 72 } })) {
+    const index = Math.max(0, document.graph.nodes.length - 1);
+    const position = { x: 64 + (index % 2) * 228, y: 100 + Math.floor(index / 2) * 180 };
+    if (dispatch({ type: 'add-node', nodeId, nodeType, position })) {
       setSelection([nodeId]);
       setSearch('');
     }

@@ -62,6 +62,9 @@ test('saves a project file, reopens it, chooses a newer draft, and protects the 
   await page.locator('.library-file-actions input[type="file"]').setInputFiles({ name: 'bad.fxweave.json', mimeType: 'application/json', buffer: Buffer.from('{') });
   await expect(page.getByRole('status').filter({ hasText: 'Import blocked: INVALID_JSON' })).toBeVisible();
   await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' })).toHaveValue('6');
+  await page.locator('.library-file-actions input[type="file"]').setInputFiles({ name: 'old.fxweave.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ ...savedProject, projectVersion: 0 })) });
+  await expect(page.getByRole('status').filter({ hasText: 'UNSUPPORTED_PROJECT_VERSION' })).toBeVisible();
+  await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' })).toHaveValue('6');
 
   await expect(page.locator('.file-state')).toContainText('Changes not saved to project file');
   await page.reload();

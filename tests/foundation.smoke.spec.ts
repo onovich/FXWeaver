@@ -142,3 +142,24 @@ test('drags a compatible wire and keeps the old wire after an incompatible drop'
   await expect(page.getByRole('alert')).toContainText('vec2 cannot connect to float');
   await expect(page.locator('.connection-path')).toHaveCount(1);
 });
+
+test('rejects a cycle before adding its second edge', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Create test graph' }).click();
+  for (let index = 0; index < 2; index += 1) {
+    await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Pass');
+    await page.locator('.library-list button').filter({ hasText: 'Pass' }).click();
+  }
+  const passNodes = page.locator('.canvas-node').filter({ has: page.getByRole('button', { name: 'Select Pass node' }) });
+  const firstBox = await passNodes.nth(0).boundingBox();
+  const secondBox = await passNodes.nth(1).boundingBox();
+  if (!firstBox || !secondBox) throw new Error('Pass nodes are not visible');
+  expect(firstBox.x + firstBox.width <= secondBox.x || secondBox.x + secondBox.width <= firstBox.x || firstBox.y + firstBox.height <= secondBox.y || secondBox.y + secondBox.height <= firstBox.y).toBe(true);
+  await passNodes.nth(0).getByRole('button', { name: 'Pass Out output, float' }).click();
+  await passNodes.nth(1).getByRole('button', { name: 'Pass In input, float' }).click();
+  await expect(page.locator('.connection-path')).toHaveCount(1);
+  await passNodes.nth(1).getByRole('button', { name: 'Pass Out output, float' }).click();
+  await passNodes.nth(0).getByRole('button', { name: 'Pass In input, float' }).click();
+  await expect(page.getByRole('alert')).toContainText('create a cycle');
+  await expect(page.locator('.connection-path')).toHaveCount(1);
+});
