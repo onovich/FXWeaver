@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>FXWeave WebGL2 Filter spike</title>
+    <style>
+      body { margin: 24px; font: 14px system-ui, sans-serif; color: #e8f0f5; background: #0a1721; }
+      #stage { width: 320px; height: 180px; margin-top: 16px; background: conic-gradient(#b6c4cb 25%, #e6edf0 0 50%, #b6c4cb 0 75%, #e6edf0 0) 0 0 / 20px 20px; }
+      #stage canvas { display: block; }
+      #status { color: #93dfe9; }
+    </style>
+  </head>
+  <body>
+    <h1>PixiJS 8.21.0 WebGL2 Filter spike</h1>
+    <p id="status" role="status">Checking WebGL2…</p>
+    <div id="stage"></div>
+    <script type="module" src="/src/spike/filterSpike.ts"></script>
+  </body>
+</html>

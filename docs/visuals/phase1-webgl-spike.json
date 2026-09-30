@@ -1,0 +1,55 @@
+{
+  "pixiVersion": "8.21.0",
+  "browser": "154.0.8037.57",
+  "viewport": "400x360",
+  "result": {
+    "status": "ready",
+    "glVersion": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "original": [
+      255,
+      0,
+      0,
+      128
+    ],
+    "filtered": [
+      128,
+      0,
+      0,
+      128
+    ],
+    "maskedOut": [
+      0,
+      0,
+      0,
+      128
+    ],
+    "noPadding": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "withPadding": [
+      0,
+      255,
+      0,
+      127
+    ],
+    "uvLeft": [
+      34,
+      129,
+      64,
+      255
+    ],
+    "uvRight": [
+      193,
+      129,
+      64,
+      255
+    ],
+    "invalidShader": "ERROR: 0:10: 'this' : Illegal use of reserved word | 0: #define SHADER_NAME fxweave-invalid-spike-fragment | PixiJS Error: Could not initialize shader. | PixiJS Warning: gl.getProgramInfoLog() Fragment shader is not compiled. | PixiJS Warning:  Attribute aPosition is not present in the shader, but is present in the geometry. Unable to infer attribute details."
+  },
+  "unavailable": {
+    "status": "unavailable"
+  }
+}
