@@ -1,6 +1,34 @@
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 
+test('a downscaled large transparent Sprite retains its visible source inside the Filter area', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Create Filter graph' }).click();
+  await page.getByRole('searchbox', { name: 'Search nodes' }).fill('Source RGBA');
+  await page.locator('.library-list button').filter({ hasText: 'Source RGBA' }).click();
+  await page.getByRole('button', { name: 'Source RGBA RGBA output, vec4' }).click();
+  await page.getByRole('button', { name: 'Filter Output RGBA input, vec4' }).click();
+  const dataUrl = await page.evaluate(() => {
+    const canvas = document.createElement('canvas'); canvas.width = 1200; canvas.height = 1300;
+    const ctx = canvas.getContext('2d')!; ctx.fillStyle = '#40bada'; ctx.fillRect(200, 200, 800, 900);
+    return canvas.toDataURL();
+  });
+  await page.getByLabel('Import preview image').setInputFiles({ name: 'large-transparent.png', mimeType: 'image/png', buffer: Buffer.from(dataUrl.split(',')[1], 'base64') });
+  await expect(page.getByText('large-transparent.png added to project preview assets.')).toBeVisible();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  const visible = () => page.locator('.preview-stage canvas').evaluate((item: HTMLCanvasElement) => {
+    const copy = document.createElement('canvas'); copy.width = item.width; copy.height = item.height;
+    const ctx = copy.getContext('2d')!; ctx.drawImage(item, 0, 0);
+    const data = ctx.getImageData(0, 0, copy.width, copy.height).data;
+    let count = 0; for (let i = 3; i < data.length; i += 4) if (data[i] > 0) count++;
+    return count;
+  });
+  const full = await visible(); expect(full).toBeGreaterThan(1000);
+  await page.getByRole('spinbutton', { name: 'Filter area inset' }).fill('32');
+  await expect.poll(visible).toBeLessThan(full);
+  await expect.poll(visible).toBeGreaterThan(100);
+});
+
 test('renders generated Filter on Sprite and Container and marks stale preview after invalid graph', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Create Filter graph' }).click();

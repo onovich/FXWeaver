@@ -83,7 +83,10 @@ function createHost(scene: PreviewScene, texture: Texture): Container {
     host = container;
   }
   const inset = Math.min(scene.filterAreaInset, contentWidth / 2 - 1, contentHeight / 2 - 1);
-  host.filterArea = new Rectangle(inset, inset, contentWidth - inset * 2, contentHeight - inset * 2);
+  // Pixi transforms filterArea by the host's world matrix. Sprite width/height already set its scale.
+  const localScale = scene.host === 'sprite' ? scale : 1;
+  host.filterArea = new Rectangle(inset / localScale, inset / localScale,
+    (contentWidth - inset * 2) / localScale, (contentHeight - inset * 2) / localScale);
   return host;
 }
 
