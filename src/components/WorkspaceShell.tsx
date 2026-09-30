@@ -27,6 +27,8 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const importRef = useRef<HTMLInputElement>(null);
   const document = history.present;
   const currentProject = withEditorDocument(project, document);
+  const currentProjectRef = useRef(currentProject);
+  currentProjectRef.current = currentProject;
   const currentJson = serializeProject(currentProject);
   const issues = validateGraph(document.graph);
   const selectedId = document.layout.selectedNodeIds[0];
@@ -75,18 +77,19 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
 
   async function saveToFile(saveAs = false) {
     try {
-      const draft = saveRecoveryDraft(currentProject);
+      const snapshot = currentProjectRef.current;
+      const draft = saveRecoveryDraft(snapshot);
       setDraftSavedAt(draft.savedAt);
       let handle = saveAs ? null : fileHandle;
       if (!handle) {
         if (!hasFilePicker()) {
-          downloadProject(currentProject);
+          downloadProject(snapshot);
           setSaveNotice('Project JSON downloaded. No working file is linked; future edits still need export.');
           return;
         }
-        handle = await chooseSaveHandle(currentProject);
+        handle = await chooseSaveHandle(snapshot);
       }
-      const json = await writeProjectFile(handle, currentProject);
+      const json = await writeProjectFile(handle, snapshot);
       setFileHandle(handle);
       setLastSavedJson(json);
       setSaveNotice(`Saved to ${handle.name}.`);
@@ -97,8 +100,10 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   }
 
   function returnToEntry() {
-    try { saveRecoveryDraft(currentProject); onBack(); }
-    catch (error) { setSaveNotice(`Could not preserve recovery draft: ${error instanceof Error ? error.message : 'Unknown error'}`); }
+    window.setTimeout(() => {
+      try { saveRecoveryDraft(currentProjectRef.current); onBack(); }
+      catch (error) { setSaveNotice(`Could not preserve recovery draft: ${error instanceof Error ? error.message : 'Unknown error'}`); }
+    }, 0);
   }
 
   async function openProjectFromPicker() {
@@ -136,14 +141,19 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       const target = event.target;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        if (target instanceof HTMLElement && (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable)) {
+          target.blur();
+          window.setTimeout(() => { void saveToFile(); }, 0);
+        } else void saveToFile();
+        return;
+      }
       if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || (target instanceof HTMLElement && target.isContentEditable)) return;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
         event.preventDefault();
         setHistory((current) => event.shiftKey ? redo(current) : undo(current));
         setActionIssue(null);
-      } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
-        event.preventDefault();
-        void saveToFile();
       } else if (event.key === 'Delete' && document.layout.selectedNodeIds.length > 0) {
         event.preventDefault();
         dispatch({ type: 'delete-nodes', nodeIds: document.layout.selectedNodeIds });

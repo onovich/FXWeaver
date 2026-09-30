@@ -18,6 +18,8 @@ for (const viewport of [{ width: 1920, height: 1080 }, { width: 1366, height: 76
 }
 
 test('edits a typed test graph and explains a rejected connection', async ({ page }) => {
+  const consoleErrors: string[] = [];
+  page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto('/');
   await page.getByRole('button', { name: 'Create test graph' }).click();
@@ -54,8 +56,11 @@ test('edits a typed test graph and explains a rejected connection', async ({ pag
   await page.getByRole('button', { name: 'Zoom in' }).click();
   await expect(page.getByLabel('Canvas zoom')).toHaveText('125%');
   const world = page.locator('.canvas-world');
-  const transformBefore = await world.getAttribute('style');
   const canvas = page.getByLabel('Node graph canvas');
+  await canvas.hover({ position: { x: 25, y: 25 } });
+  await page.mouse.wheel(0, -300);
+  await expect(page.getByLabel('Canvas zoom')).not.toHaveText('125%');
+  const transformBefore = await world.getAttribute('style');
   const canvasBox = await canvas.boundingBox();
   if (!canvasBox) throw new Error('Canvas is not visible');
   await page.mouse.move(canvasBox.x + 15, canvasBox.y + 15);
@@ -63,6 +68,7 @@ test('edits a typed test graph and explains a rejected connection', async ({ pag
   await page.mouse.move(canvasBox.x + 50, canvasBox.y + 45, { steps: 4 });
   await page.mouse.up();
   expect(await world.getAttribute('style')).not.toBe(transformBefore);
+  expect(consoleErrors).toEqual([]);
 });
 
 test('focuses a problem and edits one source value through inspector and exposed parameter', async ({ page }) => {

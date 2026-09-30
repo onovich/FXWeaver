@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent, type WheelEvent } from 'react';
+import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { checkConnection } from '../graph/connections';
 import type { EditorDocument } from '../graph/commands';
 import { getNodeDefinition } from '../graph/registry';
@@ -39,6 +39,27 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
   const panRef = useRef<{ pointerId: number; startX: number; startY: number; viewport: { x: number; y: number; zoom: number } } | null>(null);
   const [dragPositions, setDragPositions] = useState<Record<string, { x: number; y: number }> | null>(null);
   const { graph, layout } = document;
+  const viewportRef = useRef(layout.viewport);
+  viewportRef.current = layout.viewport;
+  const onViewportRef = useRef(onViewport);
+  onViewportRef.current = onViewport;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    function wheelZoom(event: WheelEvent) {
+      event.preventDefault();
+      const rect = canvas!.getBoundingClientRect();
+      const viewport = viewportRef.current;
+      const px = event.clientX - rect.left;
+      const py = event.clientY - rect.top;
+      const zoom = Math.min(2, Math.max(.5, viewport.zoom * (event.deltaY < 0 ? 1.1 : .9)));
+      const ratio = zoom / viewport.zoom;
+      onViewportRef.current({ x: px - (px - viewport.x) * ratio, y: py - (py - viewport.y) * ratio, zoom });
+    }
+    canvas.addEventListener('wheel', wheelZoom, { passive: false });
+    return () => canvas.removeEventListener('wheel', wheelZoom);
+  }, []);
 
   function startDrag(event: PointerEvent<HTMLButtonElement>, nodeId: string) {
     if (event.button !== 0) return;
@@ -85,19 +106,8 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
     onViewport({ ...pan.viewport, x: pan.viewport.x + event.clientX - pan.startX, y: pan.viewport.y + event.clientY - pan.startY });
   }
 
-  function wheelZoom(event: WheelEvent<HTMLDivElement>) {
-    event.preventDefault();
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
-    const zoom = Math.min(2, Math.max(.5, layout.viewport.zoom * (event.deltaY < 0 ? 1.1 : .9)));
-    const ratio = zoom / layout.viewport.zoom;
-    onViewport({ x: px - (px - layout.viewport.x) * ratio, y: py - (py - layout.viewport.y) * ratio, zoom });
-  }
-
   return (
-    <div ref={canvasRef} className="graph-canvas" aria-label="Node graph canvas" onPointerDown={startPan} onPointerMove={movePan} onPointerUp={() => { panRef.current = null; }} onWheel={wheelZoom} onDoubleClick={onSearch}>
+    <div ref={canvasRef} className="graph-canvas" aria-label="Node graph canvas" onPointerDown={startPan} onPointerMove={movePan} onPointerUp={() => { panRef.current = null; }} onDoubleClick={onSearch}>
       <div className="canvas-world" style={{ transform: `translate(${layout.viewport.x}px, ${layout.viewport.y}px) scale(${layout.viewport.zoom})` }}>
         <svg className="connection-layer" width="2400" height="1600" aria-hidden="true">
           {graph.edges.map((edge) => {

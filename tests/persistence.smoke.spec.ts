@@ -20,9 +20,20 @@ test('saves a project file, reopens it, chooses a newer draft, and protects the 
   await page.locator('.library-list button').filter({ hasText: 'Number' }).click();
   await page.getByRole('button', { name: 'Number Value output, float' }).click();
   await page.getByRole('button', { name: 'Test Output Value input, float' }).click();
-  await page.locator('.inspector-content').getByRole('spinbutton', { name: 'Value' }).fill('4');
-  await page.locator('.inspector-content').getByRole('spinbutton', { name: 'Value' }).press('Enter');
+  const propertyValue = page.locator('.inspector-content').getByRole('spinbutton', { name: 'Value' });
+  await propertyValue.fill('4');
+  await propertyValue.press('Control+s');
+  await expect(page.locator('.file-state')).toContainText('Saved to project');
+  expect(JSON.parse(await page.evaluate(() => (window as unknown as { __fxSaved: string }).__fxSaved)).graph.nodes.find((node: { type: string }) => node.type === 'foundation.number').values.value).toBe(4);
   await page.getByRole('button', { name: 'Expose as parameter' }).click();
+  const numberNode = page.locator('.canvas-node').filter({ has: page.getByRole('button', { name: 'Select Number node' }) });
+  const numberBox = await numberNode.boundingBox();
+  if (!numberBox) throw new Error('Number node is not visible');
+  await page.getByRole('button', { name: 'Select Number node' }).hover();
+  await page.mouse.down();
+  await page.mouse.move(numberBox.x + 115, numberBox.y + 95, { steps: 6 });
+  await page.mouse.up();
+  const savedPosition = await numberNode.getAttribute('style');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.locator('.file-state')).toContainText('Saved to project');
   const saved = await page.evaluate(() => (window as unknown as { __fxSaved: string }).__fxSaved);
@@ -36,6 +47,7 @@ test('saves a project file, reopens it, chooses a newer draft, and protects the 
   await page.getByRole('button', { name: 'Open project file' }).click();
   await expect(page.getByText('Problems 0')).toBeVisible();
   await expect(page.locator('.file-state')).toContainText('Saved to project');
+  await expect(page.locator('.canvas-node').filter({ has: page.getByRole('button', { name: 'Select Number node' }) })).toHaveAttribute('style', savedPosition!);
   const value = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Value' });
   await expect(value).toHaveValue('4');
 
