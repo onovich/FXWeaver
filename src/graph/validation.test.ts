@@ -93,4 +93,14 @@ describe('Filter graph validation', () => {
     expect(exposed.document.graph.parameters[0]).toMatchObject({ id: 'stable-color-id', valueType: 'color', defaultValue: '#ffffffff' });
     expect(parseProject(serializeProject({ ...base, ...exposed.document }))).toMatchObject({ ok: true, issues: [] });
   });
+
+  it('rejects duplicate parameter bindings in imported graph data', () => {
+    const base = createProject('duplicate', 'Duplicate', FILTER_GRAPH_KIND, 'root');
+    const added = applyCommand(base, { type: 'add-node', nodeId: 'value', nodeType: 'filter.float', position: { x: 0, y: 0 } });
+    const binding = { name: 'Amount', valueType: 'float' as const, sourceNodeId: 'value', sourceKey: 'value', defaultValue: 0 };
+    const graph = { ...added.document.graph, parameters: [{ id: 'first', ...binding }, { id: 'second', ...binding }] };
+    expect(validateGraph(graph)).toEqual(expect.arrayContaining([
+      expect.objectContaining({ code: 'DUPLICATE_PARAMETER_BINDING', nodeId: 'value', portId: 'value' }),
+    ]));
+  });
 });

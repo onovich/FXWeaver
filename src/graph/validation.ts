@@ -68,9 +68,13 @@ export function validateGraph(graph: GraphDocument): GraphIssue[] {
   }
 
   const seenParameters = new Set<string>();
+  const seenParameterBindings = new Set<string>();
   for (const parameter of graph.parameters) {
     if (seenParameters.has(parameter.id)) issues.push({ code: 'DUPLICATE_PARAMETER_ID', message: `Parameter ID ${parameter.id} is duplicated.`, nodeId: parameter.sourceNodeId });
     seenParameters.add(parameter.id);
+    const binding = `${parameter.sourceNodeId}\0${parameter.sourceKey}`;
+    if (seenParameterBindings.has(binding)) issues.push({ code: 'DUPLICATE_PARAMETER_BINDING', message: `Property ${parameter.sourceKey} is exposed more than once.`, nodeId: parameter.sourceNodeId, portId: parameter.sourceKey });
+    seenParameterBindings.add(binding);
     const node = graph.nodes.find((item) => item.id === parameter.sourceNodeId);
     const property = node && getNodeDefinition(graph.graphKind, node.type)?.properties.find((item) => item.id === parameter.sourceKey);
     if (!property || property.type !== parameter.valueType || !isValueOfType(parameter.defaultValue, parameter.valueType) ||
