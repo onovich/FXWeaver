@@ -94,3 +94,33 @@ test('a late example load cannot replace a newer choice', async ({ page }) => {
   await oldResponse;
   await expect(page.locator('.project-heading')).toContainText('05 · Local Melt / Wave Distortion copy');
 });
+
+test('saving one derived work leaves the original available for another independent copy', async ({ page }) => {
+  const original = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', '03-radial-burn.fxweave.json'), 'utf8'));
+  const manifest = JSON.parse(await readFile(path.resolve(import.meta.dirname, '..', 'examples', 'generated', '03-radial-burn.manifest.json'), 'utf8'));
+  await page.addInitScript(() => {
+    const handle = { name: 'first-copy.fxweave.json', createWritable: async () => ({ write: async (text: string) => { Object.assign(window, { __firstCopy: text }); }, close: async () => {} }) };
+    Object.assign(window, { showSaveFilePicker: async () => handle, __firstCopy: '' });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Edit a copy of Radial burn' }).click();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  const radius = page.locator('.parameter-section').getByRole('spinbutton', { name: 'Radius' });
+  await radius.fill('0.18');
+  await radius.press('Enter');
+  await page.getByRole('button', { name: 'Save As' }).click();
+  await expect(page.locator('.file-state')).toContainText('Saved to project');
+  const first = JSON.parse(await page.evaluate(() => (window as unknown as { __firstCopy: string }).__firstCopy));
+  expect(first.id).not.toBe(original.id);
+  await page.getByRole('button', { name: 'Return to project entry' }).click();
+  await page.getByRole('button', { name: 'Edit a copy of Radial burn' }).click();
+  await expect(page.getByText('Preview ready')).toBeVisible();
+  await expect(page.getByTestId('preview-build-id')).toHaveText(manifest.buildId);
+  await expect(page.locator('.parameter-section').getByRole('spinbutton', { name: 'Radius' })).toHaveValue('0.34');
+  const secondDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export JSON' }).click();
+  const second = JSON.parse(await readFile((await (await secondDownload).path())!, 'utf8'));
+  expect(second.id).not.toBe(first.id);
+  expect(second.id).not.toBe(original.id);
+  expect(second.graph).toEqual(original.graph);
+});
