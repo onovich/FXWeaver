@@ -119,6 +119,32 @@ for (const sample of samples) test(`local work ${sample.id}: modify graph, compa
   await page.getByText('Generated code and bindings').click();
   const buildId = await page.getByTestId('preview-build-id').innerText();
   await expect(page.getByTestId('code-build-id')).toHaveText(buildId);
+  await page.getByRole('button', { name: 'Fit all nodes', exact: true }).click();
+  await expect.poll(() => page.locator('.graph-canvas').evaluate((area) => {
+    const frame = area.getBoundingClientRect();
+    return [...area.querySelectorAll('.canvas-node')].every((node) => {
+      const box = node.getBoundingClientRect();
+      return box.left >= frame.left + 30 && box.top >= frame.top + 30 && box.right <= frame.right - 30 && box.bottom <= frame.bottom - 30;
+    });
+  })).toBe(true);
+  const viewportStyle = await page.locator('.canvas-world').getAttribute('style');
+  await page.screenshot({ path: path.join(output, `work${sample.id}-workbench.png`) });
+  const small = (await canvas.boundingBox())!;
+  await page.getByRole('button', { name: 'Enlarge preview' }).click();
+  expect((await canvas.boundingBox())!.width).toBeGreaterThan(small.width * 2);
+  expect(await pixelHash()).toBe(hash(fixed));
+  await runtimeParameter.fill(sample.graphValue); await runtimeParameter.press('Enter');
+  await expect.poll(pixelHash).not.toBe(hash(fixed));
+  await runtimeParameter.fill(sample.runtimeValue); await runtimeParameter.press('Enter');
+  await expect.poll(pixelHash).toBe(hash(fixed));
+  await page.getByRole('button', { name: 'Split', exact: true }).click();
+  await expect(page.getByAltText('Original host pixels before Filter')).toHaveClass(/split/);
+  await page.locator('.preview-stage').screenshot({ path: path.join(output, `work${sample.id}-enlarged-split.png`) });
+  await page.getByRole('button', { name: 'Effect', exact: true }).click();
+  await page.locator('.preview-stage').screenshot({ path: path.join(output, `work${sample.id}-enlarged-effect.png`) });
+  await page.keyboard.press('Escape');
+  expect(await pixelHash()).toBe(hash(fixed));
+  await expect(page.getByTestId('preview-build-id')).toHaveText(buildId);
   await page.getByRole('button', { name: 'Save As' }).click();
   await expect(page.locator('.file-state')).toContainText('Saved to project');
   const saved = await readFile(projectPath, 'utf8');
@@ -129,10 +155,12 @@ for (const sample of samples) test(`local work ${sample.id}: modify graph, compa
   await expect(page.getByText('Preview ready')).toBeVisible();
   await expect(page.getByTestId('preview-build-id')).toHaveText(buildId);
   expect(await pixelHash()).toBe(hash(fixed));
+  await expect(page.locator('.canvas-world')).toHaveAttribute('style', viewportStyle!);
   const result = { work: sample.id, operator: 'Codex via Playwright', recordedAt: new Date().toISOString(),
     source: sample.source, projectFile: path.basename(projectPath), projectHash: hash(saved),
     buildId, fixedCanvasHash: hash(fixed), alpha, graphParameter: { name: sample.parameter, value: sample.graphValue },
     runtimeValue: sample.runtimeValue, fixedTime: sample.time, host: project.preview.host,
+    usability: { fitAllNodes: true, enlargedParameterResponse: true, enlargedSplit: true, reopenedViewport: viewportStyle },
     persistenceMethod: 'UI Save As with a disk-writing file-handle bridge; physical JSON file reimport',
     durationSeconds: (Date.now() - startedAt) / 1000 };
   await writeFile(path.join(output, `work${sample.id}-result.json`), JSON.stringify(result, null, 2));
