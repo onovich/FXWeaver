@@ -50,3 +50,6 @@
 5. 每次确定新范围或改变定位时更新主文档，而不是只保留在聊天记录里。
 
 历史研究原稿在 [research-history](./research-history/INDEX.md)，主文档优先于旧稿。
+
+
+用户要求官网与生产工作台美化，按 [Phase 3 视觉升级指南](./35-phase3-visual-goal-mode-execution-guide.md) 执行 5 轮；由规划者生成视觉稿并负责验收。

@@ -75,3 +75,6 @@ Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phas
 本目录是后续会话的项目工作区。继续推进时先阅读主文档，并把新决策更新到这里。
 
 **V0 Phase 0 与 Phase 1** 均通过独立技术验收。Phase 2 已完成三件本地实际素材工程、同源大预览与 Fit all nodes / F，已通过[独立验收](./docs/34-phase2-planner-acceptance.md)，见[开发报告](./docs/33-phase2-validation-report.md)。你可以按[本地试用入口](./docs/32-phase2-user-trial.md)直接打开工程继续创作。`npm run trial:local` 单独运行实际素材技术验证，`npm run trial:prepare` 准备私有恢复索引并保留人工记录；普通 smoke 不依赖 Unity。真实人工跨日继续使用尚待验证。
+
+
+用户要求官网与生产工作台美化，按 [Phase 3 视觉升级指南](./docs/35-phase3-visual-goal-mode-execution-guide.md) 执行 5 轮；由规划者生成视觉稿并负责验收。
