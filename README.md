@@ -4,7 +4,7 @@
 
 FXWeave 是一个面向游戏效果的网页低代码节点创作工具。平台中的 Shader 都由这套节点工具生成。**第一步先做项目方自用版**，用它实际制作和迭代自己的效果；随后推出面向用户的网页第一版，让用户搭建节点图并生成所见即所得的 Shader 和效果；第二版在代码生成/编译层扩展到不同平台，并按需要适配各自的渲染管线。作品社区与分享是后续围绕同一节点源图发展的产品层。
 
-**状态：Phase 0 与 Phase 1 均已通过独立技术验收。** 桌面 Chrome 中已有 PixiJS **8.21.0 WebGL2** Sprite/Container Filter 节点图、生成 GLSL、同源实时预览与可搬迁工程。首批 **03 径向燃烧、05 局部溶融、09 局部全息扫描** 均由编辑器从空图创作；示例入口可派生独立副本。[Phase 1 独立验收](./docs/28-phase1-planner-acceptance.md)记录通过范围；Phase 2 实际素材技术试用已完成并等待独立验收，真实人工跨日编辑仍待验证。第二版目标平台和商业模式仍待确定。
+**状态：Phase 0、Phase 1 与 Phase 2 均已通过独立技术验收。** 桌面 Chrome 中已有 PixiJS **8.21.0 WebGL2** Sprite/Container Filter 节点图、生成 GLSL、同源实时预览与可搬迁工程。首批 **03 径向燃烧、05 局部溶融、09 局部全息扫描** 均由编辑器从空图创作；示例入口可派生独立副本。[Phase 1 独立验收](./docs/28-phase1-planner-acceptance.md)记录通过范围；Phase 2 实际素材技术试用已通过[独立验收](./docs/34-phase2-planner-acceptance.md)，真实人工跨日编辑仍待验证。第二版目标平台和商业模式仍待确定。
 
 ## 运行与验证
 
@@ -50,6 +50,8 @@ Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phas
 17. [V0 Phase 1 独立验收](./docs/28-phase1-planner-acceptance.md)：技术交付 PASS、独立复验和真实自用门槛。
 18. [V0 Phase 2 执行指南](./docs/29-v0-local-selfuse-goal-mode-execution-guide.md)：本地实际素材试用、预览放大和适配全部节点，8 轮。
 
+19. [V0 Phase 2 独立验收](./docs/34-phase2-planner-acceptance.md)：实际素材、大预览、全图适配及保存重开 PASS；人工跨日自用待验证。
+
 此前讨论形成的完整研究文档存放在 [研究历史目录](./docs/research-history/INDEX.md)；它们保留原貌供追溯，以上主文档是当前项目口径。
 
 ## 当前已确定
@@ -66,10 +68,10 @@ Phase 1 的 20 轮结果、验证矩阵和边界见[开发报告](./docs/27-phas
 
 ## 当前建议，尚未定案
 
-- 已在合成测试素材上证明「搭节点 → 实时预览 → 生成 Shader/效果 → 保存并再次编辑」；项目方真实授权素材和跨日持续编辑仍需验证。
+- 已在合成测试素材上证明「搭节点 → 实时预览 → 生成 Shader/效果 → 保存并再次编辑」；实际授权素材已通过自动技术试用，人工跨日持续编辑仍需验证。
 - Phase 1 经独立验收且自用版持续使用稳定后，再考虑面向用户的网页第一版。
 - 第二版再实现平台/管线适配及其验证；创作者社区和交易市场按实际使用情况推进。
 
 本目录是后续会话的项目工作区。继续推进时先阅读主文档，并把新决策更新到这里。
 
-**V0 Phase 0 与 Phase 1** 均通过独立技术验收。Phase 2 已完成三件本地实际素材工程、同源大预览与 Fit all nodes / F，等待规划独立验收，见[开发报告](./docs/33-phase2-validation-report.md)。你可以按[本地试用入口](./docs/32-phase2-user-trial.md)直接打开工程继续创作。`npm run trial:local` 单独运行实际素材技术验证，`npm run trial:prepare` 准备私有恢复索引并保留人工记录；普通 smoke 不依赖 Unity。真实人工跨日继续使用尚待验证。
+**V0 Phase 0 与 Phase 1** 均通过独立技术验收。Phase 2 已完成三件本地实际素材工程、同源大预览与 Fit all nodes / F，已通过[独立验收](./docs/34-phase2-planner-acceptance.md)，见[开发报告](./docs/33-phase2-validation-report.md)。你可以按[本地试用入口](./docs/32-phase2-user-trial.md)直接打开工程继续创作。`npm run trial:local` 单独运行实际素材技术验证，`npm run trial:prepare` 准备私有恢复索引并保留人工记录；普通 smoke 不依赖 Unity。真实人工跨日继续使用尚待验证。
