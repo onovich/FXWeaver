@@ -8,7 +8,7 @@
 
 团队成员从空节点图开始，制作一个真实要使用或展示的效果；更换测试素材，调参数，看到由当前图**生成的 Shader** 实时渲染；保存工程，隔天打开继续修改；取得当前网页目标的生成代码与参数/素材说明。项目方制作的所有示例 Shader 都从这套工具生成，不在工具外手写 Shader 来补齐作品。
 
-V0 的“所见即所得”限定在**一个选定的网页渲染后端和一种首发效果宿主**。首发候选是 2D 对象/容器 Filter；PixiJS 8 WebGL 是其实现候选，尚未定案。不同宿主需要不同根节点、输入和预览场景。若选择 PixiJS Filter，预览需能检验滤镜作用范围、透明边和纹理采样；PixiJS 官方文档确认 Filter 可应用于 Sprite/Container，纹理还有 frame、trim、alphaMode、scaleMode 等语义。[PixiJS Filter](https://pixijs.com/8.x/guides/components/filters) · [PixiJS 纹理](https://pixijs.com/8.x/guides/components/textures)
+V0 的“所见即所得”限定在**已选的 PixiJS 8 WebGL Sprite/Container Filter**。这是一类处理宿主已绘制内容的效果，其他宿主需要不同根节点、输入和预览场景。预览需能检验滤镜作用范围、透明边和纹理采样；PixiJS 官方文档确认 Filter 可应用于 Sprite/Container，纹理还有 frame、trim、alphaMode、scaleMode 等语义。首批效果待从[候选清单](./13-v0-2d-effect-candidates.md)选定。[PixiJS Filter](https://pixijs.com/8.x/guides/components/filters) · [PixiJS 纹理](https://pixijs.com/8.x/guides/components/textures)
 
 V0 内部创作者同时是产品的第一批使用者。优先保证**做得出、改得动、存得住、结果一致**；视觉装饰和社区机制按这些任务的实际卡点再排序。
 
@@ -71,11 +71,11 @@ V0 只需要两个主页面：**项目入口**与**编辑工作台**。固定在
 - 时间有播放/暂停、归零、单步或拖动到指定秒数。图中的时间节点使用同一时间定义；暂停后修改节点不应悄悄推进时间。
 - 参数拖动只更新运行时 uniform 时可直接刷新；拓扑和编译期值改变才重新生成/编译。无论哪一种，预览标识必须与当前图/参数状态对应。
 - “原图/效果”切换可帮助判断作用位置；此处的“原图”指同一素材未经当前 Shader 处理的对照，不是另一套效果实现。
-- 若首发选 Filter，预览增加 Sprite/Container 宿主与作用边界显示，并可调测试用的滤镜区域/边距、采样方式和分辨率；这些是宿主相关设置，不作为所有 Shader 图的通用节点。[PixiJS Filter](https://pixijs.com/8.x/guides/components/filters) · [PixiJS 性能提示](https://pixijs.com/8.x/guides/concepts/performance-tips)
+- 预览增加 Sprite/Container 宿主与作用边界显示，并可调测试用的滤镜区域/边距、采样方式和分辨率；这些是宿主相关设置，不作为所有 Shader 图的通用节点。[PixiJS Filter](https://pixijs.com/8.x/guides/components/filters) · [PixiJS 性能提示](https://pixijs.com/8.x/guides/concepts/performance-tips)
 
 ## 4. 首发节点与效果宿主
 
-**先固定一个图类型**。V0 的节点库只覆盖团队选定的效果任务，但要支持从空图组合出不同结构。以下是若首发选“2D 对象/容器 Filter”时的候选最小集，需用真实作品删减或补充：
+**先固定一个图类型**。V0 的节点库只覆盖团队选定的效果任务，但要支持从空图组合出不同结构。以下是“2D 对象/容器 Filter”图的候选最小集，需用选定作品删减或补充：
 
 | 类别 | 候选节点/输入 | 用途 |
 | --- | --- | --- |
@@ -137,10 +137,10 @@ V0 只需要两个主页面：**项目入口**与**编辑工作台**。固定在
 5. **输出可追溯**：生成代码、参数清单和素材依赖能关联源图版本、后端和构建标识；只读代码视图与实时预览使用同一次成功构建。
 6. **持续自用**：至少一件效果经历隔天修改，团队记录制作时间、缺失能力和绕行；这些记录决定对外 V1 的优先级。
 
-## 8. 待确定但不阻断交互设计的三项选择
+## 8. 已定首个目标与仍待确定的事项
 
-1. **首个效果宿主**：2D 对象/容器 Filter、Sprite 材质或全屏后效中的一个。它决定根节点、合法输入、素材场景和生成代码形态。
-2. **首个网页渲染后端及版本**：若选 PixiJS 8 WebGL Filter，需要把其 Filter 与纹理语义写进图类型和预览测试；其他宿主使用相应契约。
+1. **已定首个效果宿主与网页后端**：PixiJS 8 WebGL 的 Sprite/Container Filter。具体 PixiJS 小版本须在开发指南中锁定，Filter 与纹理语义写进图类型和预览测试。
+2. **首批真实效果**：从[2D 游戏效果候选](./13-v0-2d-effect-candidates.md)中选 2–3 个，并说明实际用途与作用对象。
 3. **团队正式工作文件位置**：V0 建议本地完整工程包加浏览器恢复草稿；若团队已有统一仓库，可把工程包纳入版本管理。
 
-这三项一旦选定，只替换宿主/目标相关的节点、预览与输出契约，不改变“图是源文件，生成 Shader 驱动预览”的核心交互。
+后续增加其他宿主时，需扩展宿主相关节点、预览与输出契约；“图是源文件，生成 Shader 驱动预览”的核心交互不变。

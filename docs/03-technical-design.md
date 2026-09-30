@@ -1,6 +1,6 @@
 # 技术设计草案
 
-更新：2026-09-30。本文定义系统边界和不变量，**没有选定编程语言、前端框架、数据库或部署平台**。
+更新：2026-09-30。本文定义系统边界和不变量。Phase 0 已采用 React、TypeScript、Vite；V0 首个网页渲染目标已选为 PixiJS 8 WebGL 的 Sprite/Container Filter。数据库、部署平台和 V2 目标仍待确定。
 
 ## 核心原则
 
@@ -48,9 +48,9 @@ flowchart LR
 
 通用数学、颜色、纹理采样等节点可以共享；不同图类型使用不同根节点及可用输入。自用版先实现足以让项目方从空图制作数个真实效果的节点，不从所有 Shader 语言功能反推庞大的节点清单。保存/重开同一图应生成等价结果。
 
-## 第一版网页后端候选：2D Web 对象/容器 Filter
+## V0 首个网页目标：2D Web 对象/容器 Filter
 
-这是研究建议，并非已确定技术选型。PixiJS 8 的 Filter 可挂到 Sprite 或 Container，支持自定义 Shader；第一版若选它，应固定 WebGL 后端和具体 PixiJS 版本，用节点工具生成 Filter Shader，并让预览运行该生成结果。Filter 处理已绘制内容；它不等于替换 Sprite 绘制材质。全屏后效和真正的 Sprite 材质需要新的图类型与挂载方式。[PixiJS Filters](https://pixijs.com/8.x/guides/components/filters)
+用户已确认 PixiJS 8 WebGL 的 Sprite/Container Filter 为 V0 首个网页目标。执行阶段还需固定 PixiJS 小版本，用节点工具生成 Filter Shader，并让预览运行该生成结果。Filter 处理已绘制内容；它不等于替换 Sprite 绘制材质。全屏后效和真正的 Sprite 材质需要新的图类型与挂载方式。首批效果候选见[策划清单](./13-v0-2d-effect-candidates.md)。[PixiJS Filters](https://pixijs.com/8.x/guides/components/filters)
 
 第一版至少要能查看/保存节点源图、生成的网页 Shader、参数与素材输入说明，并证明重开图后结果一致。第二版的目标导出包应包含：适配后的 Shader、运行时封装/参数接口、所需纹理与依赖清单、版本及管线信息、最小安装示例、许可证、构建诊断，以及可回到 FXWeave 编辑的源图或引用。公开分享页面始终保留源图。
 

@@ -2,6 +2,8 @@
 
 这里保留此前以 **Shader Node Studio** 为临时名称时形成的研究原稿。文件保留原有内容、日期与相互链接，便于追溯证据和判断的变化；它们不是 FXWeave 的最终产品规格。当前决策请先阅读项目根目录的 [README](../../README.md) 和 [新会话接续说明](../00-handoff.md)。
 
+新增专题核查：[2D 游戏 Filter 效果候选研究](./2d-game-filter-effect-candidates.md)。它为当前的[首批作品候选清单](../13-v0-2d-effect-candidates.md)提供来源，不代替用户的选型决定。
+
 - [原研究索引](./README.md)
 - [初始产品研究](./product-research.md)
 - [广义竞品核查](./competitive-landscape.md)
