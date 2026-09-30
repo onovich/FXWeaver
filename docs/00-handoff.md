@@ -54,4 +54,4 @@
 历史研究原稿在 [research-history](./research-history/INDEX.md)，主文档优先于旧稿。
 
 
-用户要求官网与生产工作台美化，按 [Phase 3 视觉升级指南](./35-phase3-visual-goal-mode-execution-guide.md) 执行 5 轮；由规划者生成视觉稿并负责验收。
+用户要求官网与生产工作台美化，按 [Phase 3 视觉升级指南](./35-phase3-visual-goal-mode-execution-guide.md) 已完成 5 轮并通过[独立视觉与功能验收](./37-phase3-planner-acceptance.md)。官网与创作工作台可直接试用。
