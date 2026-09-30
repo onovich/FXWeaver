@@ -1,0 +1,384 @@
+{
+  "method": "Playwright editor UI from Create Filter graph",
+  "startedAt": "2026-09-30T16:55:03.916Z",
+  "durationSeconds": 4.04,
+  "buildId": "f1-5f9ea9d2ed4943d9",
+  "baselineHash": "c682c64ac2c3569732c6d6a6c36e8c44aa4fdf8adae106a78cf21a9db360f12b",
+  "changedHash": "008d9b000fba9c14ade2e08df4fec63ada7d9560174e2faf48b782e39ecb59b8",
+  "operations": [
+    {
+      "action": "add-node",
+      "alias": "uv",
+      "label": "Filter UV",
+      "nodeId": "164b4300-0ed2-4f05-be39-f38cbc5d90f0"
+    },
+    {
+      "action": "add-node",
+      "alias": "center",
+      "label": "Vector 2",
+      "nodeId": "f3bf787c-7545-438c-bf3a-c1750e884619"
+    },
+    {
+      "action": "add-node",
+      "alias": "distance",
+      "label": "Vector 2 Distance",
+      "nodeId": "cf811e61-c367-40b0-8782-039a2f99db84"
+    },
+    {
+      "action": "add-node",
+      "alias": "noise",
+      "label": "Sample Image",
+      "nodeId": "1abce271-e472-408a-9a6f-19166bc3ff16"
+    },
+    {
+      "action": "add-node",
+      "alias": "noiseChannel",
+      "label": "Split RGBA",
+      "nodeId": "8d88aff1-3b9c-4bf5-badf-92f3a6c3f909"
+    },
+    {
+      "action": "add-node",
+      "alias": "noiseStrength",
+      "label": "Number",
+      "nodeId": "c21ad5e8-d189-477d-a4bc-747392c33d52"
+    },
+    {
+      "action": "add-node",
+      "alias": "noiseShift",
+      "label": "Multiply",
+      "nodeId": "454a08cc-02ea-4719-97da-7e35e91e3ab8"
+    },
+    {
+      "action": "add-node",
+      "alias": "radius",
+      "label": "Number",
+      "nodeId": "c76e2dde-7696-4db6-ba73-8fd21821da5f"
+    },
+    {
+      "action": "add-node",
+      "alias": "edgeLimit",
+      "label": "Add",
+      "nodeId": "3382f421-4cd1-4fa9-b941-6d6d931b8374"
+    },
+    {
+      "action": "add-node",
+      "alias": "edgeWidth",
+      "label": "Number",
+      "nodeId": "3ef402da-4a3b-4d5a-9833-5f04d21312cd"
+    },
+    {
+      "action": "add-node",
+      "alias": "outerRadius",
+      "label": "Add",
+      "nodeId": "fab32de8-0b09-454d-8c95-b7fb07191d28"
+    },
+    {
+      "action": "add-node",
+      "alias": "smooth",
+      "label": "Smoothstep",
+      "nodeId": "1f546d34-39a2-4787-8294-83433695e986"
+    },
+    {
+      "action": "add-node",
+      "alias": "one",
+      "label": "Number",
+      "nodeId": "7eccbd0a-aced-4baa-b41e-d92a4488b10f"
+    },
+    {
+      "action": "add-node",
+      "alias": "mask",
+      "label": "Subtract",
+      "nodeId": "b719482e-59d3-4994-89e3-6aec08e22c0a"
+    },
+    {
+      "action": "add-node",
+      "alias": "source",
+      "label": "Source RGBA",
+      "nodeId": "0dffe893-7ec1-4e87-9b50-14df9b35172d"
+    },
+    {
+      "action": "add-node",
+      "alias": "edgeColor",
+      "label": "Color",
+      "nodeId": "1853e15c-7375-4757-aede-3a687d566fee"
+    },
+    {
+      "action": "add-node",
+      "alias": "edgeRgba",
+      "label": "Color to RGBA",
+      "nodeId": "2865e109-fc75-4d6c-8be8-fe8abfe5172b"
+    },
+    {
+      "action": "add-node",
+      "alias": "blend",
+      "label": "Mix Vector 4",
+      "nodeId": "4870bfea-5346-4871-81bf-c3a711703b22"
+    },
+    {
+      "action": "add-node",
+      "alias": "masked",
+      "label": "Scale Vector 4",
+      "nodeId": "96b920cc-f583-4a2a-a78d-0ae7f4dce610"
+    },
+    {
+      "action": "set-property",
+      "alias": "center",
+      "value": "0.5, 0.5"
+    },
+    {
+      "action": "set-property",
+      "alias": "noiseStrength",
+      "value": "0.08"
+    },
+    {
+      "action": "set-property",
+      "alias": "radius",
+      "value": "0.34"
+    },
+    {
+      "action": "set-property",
+      "alias": "edgeWidth",
+      "value": "0.07"
+    },
+    {
+      "action": "set-property",
+      "alias": "one",
+      "value": "1"
+    },
+    {
+      "action": "set-property",
+      "alias": "edgeColor",
+      "value": "#ff6226ff"
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "center",
+      "name": "Center"
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "radius",
+      "name": "Radius",
+      "range": [
+        0,
+        0.8
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "edgeWidth",
+      "name": "Edge width",
+      "range": [
+        0.01,
+        0.2
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "noiseStrength",
+      "name": "Noise amount",
+      "range": [
+        0,
+        0.2
+      ]
+    },
+    {
+      "action": "expose-parameter",
+      "alias": "edgeColor",
+      "name": "Edge color"
+    },
+    {
+      "action": "import-dependency",
+      "name": "synthetic-noise.png",
+      "assetId": "c58fb23b-c8e3-4203-a96e-a490e4bba7e3"
+    },
+    {
+      "action": "import-preview-source",
+      "name": "synthetic-evidence-tile.png"
+    },
+    {
+      "action": "connect",
+      "from": "uv",
+      "output": "uv",
+      "to": "distance",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "center",
+      "output": "value",
+      "to": "distance",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "uv",
+      "output": "uv",
+      "to": "noise",
+      "input": "uv"
+    },
+    {
+      "action": "connect",
+      "from": "noise",
+      "output": "rgba",
+      "to": "noiseChannel",
+      "input": "rgba"
+    },
+    {
+      "action": "connect",
+      "from": "noiseChannel",
+      "output": "r",
+      "to": "noiseShift",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "noiseStrength",
+      "output": "value",
+      "to": "noiseShift",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "radius",
+      "output": "value",
+      "to": "edgeLimit",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "noiseShift",
+      "output": "value",
+      "to": "edgeLimit",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "edgeLimit",
+      "output": "value",
+      "to": "outerRadius",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "edgeWidth",
+      "output": "value",
+      "to": "outerRadius",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "edgeLimit",
+      "output": "value",
+      "to": "smooth",
+      "input": "low"
+    },
+    {
+      "action": "connect",
+      "from": "outerRadius",
+      "output": "value",
+      "to": "smooth",
+      "input": "high"
+    },
+    {
+      "action": "connect",
+      "from": "distance",
+      "output": "value",
+      "to": "smooth",
+      "input": "x"
+    },
+    {
+      "action": "connect",
+      "from": "one",
+      "output": "value",
+      "to": "mask",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "smooth",
+      "output": "value",
+      "to": "mask",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "source",
+      "output": "rgba",
+      "to": "blend",
+      "input": "a"
+    },
+    {
+      "action": "connect",
+      "from": "edgeColor",
+      "output": "color",
+      "to": "edgeRgba",
+      "input": "color"
+    },
+    {
+      "action": "connect",
+      "from": "edgeRgba",
+      "output": "rgba",
+      "to": "blend",
+      "input": "b"
+    },
+    {
+      "action": "connect",
+      "from": "smooth",
+      "output": "value",
+      "to": "blend",
+      "input": "t"
+    },
+    {
+      "action": "connect",
+      "from": "blend",
+      "output": "value",
+      "to": "masked",
+      "input": "vector"
+    },
+    {
+      "action": "connect",
+      "from": "mask",
+      "output": "value",
+      "to": "masked",
+      "input": "scale"
+    },
+    {
+      "action": "connect",
+      "from": "masked",
+      "output": "value",
+      "to": "root",
+      "input": "rgba"
+    },
+    {
+      "action": "change-radius-default",
+      "from": 0.34,
+      "to": 0.18,
+      "baselineHash": "c682c64ac2c3569732c6d6a6c36e8c44aa4fdf8adae106a78cf21a9db360f12b",
+      "changedHash": "008d9b000fba9c14ade2e08df4fec63ada7d9560174e2faf48b782e39ecb59b8"
+    }
+  ],
+  "nodeIds": {
+    "root": "1998b733-a930-4647-89f8-9bc0cf531e03",
+    "uv": "164b4300-0ed2-4f05-be39-f38cbc5d90f0",
+    "center": "f3bf787c-7545-438c-bf3a-c1750e884619",
+    "distance": "cf811e61-c367-40b0-8782-039a2f99db84",
+    "noise": "1abce271-e472-408a-9a6f-19166bc3ff16",
+    "noiseChannel": "8d88aff1-3b9c-4bf5-badf-92f3a6c3f909",
+    "noiseStrength": "c21ad5e8-d189-477d-a4bc-747392c33d52",
+    "noiseShift": "454a08cc-02ea-4719-97da-7e35e91e3ab8",
+    "radius": "c76e2dde-7696-4db6-ba73-8fd21821da5f",
+    "edgeLimit": "3382f421-4cd1-4fa9-b941-6d6d931b8374",
+    "edgeWidth": "3ef402da-4a3b-4d5a-9833-5f04d21312cd",
+    "outerRadius": "fab32de8-0b09-454d-8c95-b7fb07191d28",
+    "smooth": "1f546d34-39a2-4787-8294-83433695e986",
+    "one": "7eccbd0a-aced-4baa-b41e-d92a4488b10f",
+    "mask": "b719482e-59d3-4994-89e3-6aec08e22c0a",
+    "source": "0dffe893-7ec1-4e87-9b50-14df9b35172d",
+    "edgeColor": "1853e15c-7375-4757-aede-3a687d566fee",
+    "edgeRgba": "2865e109-fc75-4d6c-8be8-fe8abfe5172b",
+    "blend": "4870bfea-5346-4871-81bf-c3a711703b22",
+    "masked": "96b920cc-f583-4a2a-a78d-0ae7f4dce610"
+  },
+  "dependencyAssetId": "c58fb23b-c8e3-4203-a96e-a490e4bba7e3"
+}

@@ -1,0 +1,154 @@
+{
+  "buildId": "f1-5f9ea9d2ed4943d9",
+  "backend": "pixi.webgl2",
+  "pixiVersion": "8.21.0",
+  "generatorVersion": 1,
+  "graphSchemaVersion": 1,
+  "irVersion": 1,
+  "parameterBindings": [
+    {
+      "id": "3b609168-88fc-4810-97c1-7696165c4a40",
+      "name": "Center",
+      "valueType": "vec2",
+      "sourceNodeId": "f3bf787c-7545-438c-bf3a-c1750e884619",
+      "sourceKey": "value",
+      "defaultValue": [
+        0.5,
+        0.5
+      ],
+      "uniformName": "uParam0"
+    },
+    {
+      "id": "924d8c02-b500-4112-90fc-d1682da6c27e",
+      "name": "Edge width",
+      "valueType": "float",
+      "sourceNodeId": "3ef402da-4a3b-4d5a-9833-5f04d21312cd",
+      "sourceKey": "value",
+      "defaultValue": 0.07,
+      "min": 0.01,
+      "max": 0.2,
+      "uniformName": "uParam1"
+    },
+    {
+      "id": "a76ccfe0-f55f-412c-95f0-7a11ccb8c698",
+      "name": "Noise amount",
+      "valueType": "float",
+      "sourceNodeId": "c21ad5e8-d189-477d-a4bc-747392c33d52",
+      "sourceKey": "value",
+      "defaultValue": 0.08,
+      "min": 0,
+      "max": 0.2,
+      "uniformName": "uParam2"
+    },
+    {
+      "id": "bbfa364b-ff8d-4ca4-ae6a-85d3b805c493",
+      "name": "Radius",
+      "valueType": "float",
+      "sourceNodeId": "c76e2dde-7696-4db6-ba73-8fd21821da5f",
+      "sourceKey": "value",
+      "defaultValue": 0.34,
+      "min": 0,
+      "max": 0.8,
+      "uniformName": "uParam3"
+    },
+    {
+      "id": "fcf9e679-3108-4f48-9162-26ed9efae816",
+      "name": "Edge color",
+      "valueType": "color",
+      "sourceNodeId": "1853e15c-7375-4757-aede-3a687d566fee",
+      "sourceKey": "value",
+      "defaultValue": "#ff6226ff",
+      "uniformName": "uParam4"
+    }
+  ],
+  "textureBindings": [
+    {
+      "assetId": "c58fb23b-c8e3-4203-a96e-a490e4bba7e3",
+      "uniformName": "uAsset0",
+      "samplerName": "uAsset0Sampler"
+    }
+  ],
+  "usesTime": false,
+  "nodeSourceRanges": {
+    "0dffe893-7ec1-4e87-9b50-14df9b35172d": {
+      "firstLine": 22,
+      "lastLine": 22
+    },
+    "164b4300-0ed2-4f05-be39-f38cbc5d90f0": {
+      "firstLine": 23,
+      "lastLine": 23
+    },
+    "1853e15c-7375-4757-aede-3a687d566fee": {
+      "firstLine": 24,
+      "lastLine": 24
+    },
+    "1abce271-e472-408a-9a6f-19166bc3ff16": {
+      "firstLine": 25,
+      "lastLine": 25
+    },
+    "2865e109-fc75-4d6c-8be8-fe8abfe5172b": {
+      "firstLine": 26,
+      "lastLine": 26
+    },
+    "3ef402da-4a3b-4d5a-9833-5f04d21312cd": {
+      "firstLine": 27,
+      "lastLine": 27
+    },
+    "7eccbd0a-aced-4baa-b41e-d92a4488b10f": {
+      "firstLine": 28,
+      "lastLine": 28
+    },
+    "8d88aff1-3b9c-4bf5-badf-92f3a6c3f909": {
+      "firstLine": 29,
+      "lastLine": 32
+    },
+    "c21ad5e8-d189-477d-a4bc-747392c33d52": {
+      "firstLine": 33,
+      "lastLine": 33
+    },
+    "454a08cc-02ea-4719-97da-7e35e91e3ab8": {
+      "firstLine": 34,
+      "lastLine": 34
+    },
+    "c76e2dde-7696-4db6-ba73-8fd21821da5f": {
+      "firstLine": 35,
+      "lastLine": 35
+    },
+    "3382f421-4cd1-4fa9-b941-6d6d931b8374": {
+      "firstLine": 36,
+      "lastLine": 36
+    },
+    "f3bf787c-7545-438c-bf3a-c1750e884619": {
+      "firstLine": 37,
+      "lastLine": 37
+    },
+    "cf811e61-c367-40b0-8782-039a2f99db84": {
+      "firstLine": 38,
+      "lastLine": 38
+    },
+    "fab32de8-0b09-454d-8c95-b7fb07191d28": {
+      "firstLine": 39,
+      "lastLine": 39
+    },
+    "1f546d34-39a2-4787-8294-83433695e986": {
+      "firstLine": 40,
+      "lastLine": 40
+    },
+    "4870bfea-5346-4871-81bf-c3a711703b22": {
+      "firstLine": 41,
+      "lastLine": 41
+    },
+    "b719482e-59d3-4994-89e3-6aec08e22c0a": {
+      "firstLine": 42,
+      "lastLine": 42
+    },
+    "96b920cc-f583-4a2a-a78d-0ae7f4dce610": {
+      "firstLine": 43,
+      "lastLine": 43
+    },
+    "1998b733-a930-4647-89f8-9bc0cf531e03": {
+      "firstLine": 44,
+      "lastLine": 44
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { PropertyControl } from './PropertyControl';
 import { ParameterNameControl } from './ParameterNameControl';
+import { ParameterRangeControl } from './ParameterRangeControl';
 import type { GraphCommand } from '../graph/commands';
 import { getGraphKind, getNodeDefinition } from '../graph/registry';
 import type { GraphDocument } from '../graph/schema';
@@ -54,6 +55,7 @@ export function Inspector({ graph, assets, selectedNodeId, dispatch, onDelete }:
         return <div className="parameter-item" key={parameter.id}>
           <div className="parameter-title"><strong>{parameter.name}</strong><div className="parameter-title-actions"><ParameterNameControl id={`parameter-name-${parameter.id}`} name={parameter.name} onCommit={(name) => dispatch({ type: 'rename-parameter', parameterId: parameter.id, name })} /><button type="button" className="text-button" onClick={() => dispatch({ type: 'remove-parameter', parameterId: parameter.id })}>Remove</button></div></div>
           <PropertyControl id={`parameter-${parameter.id}`} property={{ ...property, label: parameter.name }} value={source.values[property.id]} onCommit={(value) => dispatch({ type: 'set-property', nodeId: source.id, propertyId: property.id, value })} />
+          {parameter.valueType === 'float' && <ParameterRangeControl parameter={parameter} onCommit={(min, max) => dispatch({ type: 'set-parameter-range', parameterId: parameter.id, min, max })} />}
         </div>;
       })}
     </div>

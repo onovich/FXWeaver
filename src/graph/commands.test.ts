@@ -69,4 +69,14 @@ describe('immutable graph commands', () => {
     expect(removed.graph.parameters).toEqual([]);
     expect(removed.graph.nodes[0].values.value).toBe(4.5);
   });
+
+  it('limits exposed scalar defaults to an editable finite slider range', () => {
+    const number = execute(createEditorDocument(FOUNDATION_GRAPH_KIND), { type: 'add-node', nodeId: 'number', nodeType: 'foundation.number', position: { x: 0, y: 0 } });
+    const exposed = execute(number, { type: 'expose-parameter', parameterId: 'p', nodeId: 'number', propertyId: 'value', name: 'Amount' });
+    const ranged = execute(exposed, { type: 'set-parameter-range', parameterId: 'p', min: -1, max: 1 });
+    expect(ranged.graph.parameters[0]).toMatchObject({ min: -1, max: 1 });
+    expect(applyCommand(ranged, { type: 'set-property', nodeId: 'number', propertyId: 'value', value: 2 }).ok).toBe(false);
+    expect(applyCommand(ranged, { type: 'set-parameter-range', parameterId: 'p', min: 0.5, max: 1 }).ok).toBe(false);
+    expect(applyCommand(ranged, { type: 'set-parameter-range', parameterId: 'p', min: 1, max: 1 }).ok).toBe(false);
+  });
 });

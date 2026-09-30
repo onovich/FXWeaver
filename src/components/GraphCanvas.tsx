@@ -183,7 +183,7 @@ export function GraphCanvas({ document, pendingFrom, onPendingFrom, onSelect, on
                 })}
                 {definition?.outputs.map((port) => {
                   const ref = { nodeId: node.id, portId: port.id };
-                  return <div className="port-row" key={`out-${port.id}`}><button className={`port-button output-port ${pendingFrom?.nodeId === node.id && pendingFrom.portId === port.id ? 'port-active' : ''}`} type="button" onPointerDown={(event) => startWire(event, ref)} onPointerMove={moveWire} onPointerUp={endWire} onPointerCancel={() => { wireDragRef.current = null; setWirePointer(null); }} onClick={(event) => { if (event.detail === 0) onPendingFrom(ref); }} aria-label={`${definition.label} ${port.label} output, ${port.type}`}>{port.label}<small>{port.type}</small><i className={`port-dot port-${port.type}`} /></button></div>;
+                    return <div className="port-row" key={`out-${port.id}`}><button className={`port-button output-port ${pendingFrom?.nodeId === node.id && pendingFrom.portId === port.id ? 'port-active' : ''}`} type="button" data-output-node={node.id} data-output-port={port.id} onPointerDown={(event) => startWire(event, ref)} onPointerMove={moveWire} onPointerUp={endWire} onPointerCancel={() => { wireDragRef.current = null; setWirePointer(null); }} onClick={(event) => { if (event.detail === 0) onPendingFrom(ref); }} aria-label={`${definition.label} ${port.label} output, ${port.type}`}>{port.label}<small>{port.type}</small><i className={`port-dot port-${port.type}`} /></button></div>;
                 })}
               </div>
             </article>

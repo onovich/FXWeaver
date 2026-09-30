@@ -18,6 +18,7 @@ export type GraphCommand =
   | { type: 'set-property'; nodeId: string; propertyId: string; value: JsonValue }
   | { type: 'expose-parameter'; parameterId: string; nodeId: string; propertyId: string; name: string }
   | { type: 'rename-parameter'; parameterId: string; name: string }
+  | { type: 'set-parameter-range'; parameterId: string; min: number; max: number }
   | { type: 'remove-parameter'; parameterId: string };
 
 export type CommandResult = { ok: true; document: EditorDocument } | { ok: false; document: EditorDocument; issue: GraphIssue };
@@ -99,8 +100,10 @@ export function applyCommand(document: EditorDocument, command: GraphCommand): C
       const property = getNodeDefinition(graph.graphKind, node.type)?.properties.find((item) => item.id === command.propertyId);
       if (!property) return reject(document, `Property ${command.propertyId} does not exist.`, { code: 'INVALID_PROPERTY', nodeId: command.nodeId, portId: command.propertyId });
       const value = command.value;
+      const parameter = graph.parameters.find((item) => item.sourceNodeId === node.id && item.sourceKey === property.id);
       if (!isValueOfType(value, property.type) ||
-        (typeof value === 'number' && ((property.min !== undefined && value < property.min) || (property.max !== undefined && value > property.max)))) {
+        (typeof value === 'number' && ((property.min !== undefined && value < property.min) || (property.max !== undefined && value > property.max) ||
+          (parameter?.min !== undefined && value < parameter.min) || (parameter?.max !== undefined && value > parameter.max)))) {
         return reject(document, `${property.label} needs a valid ${property.type} value.`, { code: 'INVALID_PROPERTY', nodeId: command.nodeId, portId: command.propertyId });
       }
       return {
@@ -131,6 +134,16 @@ export function applyCommand(document: EditorDocument, command: GraphCommand): C
       if (!command.name.trim()) return reject(document, 'Parameter name cannot be empty.', { code: 'INVALID_PARAMETER' });
       if (!graph.parameters.some((parameter) => parameter.id === command.parameterId)) return reject(document, 'Parameter does not exist.', { code: 'INVALID_PARAMETER' });
       return { ok: true, document: { ...document, graph: { ...graph, parameters: graph.parameters.map((parameter) => parameter.id === command.parameterId ? { ...parameter, name: command.name.trim() } : parameter) } } };
+    }
+    case 'set-parameter-range': {
+      const parameter = graph.parameters.find((item) => item.id === command.parameterId);
+      if (!parameter || parameter.valueType !== 'float' || typeof parameter.defaultValue !== 'number' ||
+        !Number.isFinite(command.min) || !Number.isFinite(command.max) || command.min >= command.max ||
+        parameter.defaultValue < command.min || parameter.defaultValue > command.max) {
+        return reject(document, 'Parameter range must be finite, ordered, and include its default value.', { code: 'INVALID_PARAMETER' });
+      }
+      return { ok: true, document: { ...document, graph: { ...graph, parameters: graph.parameters.map((item) =>
+        item.id === parameter.id ? { ...item, min: command.min, max: command.max } : item) } } };
     }
     case 'remove-parameter': {
       if (!graph.parameters.some((parameter) => parameter.id === command.parameterId)) return reject(document, 'Parameter does not exist.', { code: 'INVALID_PARAMETER' });

@@ -32,8 +32,12 @@ export function WorkspaceShell({ project, initialHandle, initialSavedJson, sourc
   const importRef = useRef<HTMLInputElement>(null);
   const document = history.present;
   const graphKind = getGraphKind(document.graph.graphKind)!;
-  const activeParameterIds = new Set(document.graph.parameters.map((parameter) => parameter.id));
-  const activeParameterValues = Object.fromEntries(Object.entries(previewScene.parameterValues).filter(([id]) => activeParameterIds.has(id)));
+  const activeParameters = new Map(document.graph.parameters.map((parameter) => [parameter.id, parameter]));
+  const activeParameterValues = Object.fromEntries(Object.entries(previewScene.parameterValues).filter(([id, value]) => {
+    const parameter = activeParameters.get(id);
+    return parameter && (typeof value !== 'number' ||
+      (parameter.min === undefined || value >= parameter.min) && (parameter.max === undefined || value <= parameter.max));
+  }));
   const safePreviewScene = Object.keys(activeParameterValues).length === Object.keys(previewScene.parameterValues).length
     ? previewScene : { ...previewScene, parameterValues: activeParameterValues };
   const currentProject = { ...withEditorDocument(project, document), assets: projectAssets, preview: safePreviewScene };

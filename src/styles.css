@@ -189,7 +189,11 @@ button:focus-visible { outline: 2px solid #86e5ee; outline-offset: 3px; }
 .parameter-section { margin-top: 1.2rem; padding: .7rem 1rem 1rem; border-top: 1px solid var(--border); }
 .parameter-section h3 { margin: .4rem 0 .7rem; font-size: .82rem; }
 .parameter-section .panel-note { padding: 0; }
-.parameter-item { margin: .8rem 0; padding: .65rem; border: 1px solid #355366; border-radius: .25rem; background: #132a38; }
+  .parameter-item { margin: .8rem 0; padding: .65rem; border: 1px solid #355366; border-radius: .25rem; background: #132a38; }
+  .parameter-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .35rem; padding-top: .4rem; border-top: 1px solid #355366; }
+  .parameter-range label { display: grid; gap: .2rem; color: var(--text-muted); font-size: .65rem; }
+  .parameter-range input { width: 100%; min-width: 0; padding: .3rem; color: #e8f0f5; background: #182e3c; border: 1px solid #476271; border-radius: .2rem; }
+  .parameter-range button { grid-column: span 2; padding: .3rem; color: #d7eef0; background: #1b3a48; border: 1px solid #476271; border-radius: .2rem; }
 .parameter-title { display: flex; justify-content: space-between; align-items: center; font-size: .73rem; }
 .parameter-title-actions { display: flex; align-items: center; gap: .55rem; }
 .parameter-name-control { display: grid; gap: .3rem; margin: .7rem 0; }
