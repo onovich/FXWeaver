@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createProject } from '../graph/project';
 import { FOUNDATION_GRAPH_KIND } from '../graph/registry';
-import { listRecoveryDrafts, loadRecoveryDraft, projectFilename, saveRecoveryDraft } from './projectStorage';
+import { listRecoveryDrafts, loadRecoveryDraft, projectFilename, readRecoveryDraft, readRecoveryDrafts, saveRecoveryDraft } from './projectStorage';
 
 function memoryStorage(): Storage {
   const data = new Map<string, string>();
@@ -32,5 +32,16 @@ describe('browser recovery boundary', () => {
     localStorage.setItem('fxweave:draft:v1:bad', '{');
     expect(loadRecoveryDraft('bad')).toBeNull();
     expect(listRecoveryDrafts()).toEqual([]);
+  });
+
+  it('reports unavailable draft reads without throwing into project-file workflows', () => {
+    vi.stubGlobal('localStorage', {
+      get length() { throw new DOMException('Storage disabled', 'SecurityError'); },
+      getItem() { throw new DOMException('Storage disabled', 'SecurityError'); },
+    });
+    expect(readRecoveryDrafts()).toMatchObject({ value: [], error: expect.stringContaining('Storage disabled') });
+    expect(listRecoveryDrafts()).toEqual([]);
+    expect(readRecoveryDraft('p-1')).toMatchObject({ value: null, error: expect.stringContaining('Storage disabled') });
+    expect(loadRecoveryDraft('p-1')).toBeNull();
   });
 });

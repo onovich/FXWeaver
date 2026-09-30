@@ -20,6 +20,7 @@ export interface DraftRecord {
 }
 
 export interface DraftProject extends DraftRecord { project: ProjectFile }
+export interface RecoveryDraftRead<T> { value: T; error: string | null }
 
 function pickerWindow(): PickerWindow { return window as PickerWindow; }
 
@@ -75,8 +76,7 @@ export function saveRecoveryDraft(project: ProjectFile): DraftRecord {
   return record;
 }
 
-export function loadRecoveryDraft(projectId: string): DraftProject | null {
-  const raw = localStorage.getItem(`${DRAFT_PREFIX}${projectId}`);
+function parseRecoveryDraft(raw: string | null, projectId: string): DraftProject | null {
   if (!raw) return null;
   try {
     const record = JSON.parse(raw) as DraftRecord;
@@ -86,13 +86,35 @@ export function loadRecoveryDraft(projectId: string): DraftProject | null {
   } catch { return null; }
 }
 
-export function listRecoveryDrafts(): DraftProject[] {
-  const drafts: DraftProject[] = [];
-  for (let index = 0; index < localStorage.length; index += 1) {
-    const key = localStorage.key(index);
-    if (!key?.startsWith(DRAFT_PREFIX)) continue;
-    const draft = loadRecoveryDraft(key.slice(DRAFT_PREFIX.length));
-    if (draft) drafts.push(draft);
+function recoveryReadError(error: unknown): string {
+  return `Recovery drafts unavailable: ${error instanceof Error ? error.message : 'Browser storage could not be read'}. Project files can still be opened and saved.`;
+}
+
+export function readRecoveryDraft(projectId: string): RecoveryDraftRead<DraftProject | null> {
+  try { return { value: parseRecoveryDraft(localStorage.getItem(`${DRAFT_PREFIX}${projectId}`), projectId), error: null }; }
+  catch (error) { return { value: null, error: recoveryReadError(error) }; }
+}
+
+export function loadRecoveryDraft(projectId: string): DraftProject | null {
+  return readRecoveryDraft(projectId).value;
+}
+
+export function readRecoveryDrafts(): RecoveryDraftRead<DraftProject[]> {
+  try {
+    const storage = localStorage;
+    const drafts: DraftProject[] = [];
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index);
+      if (!key?.startsWith(DRAFT_PREFIX)) continue;
+      const draft = parseRecoveryDraft(storage.getItem(key), key.slice(DRAFT_PREFIX.length));
+      if (draft) drafts.push(draft);
+    }
+    return { value: drafts.sort((a, b) => b.savedAt - a.savedAt), error: null };
+  } catch (error) {
+    return { value: [], error: recoveryReadError(error) };
   }
-  return drafts.sort((a, b) => b.savedAt - a.savedAt);
+}
+
+export function listRecoveryDrafts(): DraftProject[] {
+  return readRecoveryDrafts().value;
 }

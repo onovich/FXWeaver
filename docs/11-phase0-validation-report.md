@@ -1,6 +1,6 @@
 # FXWeave V0 Phase 0 验收报告
 
-日期：2026-09-30。阶段：节点图与编辑器基础。状态：首次规划验收反馈的两项缺陷已修复，待规划验收负责人重跑 `$checkandgoal`。第 16 轮提交 `b11cb34130509414e1311bc200747e6b02e27482` 已推送到 `origin/main`；本报告在验收修复后更新。执行依据为 [16 轮指南](./09-v0-graph-foundation-goal-mode-execution-guide.md)。
+日期：2026-09-30。阶段：节点图与编辑器基础。状态：规划验收反馈的缺陷已修复，待规划验收负责人重跑 `$checkandgoal`。第 16 轮提交 `b11cb34130509414e1311bc200747e6b02e27482` 已推送到 `origin/main`；本报告在验收修复后更新。执行依据为 [16 轮指南](./09-v0-graph-foundation-goal-mode-execution-guide.md)。
 
 ## 阶段结果与边界
 
@@ -31,6 +31,8 @@ Phase 0 提供可运行的桌面测试图编辑器：添加和拖动节点、类
 
 首次规划验收增加了 `tests/qa-review.smoke.spec.ts`，发现恢复草稿写入失败会阻断正式保存，以及编辑器内取消文件/草稿版本选择会丢失当前会话。验收修复将草稿写入错误作为独立警告，正式保存、打开、导入和返回入口继续执行；版本选择期间保留并暂停原编辑器，Cancel 回到发起位置，编辑值和撤销历史仍在。新增测试同时覆盖从入口发起的 Cancel 路径。
 
+二次复验增加了 `tests/qa-localstorage.smoke.spec.ts`，发现浏览器禁止读取 `localStorage` 属性时入口初始化崩溃。恢复草稿的单项读取与列表枚举现返回可诊断结果；读取失败只显示草稿不可用警告，创建、正式保存、文件打开与导入照常进行。单元测试覆盖枚举和读取异常，浏览器测试覆盖 `SecurityError` 属性访问异常及相关操作路径。
+
 ## 实现与源图契约
 
 - `src/graph/schema.ts` 定义版本 1 的 `GraphDocument`：`graphKind`、节点、边、暴露参数及稳定 ID；`GraphLayout` 单独保存位置、视口和选中状态。语义 JSON 对数组及对象键排序，布局变化不改变语义指纹。
@@ -55,9 +57,9 @@ Phase 0 提供可运行的桌面测试图编辑器：添加和拖动节点、类
 | 命令 | 结果 | 覆盖 |
 | --- | --- | --- |
 | `npm run typecheck` | PASS | TypeScript 类型检查 |
-| `npm test` | PASS | 图模型、注册表、连接、校验、命令、历史、项目与存储单元测试 |
+| `npm test` | PASS（37 项） | 图模型、注册表、连接、校验、命令、历史、项目与存储单元测试 |
 | `npm run build` | PASS | 生产构建 |
-| `npm run smoke` | PASS（11 项） | Chrome 1920×1080 与 1366×768、操作流程、类型与环拒绝、保存重开、草稿写入失败、版本错误与 Cancel 路由 |
+| `npm run smoke` | PASS（12 项） | Chrome 1920×1080 与 1366×768、操作流程、类型与环拒绝、保存重开、草稿读写失败、版本错误与 Cancel 路由 |
 | `npm run demo:capture` | PASS | 实际浏览器截图与录像；无页面或控制台错误 |
 | `git diff --check` | PASS | 补丁空白与冲突标记检查 |
 
