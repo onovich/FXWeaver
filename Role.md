@@ -23,10 +23,10 @@ idempotency:
   last_planner_dispatch_status: sent
   last_planner_dispatch_guide: docs/35-phase3-visual-goal-mode-execution-guide.md
   last_planner_dispatch_commit: 034b49d
-  last_executor_report_commit: 80dc092ba0b94f3a0400fbeb2aeb03ab3e72939c
+  last_executor_report_commit: af690cd0f692971641558459ebc00a1b2e65f774
   last_executor_report_status: sent
-  last_executor_report_at: 2026-10-01T03:31:44.0081459+08:00
-  last_executor_report_guide: docs/29-v0-local-selfuse-goal-mode-execution-guide.md
+  last_executor_report_at: 2026-10-01T04:22:35.1358977+08:00
+  last_executor_report_guide: docs/35-phase3-visual-goal-mode-execution-guide.md
   last_check_status: pass
   last_check_phase: V0 Phase 2 local project asset trial and usability
   last_check_report: docs/34-phase2-planner-acceptance.md
