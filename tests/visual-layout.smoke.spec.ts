@@ -25,3 +25,20 @@ for (const width of [1920, 1024]) test(`studio at ${width} keeps file actions an
   await page.keyboard.press('Escape'); await expect(page.getByRole('button', { name: 'Enlarge preview' })).toBeFocused();
   await expect(page.locator('.problem-context')).toHaveText('Filter graph · WebGL2');
 });
+
+test('homepage navigation and test graph target describe available actions accurately', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  for (const name of ['Create Filter graph', 'Open project file']) {
+    const box = (await page.getByRole('button', { name, exact: true }).boundingBox())!;
+    expect(box.y + box.height).toBeLessThanOrEqual(844);
+  }
+  await page.getByRole('link', { name: 'Effect graphs' }).click();
+  await expect(page).toHaveURL(/#examples$/); await expect(page.getByRole('heading', { name: 'An effect starts with a graph.' })).toBeInViewport();
+  await page.getByRole('link', { name: 'Your projects' }).click();
+  await expect(page).toHaveURL(/#project-files$/); await expect(page.getByRole('button', { name: 'Import JSON', exact: true })).toBeInViewport();
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.getByRole('button', { name: 'Create test graph' }).click();
+  await expect(page.locator('.problem-context')).toHaveText('Test graph · No build');
+  await expect(page.getByText('Renderer not configured')).toBeVisible();
+});
